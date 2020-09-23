@@ -86,6 +86,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Common\ArgsParser.h" />
     <ClInclude Include="..\..\Source\Common\File.h" />
     <ClInclude Include="..\..\Source\Common\Simulator.h" />
     <ClInclude Include="..\..\Source\Common\Types.h" />
@@ -94,6 +95,7 @@
     <ClInclude Include="..\..\Source\Geometry\SurfaceMesh.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Common\ArgsParser.cpp" />
     <ClCompile Include="..\..\Source\Common\Simulator.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>

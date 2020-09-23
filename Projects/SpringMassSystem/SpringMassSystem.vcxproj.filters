@@ -30,12 +30,18 @@
     <ClInclude Include="..\..\Source\Common\Simulator.h">
       <Filter>Source\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Common\ArgsParser.h">
+      <Filter>Source\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Common\Simulator.cpp">
+      <Filter>Source\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Common\ArgsParser.cpp">
       <Filter>Source\Common</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,7 @@
 #include "ArgsParser.h"
 
 #include <string>
+#include <cctype>
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
@@ -86,4 +87,33 @@ void ArgsParser::Parse(int argc, char *argv[])
 	}
 	for (const auto &arg : args)
 		if (arg->Is_Mandatory() && !arg->Is_Set()) Throw(std::string("Unassigned argument ") + arg->Get_Name());
+}
+
+void ArgsParser::Parse(char *cmd_line)
+{
+	const std::size_t len = std::strlen(cmd_line);
+	char *buffer = new char[len + 1];
+	std::strcpy(buffer, cmd_line);
+
+	int argc = 0;
+	for (std::size_t i = 0; i < len; i++) {
+		if (!std::isspace(buffer[i])) {
+			argc++;
+			while (i + 1 < len && !std::isspace(buffer[i + 1])) i++;
+		}
+		else buffer[i] = 0;
+	}
+	char **argv = new char *[argc];
+	argc = 0;
+	for (std::size_t i = 0; i < len; i++) {
+		if (buffer[i]) {
+			argv[argc++] = buffer + i;
+			while (i + 1 < len && buffer[i + 1]) i++;
+		}
+	}
+
+	Parse(argc, argv);
+
+	delete[] argv;
+	delete[] buffer;
 }

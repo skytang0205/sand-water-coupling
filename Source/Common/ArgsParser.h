@@ -106,6 +106,8 @@ public:
 	std::string Generate_Usage() const;
 
 	void Parse(int argc, char *argv[]);
+	void Parse(char *cmd_line);
+
 	std::any Get_Value_by_Name(const std::string &name) const { return Find_Arg_by_Name(name)->Get_Value(); }
 	std::any Get_Value_by_Flag(char flag) const { return Find_Arg_by_Flag(flag)->Get_Value(); }
 };
