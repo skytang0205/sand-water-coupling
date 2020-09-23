@@ -14,7 +14,7 @@ ArgDataBase *ArgsParser::Find_Arg_by_Name(const std::string &name) const
 	return nullptr;
 }
 
-ArgDataBase *ArgsParser::Find_Arg_by_Flag(char flag) const
+ArgDataBase *ArgsParser::Find_Arg_by_Flag(const char flag) const
 {
 	for (const auto &arg : args)
 		if (flag == arg->Get_Flag()) return arg.get();
@@ -54,7 +54,7 @@ std::string ArgsParser::Generate_Usage() const
 	return oss.str();
 }
 
-void ArgsParser::Parse(int argc, char *argv[])
+void ArgsParser::Parse(const int argc, char *const argv[])
 {
 	Add_Argument<bool>("help", '?', "print this message", false);
 	prog_name = argv[0];
@@ -68,11 +68,11 @@ void ArgsParser::Parse(int argc, char *argv[])
 			if (arg)
 			{
 				// Handle options without value, assuming default_value == false.
-				if (arg->Get_Type() == typeid(bool) && !arg->Is_Mandatory()) arg->Parse_Value(std::istringstream("1"));
+				if (arg->Get_Type() == typeid(bool) && !arg->Is_Mandatory()) arg->Parse_Value("1");
 				else
 				{
 					if (i + 1 == argc) Throw(std::string("Missing value for option ") + argv[i]);
-					else if (!arg->Parse_Value(std::istringstream(argv[i + 1])))
+					else if (!arg->Parse_Value(argv[i + 1]))
 						Throw(std::string("Invalid value ") + argv[i + 1] + " for option " + argv[i]);
 					i++;
 				}
@@ -89,11 +89,11 @@ void ArgsParser::Parse(int argc, char *argv[])
 		if (arg->Is_Mandatory() && !arg->Is_Set()) Throw(std::string("Unassigned argument ") + arg->Get_Name());
 }
 
-void ArgsParser::Parse(char *cmd_line)
+void ArgsParser::Parse(const char *cmd_line)
 {
 	const std::size_t len = std::strlen(cmd_line);
 	char *buffer = new char[len + 1];
-	std::strcpy(buffer, cmd_line);
+	std::memcpy(buffer, cmd_line, len + 1);
 
 	int argc = 0;
 	for (std::size_t i = 0; i < len; i++) {

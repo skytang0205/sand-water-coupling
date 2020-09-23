@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpringMassSystem", "Simulation\SpringMassSystem\SpringMassSystem.vcxproj", "{DDE51DFA-0E3E-4663-901B-5665CF1E7143}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulation", "Simulation", "{A2BFFA6A-DCEE-411F-AA0E-7098A38EAD06}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimulationTest", "Simulation\SimulationTest\SimulationTest.vcxproj", "{75C53CCF-1300-4CB0-9AC0-5222772DD408}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,9 +19,17 @@ Global
 		{DDE51DFA-0E3E-4663-901B-5665CF1E7143}.Debug|x64.Build.0 = Debug|x64
 		{DDE51DFA-0E3E-4663-901B-5665CF1E7143}.Release|x64.ActiveCfg = Release|x64
 		{DDE51DFA-0E3E-4663-901B-5665CF1E7143}.Release|x64.Build.0 = Release|x64
+		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Debug|x64.ActiveCfg = Debug|x64
+		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Debug|x64.Build.0 = Debug|x64
+		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Release|x64.ActiveCfg = Release|x64
+		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DDE51DFA-0E3E-4663-901B-5665CF1E7143} = {A2BFFA6A-DCEE-411F-AA0E-7098A38EAD06}
+		{75C53CCF-1300-4CB0-9AC0-5222772DD408} = {A2BFFA6A-DCEE-411F-AA0E-7098A38EAD06}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FF25F6D-05AD-416D-82C1-A2E523A66E8D}

@@ -52,5 +52,5 @@ protected:
 	void Advance_Time_by_Steps(const real target_time);
 
 	virtual real Get_Timestep() const { return real(1) / frames_per_second / steps_per_frame; }
-	real Get_Time_at_Frame(const int frame) const { real(1) / frames_per_second * frame; }
+	real Get_Time_at_Frame(const int frame) const { return real(1) / frames_per_second * frame; }
 };

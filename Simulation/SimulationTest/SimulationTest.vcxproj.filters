@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{1ab8d77a-0699-4cf9-b0c6-2720ab079bf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common">
+      <UniqueIdentifier>{fdbc2bf7-bfa3-4c84-aba4-0222ea95375e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\Source\Common\ArgsParser.cpp">
+      <Filter>Source\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Common\Simulator.cpp">
+      <Filter>Source\Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Common\ArgsParser.h">
+      <Filter>Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Common\File.h">
+      <Filter>Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Common\Simulation.h">
+      <Filter>Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Common\Simulator.h">
+      <Filter>Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Common\Types.h">
+      <Filter>Source\Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
