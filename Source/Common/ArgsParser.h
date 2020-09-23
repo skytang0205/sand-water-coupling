@@ -81,10 +81,6 @@ protected:
 	std::vector<std::unique_ptr<ArgDataBase>> args;
 	std::vector<std::string> extra_args;
 
-	ArgDataBase *Find_Arg_by_Name(const std::string &name) const;
-	ArgDataBase *Find_Arg_by_Flag(const char flag) const;
-	void Throw(const std::string &msg);
-
 public:
 
 	ArgsParser() = default;
@@ -108,4 +104,10 @@ public:
 
 	std::any Get_Value_by_Name(const std::string &name) const { return Find_Arg_by_Name(name)->Get_Value(); }
 	std::any Get_Value_by_Flag(char flag) const { return Find_Arg_by_Flag(flag)->Get_Value(); }
+
+protected:
+
+	ArgDataBase *Find_Arg_by_Name(const std::string &name) const;
+	ArgDataBase *Find_Arg_by_Flag(const char flag) const;
+	void Throw(const std::string &msg);
 };

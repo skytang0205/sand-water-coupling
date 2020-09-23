@@ -7,26 +7,6 @@
 #include <iostream>
 #include <algorithm>
 
-ArgDataBase *ArgsParser::Find_Arg_by_Name(const std::string &name) const
-{
-	for (const auto &arg : args)
-		if (name == arg->Get_Name()) return arg.get();
-	return nullptr;
-}
-
-ArgDataBase *ArgsParser::Find_Arg_by_Flag(const char flag) const
-{
-	for (const auto &arg : args)
-		if (flag == arg->Get_Flag()) return arg.get();
-	return nullptr;
-}
-
-void ArgsParser::Throw(const std::string &msg)
-{
-	std::cerr << "Error: [ArgsParser] " << msg << "." << std::endl << Generate_Usage();
-	std::exit(1);
-}
-
 std::string ArgsParser::Generate_Usage() const
 {
 	std::ostringstream oss;
@@ -116,4 +96,24 @@ void ArgsParser::Parse(const char *cmd_line)
 
 	delete[] argv;
 	delete[] buffer;
+}
+
+ArgDataBase *ArgsParser::Find_Arg_by_Name(const std::string &name) const
+{
+	for (const auto &arg : args)
+		if (name == arg->Get_Name()) return arg.get();
+	return nullptr;
+}
+
+ArgDataBase *ArgsParser::Find_Arg_by_Flag(const char flag) const
+{
+	for (const auto &arg : args)
+		if (flag == arg->Get_Flag()) return arg.get();
+	return nullptr;
+}
+
+void ArgsParser::Throw(const std::string &msg)
+{
+	std::cerr << "Error: [ArgsParser] " << msg << "." << std::endl << Generate_Usage();
+	std::exit(1);
 }
