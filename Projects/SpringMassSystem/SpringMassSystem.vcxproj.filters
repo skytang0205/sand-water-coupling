@@ -35,5 +35,8 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Common\Simulator.cpp">
+      <Filter>Source\Common</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,17 +9,6 @@
 #include <cstdlib>
 #include <iomanip>
 
-void Simulator::Reset(Simulation *_simulation, SimulatorDesc *const _simulator_desc)
-{
-	simulation = _simulation;
-	output_dir = std::move(_simulator_desc->output_dir);
-	first_frame = _simulator_desc->first_frame;
-	last_frame = _simulator_desc->last_frame;
-	frames_per_second = _simulator_desc->frames_per_second;
-	steps_per_frame = _simulator_desc->steps_per_frame;
-	delete _simulator_desc;
-}
-
 void Simulator::Simulate()
 {
 	const double initial_time = omp_get_wtime();
@@ -30,7 +19,7 @@ void Simulator::Simulate()
 
 		std::string file_name = output_dir + "/scene_desc.txt";
 		std::ofstream output(file_name);
-		simulation->Write_Scene_Description(output);
+		simulation->Write_Scene_Desc(output);
 
 		first_frame = 0;
 	}
@@ -47,7 +36,7 @@ void Simulator::Simulate()
 	{
 		std::cout << "** Simulate Frame " << std::to_string(frame + 1) << "..." << std::endl;
 		// Simulate.
-		simulation->Reset_Time(Time_at_Frame(frame));
+		simulation->Set_Time(Get_Time_at_Frame(frame));
 		Advance_Time_by_Steps(1.0 / frames_per_second);
 		// Write files for frame.
 		Create_and_Write_Frame_Directory(frame + 1);
@@ -95,14 +84,14 @@ void Simulator::Check_and_Load_Frame_Directory(const int frame)
 	simulation->Load_Frame(frame_dir);
 }
 
-void Simulator::Advance_Time_by_Steps(const double target_time)
+void Simulator::Advance_Time_by_Steps(const real target_time)
 {
-	double time = 0.0;
+	real time = 0.0;
 	bool done = (time >= target_time);
 	while (!done) {
 		double begin_time = omp_get_wtime();
 
-		double dt = Timestep();
+		real dt = Get_Timestep();
 		if (time + dt >= target_time) {
 			dt = target_time - time;
 			done = true;
@@ -111,7 +100,7 @@ void Simulator::Advance_Time_by_Steps(const double target_time)
 			dt = (target_time - time) * 0.5;
 		}
 
-		std::cout << "[" << std::setw(6) << static_cast<int>(target_time / dt + 0.5) << " SPF] ";
+		std::cout << "[" << std::setw(6) << int(target_time / dt + 0.5) << " SPF] ";
 		simulation->Advance(dt);
 		time += dt;
 		double end_time = omp_get_wtime();

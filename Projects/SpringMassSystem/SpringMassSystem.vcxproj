@@ -94,6 +94,7 @@
     <ClInclude Include="..\..\Source\Geometry\SurfaceMesh.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Common\Simulator.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
