@@ -5,6 +5,8 @@
 
 #include <vector>
 
+template <int Dim> class SpringMassSystemBuilder;
+
 template <int Dim>
 class SpringMassSystem : public Simulation
 {
@@ -14,7 +16,7 @@ private:
 
 public:
 
-	enum struct Mode : uchar // name?
+	enum struct IntegratorType : uchar
 	{
 		Euler,
 		RK1 = Euler,
@@ -40,10 +42,10 @@ public:
 
 protected:
 
-	Mode mode = Mode::Backward_Euler;
+	IntegratorType integrator_type = IntegratorType::Backward_Euler;
 
-	uint num_particles;
-	uint num_dof;
+	uint num_particles = 0;
+	uint num_dof = 0;
 	VectorXr mass;
 	VectorXr inv_mass;
 	VectorXr inv_sqrt_mass;
@@ -51,24 +53,25 @@ protected:
 	std::vector<VectorDr> velocities;
 	std::vector<Spring> springs;
 
-	SurfaceMesh<Dim> surface_mesh; // std::unique_ptr?
-
 	bool enable_gravity = false;
 
 	SparseMatrixr A;
 
 public:
 
-	SpringMassSystem(const uint _num_particles) :
-		num_particles(_num_particles),
-		num_dof(Dim * num_particles),
-		mass(num_dof),
-		inv_mass(num_dof),
-		inv_sqrt_mass(num_dof),
-		positions(num_particles),
-		velocities(num_particles),
-		springs(0),
-		surface_mesh(),
-		A(num_dof, num_dof)
-	{ }
+	SpringMassSystem() = default;
+	SpringMassSystem(const SpringMassSystem &rhs) = delete;
+	SpringMassSystem &operator=(const SpringMassSystem &rhs) = delete;
+	virtual ~SpringMassSystem() = default;
+
+	void Set_Particles(const std::vector<real> &_mass, const std::vector<VectorDr> &_positions, const std::vector<VectorDr> &_velocities = {});
+	void Set_Springs(const std::vector<Spring> &_springs);
+	void Set_Fixed_Particles(const std::vector<uint> &_fixed_particles);
+
+	virtual void Write_Scene_Desc(std::ofstream &output) const override;
+	virtual void Write_Frame(const std::string &frame_dir) const override;
+	virtual void Save_Frame(const std::string &frame_dir) const override;
+	virtual void Load_Frame(const std::string &frame_dir) override;
+
+	virtual void Advance(const real dt) override;
 };

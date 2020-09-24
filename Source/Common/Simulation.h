@@ -9,17 +9,16 @@ class Simulation
 {
 protected:
 
-	real time; // the current time
+	real time = 0.0; // the current time
 
 public:
 
-	Simulation(const real _time = 0) : time(_time) { }
-
+	Simulation() = default;
 	Simulation(const Simulation &rhs) = delete;
 	Simulation &operator=(const Simulation &rhs) = delete;
 	virtual ~Simulation() = default;
 
-	void Set_Time(const real new_time = 0) { time = new_time; }
+	void Set_Time(const real _time = 0) { time = _time; }
 	real Get_Time() const { return time; }
 
 	virtual void Write_Scene_Desc(std::ofstream &output) const = 0;
@@ -27,5 +26,5 @@ public:
 	virtual void Save_Frame(const std::string &frame_dir) const = 0;
 	virtual void Load_Frame(const std::string &frame_dir) = 0;
 
-	virtual void Advance(const double dt) = 0;
+	virtual void Advance(const real dt) = 0;
 };

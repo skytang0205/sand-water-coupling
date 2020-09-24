@@ -66,9 +66,9 @@ public:
 
 	~ArgData() = default;
 
-	virtual std::string Get_Short_Desc() const { return "--" + name + (mandatory ? "" : "=" + std::to_string(default_value)); }
-	virtual bool Parse_Value(const std::string &str) { return set = true, static_cast<bool>(std::istringstream(str) >> set_value); }
-	virtual std::any Get_Value() const { return set ? set_value : (mandatory ? std::any() : default_value); }
+	virtual std::string Get_Short_Desc() const override { return "--" + name + (mandatory ? "" : "=" + std::to_string(default_value)); }
+	virtual bool Parse_Value(const std::string &str) override { return set = true, static_cast<bool>(std::istringstream(str) >> set_value); }
+	virtual std::any Get_Value() const override { return set ? set_value : (mandatory ? std::any() : default_value); }
 };
 
 template <> std::string ArgData<std::string>::Get_Short_Desc() const { return "--" + name + (mandatory ? "" : "=" + default_value); }

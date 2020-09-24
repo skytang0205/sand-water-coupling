@@ -50,5 +50,8 @@
     <ClCompile Include="..\..\Source\Common\ArgsParser.cpp">
       <Filter>Source\Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Physics\SpringMassSystem.cpp">
+      <Filter>Source\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
