@@ -10,6 +10,9 @@
     <Filter Include="Source\Geometry">
       <UniqueIdentifier>{06342b8c-2df4-4d7d-b48e-1870f5ff096b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Physics">
+      <UniqueIdentifier>{39ea12fc-2f83-4f9d-b718-a87048dfce11}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Common\Simulation.h">
@@ -32,6 +35,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Common\ArgsParser.h">
       <Filter>Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Physics\SpringMassSystem.h">
+      <Filter>Source\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

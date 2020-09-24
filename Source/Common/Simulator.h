@@ -5,36 +5,34 @@
 
 #include <string>
 
-struct SimulatorDesc
-{
-	std::string output_dir;
-	int first_frame;
-	int last_frame;
-	real frames_per_second;
-	int steps_per_frame;
-};
-
 class Simulator
 {
 protected:
 
+	Simulation *simulation;
+
 	std::string output_dir;
 	int first_frame;
 	int last_frame;
 	real frames_per_second;
 	int steps_per_frame;
 
-	Simulation *simulation;
-
 public:
 
-	Simulator(Simulation *const _simulation, const SimulatorDesc *const _simulator_desc) :
+	Simulator(
+		Simulation *const _simulation,
+		const std::string &_output_dir,
+		const int _first_frame,
+		const int _last_frame,
+		const real _frames_per_second,
+		const int _steps_per_frame
+	) :
 		simulation(_simulation),
-		output_dir(_simulator_desc->output_dir),
-		first_frame(_simulator_desc->first_frame),
-		last_frame(_simulator_desc->last_frame),
-		frames_per_second(_simulator_desc->frames_per_second),
-		steps_per_frame(_simulator_desc->steps_per_frame)
+		output_dir(_output_dir),
+		first_frame(_first_frame),
+		last_frame(_last_frame),
+		frames_per_second(_frames_per_second),
+		steps_per_frame(_steps_per_frame)
 	{ }
 
 	Simulator(const Simulator &rhs) = delete;

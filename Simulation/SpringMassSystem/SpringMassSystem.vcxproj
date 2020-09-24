@@ -93,6 +93,7 @@
     <ClInclude Include="..\..\Source\Common\Simulation.h" />
     <ClInclude Include="..\..\Source\Geometry\Surface.h" />
     <ClInclude Include="..\..\Source\Geometry\SurfaceMesh.h" />
+    <ClInclude Include="..\..\Source\Physics\SpringMassSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Common\ArgsParser.cpp" />

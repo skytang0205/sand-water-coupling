@@ -22,8 +22,7 @@ std::string ArgsParser::Generate_Usage() const
 	// Usage body.
 	size_t maxWidth = 0;
 	for (const auto &arg : args) maxWidth = std::max(maxWidth, arg->Get_Name().length());
-	for (const auto &arg : args)
-	{
+	for (const auto &arg : args) {
 		if (arg->Get_Flag()) oss << "  -" << arg->Get_Flag() << ", ";
 		else oss << "      ";
 		oss << "--" << arg->Get_Name();
@@ -38,19 +37,15 @@ void ArgsParser::Parse(const int argc, char *const argv[])
 {
 	Add_Argument<bool>("help", '?', "print this message", false);
 	prog_name = argv[0];
-	for (int i = 1; i < argc; i++)
-	{
-		if (argv[i][0] == '-')
-		{
+	for (int i = 1; i < argc; i++) {
+		if (argv[i][0] == '-') {
 			ArgDataBase *arg = nullptr;
 			if (argv[i][1] == '-') arg = Find_Arg_by_Name(argv[i] + 2);
 			else arg = Find_Arg_by_Flag(argv[i][1]);
-			if (arg)
-			{
+			if (arg) {
 				// Handle options without value, assuming default_value == false.
 				if (arg->Get_Type() == typeid(bool) && !arg->Is_Mandatory()) arg->Parse_Value("1");
-				else
-				{
+				else {
 					if (i + 1 == argc) Throw(std::string("Missing value for option ") + argv[i]);
 					else if (!arg->Parse_Value(argv[i + 1]))
 						Throw(std::string("Invalid value ") + argv[i + 1] + " for option " + argv[i]);
