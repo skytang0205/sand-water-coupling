@@ -47,6 +47,7 @@ template <class Scalar, int Dim> using Matrix = Eigen::Matrix<Scalar, Dim, Dim>;
 
 #define DECLARE_DIM_TYPES(Dim)									\
 using	VectorDr			=	Vector<real, Dim>;				\
+using	VectorDf			=	Vector<float, Dim>;				\
 using	VectorDi			=	Vector<int, Dim>;				\
 using	MatrixDr			=	Matrix<real, Dim>;
 
