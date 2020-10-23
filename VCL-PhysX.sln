@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpringMassSystem", "Simulation\SpringMassSystem\SpringMassSystem.vcxproj", "{DDE51DFA-0E3E-4663-901B-5665CF1E7143}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C666174E-BF5A-4D34-B9C6-549DC327A7F5}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulation", "Simulation", "{A2BFFA6A-DCEE-411F-AA0E-7098A38EAD06}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulations", "Simulations", "{88B55AF8-FAE7-470B-861B-9EFF40C75CF4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimulationTest", "Simulation\SimulationTest\SimulationTest.vcxproj", "{75C53CCF-1300-4CB0-9AC0-5222772DD408}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Simulations\Test\Test.vcxproj", "{F7390AB9-DDA2-4300-BCD4-47BA6583D026}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,21 +20,16 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DDE51DFA-0E3E-4663-901B-5665CF1E7143}.Debug|x64.ActiveCfg = Debug|x64
-		{DDE51DFA-0E3E-4663-901B-5665CF1E7143}.Debug|x64.Build.0 = Debug|x64
-		{DDE51DFA-0E3E-4663-901B-5665CF1E7143}.Release|x64.ActiveCfg = Release|x64
-		{DDE51DFA-0E3E-4663-901B-5665CF1E7143}.Release|x64.Build.0 = Release|x64
-		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Debug|x64.ActiveCfg = Debug|x64
-		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Debug|x64.Build.0 = Debug|x64
-		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Release|x64.ActiveCfg = Release|x64
-		{75C53CCF-1300-4CB0-9AC0-5222772DD408}.Release|x64.Build.0 = Release|x64
+		{F7390AB9-DDA2-4300-BCD4-47BA6583D026}.Debug|x64.ActiveCfg = Debug|x64
+		{F7390AB9-DDA2-4300-BCD4-47BA6583D026}.Debug|x64.Build.0 = Debug|x64
+		{F7390AB9-DDA2-4300-BCD4-47BA6583D026}.Release|x64.ActiveCfg = Release|x64
+		{F7390AB9-DDA2-4300-BCD4-47BA6583D026}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{DDE51DFA-0E3E-4663-901B-5665CF1E7143} = {A2BFFA6A-DCEE-411F-AA0E-7098A38EAD06}
-		{75C53CCF-1300-4CB0-9AC0-5222772DD408} = {A2BFFA6A-DCEE-411F-AA0E-7098A38EAD06}
+		{F7390AB9-DDA2-4300-BCD4-47BA6583D026} = {88B55AF8-FAE7-470B-861B-9EFF40C75CF4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FF25F6D-05AD-416D-82C1-A2E523A66E8D}

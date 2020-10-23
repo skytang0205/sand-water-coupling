@@ -5,6 +5,8 @@
 
 #include <cstddef>
 
+namespace PhysX {
+
 #define DECLARE_EIGEN_VECTOR_TYPES(type, t)						\
 using	Vector2##t			=	Eigen::Vector2##t;				\
 using	Vector3##t			=	Eigen::Vector3##t;				\
@@ -56,3 +58,7 @@ using	ushort				=	unsigned short;
 using	uint				=	unsigned int;
 using	llong				=	long long;
 using	ullong				=	unsigned long long;
+
+using	std::size_t;
+
+} // namespaxe PhysX
