@@ -1,45 +1,53 @@
 #pragma once
 
-#include <string>
-#include <cstring>
-#include <sstream>
-#include <vector>
-#include <memory>
+#include <fmt/core.h>
+
 #include <any>
+#include <memory>
+#include <sstream>
+#include <string>
 #include <typeinfo>
+#include <vector>
+
+#include <cstring>
+
+namespace PhysX {
 
 class ArgDataBase
 {
 protected:
 
-	const std::type_info &type;
-	std::string name;
-	char flag;
-	std::string desc;
-	bool mandatory;
-	bool set = false;
+	const std::type_info &_type;
+	std::string _name;
+	char _flag;
+	std::string _desc;
+	bool _mandatory;
+	bool _set = false;
 
 public:
 
-	ArgDataBase(const std::type_info &_type, const std::string &_name, const char _flag, const std::string _desc, const bool _mandatory) :
-		type(_type),
-		name(_name),
-		flag(_flag),
-		desc(_desc.empty() ? "<no description available>" : _desc),
-		mandatory(_mandatory)
+	ArgDataBase(const std::type_info &type, const std::string &name, const char flag, const std::string &desc, const bool mandatory) :
+		_type(type),
+		_name(name),
+		_flag(flag),
+		_desc(desc.empty() ? "<no description available>" : desc),
+		_mandatory(mandatory)
 	{ }
 
-	~ArgDataBase() = default;
+	ArgDataBase() = delete;
+	ArgDataBase(const ArgDataBase &rhs) = default;
+	ArgDataBase &operator=(const ArgDataBase &rhs) = default;
+	virtual ~ArgDataBase() = default;
 
-	const std::type_info &Get_Type() const { return type; }
-	const std::string &Get_Name() const { return name; }
-	char Get_Flag() const { return flag; }
-	const std::string &Get_Desc() const { return desc; }
-	bool Is_Mandatory() const { return mandatory; }
-	bool Is_Set() const { return set; }
-	virtual std::string Get_Short_Desc() const = 0;
-	virtual bool Parse_Value(const std::string &str) = 0;
-	virtual std::any Get_Value() const = 0;
+	const std::type_info &getType() const { return _type; }
+	const std::string &getName() const { return _name; }
+	char getFlag() const { return _flag; }
+	const std::string &getDesc() const { return _desc; }
+	bool isMandatory() const { return _mandatory; }
+	bool isSet() const { return _set; }
+	virtual std::string getShortDesc() const = 0;
+	virtual bool parseValue(const std::string &str) = 0;
+	virtual std::any getValue() const = 0;
 };
 
 template <typename ArgType>
@@ -47,67 +55,70 @@ class ArgData : public ArgDataBase
 {
 protected:
 
-	ArgType set_value;
-	ArgType default_value;
+	ArgType _setValue;
+	ArgType _defaultValue;
 
 public:
 
-	ArgData(const std::string &_name, const char _flag, const std::string _desc) :
-		ArgDataBase(typeid(ArgType), _name, _flag, _desc, true),
-		set_value(ArgType()),
-		default_value(ArgType())
+	ArgData(const std::string &name, const char flag, const std::string desc) :
+		ArgDataBase(typeid(ArgType), name, flag, desc, true),
+		_setValue(ArgType()),
+		_defaultValue(ArgType())
 	{ }
 
-	ArgData(const std::string &_name, const char _flag, const std::string _desc, const ArgType &_default_value) :
-		ArgDataBase(typeid(ArgType), _name, _flag, _desc, false),
-		set_value(ArgType()),
-		default_value(_default_value)
+	ArgData(const std::string &name, const char flag, const std::string desc, const ArgType &defaultValue) :
+		ArgDataBase(typeid(ArgType), name, flag, desc, false),
+		_setValue(ArgType()),
+		_defaultValue(defaultValue)
 	{ }
 
-	~ArgData() = default;
+	ArgData() = delete;
+	ArgData(const ArgData &rhs) = default;
+	ArgData &operator=(const ArgData &rhs) = default;
+	virtual ~ArgData() = default;
 
-	virtual std::string Get_Short_Desc() const override { return "--" + name + (mandatory ? "" : "=" + std::to_string(default_value)); }
-	virtual bool Parse_Value(const std::string &str) override { return set = true, static_cast<bool>(std::istringstream(str) >> set_value); }
-	virtual std::any Get_Value() const override { return set ? set_value : (mandatory ? std::any() : default_value); }
+	virtual std::string getShortDesc() const override { return _mandatory ? fmt::format("--{}", _name) : fmt::format("--{}={}", _name, _defaultValue); }
+	virtual bool parseValue(const std::string &str) override { return _set = true, static_cast<bool>(std::istringstream(str) >> _setValue); }
+	virtual std::any getValue() const override { return _set ? _setValue : (_mandatory ? std::any() : _defaultValue); }
 };
-
-template <> std::string ArgData<std::string>::Get_Short_Desc() const { return "--" + name + (mandatory ? "" : "=" + default_value); }
 
 class ArgsParser
 {
 protected:
-	
-	std::string prog_name;
+
+	std::string progName;
 	std::vector<std::unique_ptr<ArgDataBase>> args;
-	std::vector<std::string> extra_args;
+	std::vector<std::string> extraArgs;
 
 public:
 
 	ArgsParser() = default;
 	ArgsParser(const ArgsParser &rhs) = delete;
 	ArgsParser operator=(const ArgsParser &rhs) = delete;
-	~ArgsParser() = default;
+	virtual ~ArgsParser() = default;
 
 	template <typename ArgType>
-	void Add_Argument(const std::string &name, const char flag = 0, const std::string &desc = "", const std::any &default_value = std::any())
+	void addArgument(const std::string &name, const char flag = 0, const std::string &desc = "", const std::any &defaultValue = std::any())
 	{
-		if (default_value.has_value())
-			args.push_back(std::unique_ptr<ArgDataBase>(new ArgData<ArgType>(name, flag, desc, std::any_cast<ArgType>(default_value))));
+		if (defaultValue.has_value())
+			args.push_back(std::unique_ptr<ArgDataBase>(new ArgData<ArgType>(name, flag, desc, std::any_cast<ArgType>(defaultValue))));
 		else
 			args.push_back(std::unique_ptr<ArgDataBase>(new ArgData<ArgType>(name, flag, desc)));
 	}
 
-	std::string Generate_Usage() const;
+	std::string generateUsage() const;
 
-	void Parse(const int argc, char *const argv[]);
-	void Parse(const char *cmd_line);
+	void parse(const int argc, char *const argv[]);
+	void parse(const char *cmdLine);
 
-	std::any Get_Value_by_Name(const std::string &name) const { return Find_Arg_by_Name(name)->Get_Value(); }
-	std::any Get_Value_by_Flag(char flag) const { return Find_Arg_by_Flag(flag)->Get_Value(); }
+	std::any getValueByName(const std::string &name) const { return findArgByName(name)->getValue(); }
+	std::any getValueByFlag(char flag) const { return findArgByFlag(flag)->getValue(); }
 
 protected:
 
-	ArgDataBase *Find_Arg_by_Name(const std::string &name) const;
-	ArgDataBase *Find_Arg_by_Flag(const char flag) const;
-	void Throw(const std::string &msg);
+	ArgDataBase *findArgByName(const std::string &name) const;
+	ArgDataBase *findArgByFlag(const char flag) const;
+	void reportError(const std::string &msg);
 };
+
+} // namespace PhysX

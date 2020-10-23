@@ -1,74 +1,74 @@
 #include "ArgsParser.h"
 
-#include <string>
-#include <cctype>
-#include <cstdlib>
-#include <sstream>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
-std::string ArgsParser::Generate_Usage() const
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
+
+namespace PhysX {
+
+std::string ArgsParser::generateUsage() const
 {
-	std::ostringstream oss;
+	std::string usage;
 	// Usage header.
-	oss << "Usage: " << prog_name;
+	usage += fmt::format("Usage: {}", progName);
 	for (const auto &arg : args)
-		if (arg->Is_Mandatory())
-			oss << " " << arg->Get_Short_Desc();
+		if (arg->isMandatory())
+			usage += fmt::format(" {}", arg->getShortDesc());
 	for (const auto &arg : args)
-		if (!arg->Is_Mandatory())
-			oss << " [" << arg->Get_Short_Desc() << "]";
-	oss << std::endl << "Options:" << std::endl;
+		if (!arg->isMandatory())
+			usage += fmt::format(" [{}]", arg->getShortDesc());
+	usage += "\nOptions:\n";
 	// Usage body.
-	size_t maxWidth = 0;
-	for (const auto &arg : args) maxWidth = std::max(maxWidth, arg->Get_Name().length());
+	std::size_t maxWidth = 0;
+	for (const auto &arg : args) maxWidth = std::max(maxWidth, arg->getName().length());
 	for (const auto &arg : args) {
-		if (arg->Get_Flag()) oss << "  -" << arg->Get_Flag() << ", ";
-		else oss << "      ";
-		oss << "--" << arg->Get_Name();
-		oss << std::string(maxWidth + 4 - arg->Get_Name().length(), ' ');
-		oss << arg->Get_Desc() << std::endl;
+		if (arg->getFlag()) usage += fmt::format("  -{}, ", arg->getFlag());
+		else usage += fmt::format("{:^6}", "");
+		usage += fmt::format("--{:<{}}{}\n", arg->getName(), maxWidth + 4, arg->getDesc());
 	}
-	// Return usage as string.
-	return oss.str();
+	// Return usage.
+	return usage;
 }
 
-void ArgsParser::Parse(const int argc, char *const argv[])
+void ArgsParser::parse(const int argc, char *const argv[])
 {
-	Add_Argument<bool>("help", '?', "print this message", false);
-	prog_name = argv[0];
+	addArgument<bool>("help", '?', "print this message", false);
+	progName = argv[0];
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-') {
 			ArgDataBase *arg = nullptr;
-			if (argv[i][1] == '-') arg = Find_Arg_by_Name(argv[i] + 2);
-			else arg = Find_Arg_by_Flag(argv[i][1]);
+			if (argv[i][1] == '-') arg = findArgByName(argv[i] + 2);
+			else arg = findArgByFlag(argv[i][1]);
 			if (arg) {
 				// Handle options without value, assuming default_value == false.
-				if (arg->Get_Type() == typeid(bool) && !arg->Is_Mandatory()) arg->Parse_Value("1");
+				if (arg->getType() == typeid(bool) && !arg->isMandatory()) arg->parseValue("1");
 				else {
-					if (i + 1 == argc) Throw(std::string("Missing value for option ") + argv[i]);
-					else if (!arg->Parse_Value(argv[i + 1]))
-						Throw(std::string("Invalid value ") + argv[i + 1] + " for option " + argv[i]);
+					if (i + 1 == argc) reportError(fmt::format("Missing value for option {}", argv[i]));
+					else if (!arg->parseValue(argv[i + 1]))
+						reportError(fmt::format("Invalid value {} for option {}", argv[i + 1], argv[i]));
 					i++;
 				}
 			}
-			else Throw(std::string("Invalid option ") + argv[i]);
+			else reportError(fmt::format("Invalid option {}", argv[i]));
 		}
-		else extra_args.push_back(argv[i]);
+		else extraArgs.push_back(argv[i]);
 	}
-	if (std::any_cast<bool>(Get_Value_by_Name("help"))) {
-		std::cerr << Generate_Usage();
+	if (std::any_cast<bool>(getValueByName("help"))) {
+		std::cerr << generateUsage();
 		std::exit(0);
 	}
 	for (const auto &arg : args)
-		if (arg->Is_Mandatory() && !arg->Is_Set()) Throw(std::string("Unassigned argument ") + arg->Get_Name());
+		if (arg->isMandatory() && !arg->isSet()) reportError(fmt::format("Unassigned argument {}", arg->getName()));
 }
 
-void ArgsParser::Parse(const char *cmd_line)
+void ArgsParser::parse(const char *cmdLine)
 {
-	const std::size_t len = std::strlen(cmd_line);
+	const std::size_t len = std::strlen(cmdLine);
 	char *buffer = new char[len + 1];
-	std::memcpy(buffer, cmd_line, len + 1);
+	std::memcpy(buffer, cmdLine, len + 1);
 
 	int argc = 0;
 	for (std::size_t i = 0; i < len; i++) {
@@ -78,6 +78,7 @@ void ArgsParser::Parse(const char *cmd_line)
 		}
 		else buffer[i] = 0;
 	}
+
 	char **argv = new char *[argc];
 	argc = 0;
 	for (std::size_t i = 0; i < len; i++) {
@@ -87,28 +88,30 @@ void ArgsParser::Parse(const char *cmd_line)
 		}
 	}
 
-	Parse(argc, argv);
+	parse(argc, argv);
 
 	delete[] argv;
 	delete[] buffer;
 }
 
-ArgDataBase *ArgsParser::Find_Arg_by_Name(const std::string &name) const
+ArgDataBase *ArgsParser::findArgByName(const std::string &name) const
 {
 	for (const auto &arg : args)
-		if (name == arg->Get_Name()) return arg.get();
+		if (name == arg->getName()) return arg.get();
 	return nullptr;
 }
 
-ArgDataBase *ArgsParser::Find_Arg_by_Flag(const char flag) const
+ArgDataBase *ArgsParser::findArgByFlag(const char flag) const
 {
 	for (const auto &arg : args)
-		if (flag == arg->Get_Flag()) return arg.get();
+		if (flag == arg->getFlag()) return arg.get();
 	return nullptr;
 }
 
-void ArgsParser::Throw(const std::string &msg)
+void ArgsParser::reportError(const std::string &msg)
 {
-	std::cerr << "Error: [ArgsParser] " << msg << "." << std::endl << Generate_Usage();
+	std::cerr << fmt::format("Error: [ArgsParser] {}.\n{}", msg, generateUsage());
 	std::exit(1);
 }
+
+} // namespace PhysX
