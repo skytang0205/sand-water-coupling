@@ -1,27 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source">
-      <UniqueIdentifier>{c6d9ffa9-a28d-462f-8771-88e920e025db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Common">
-      <UniqueIdentifier>{adbe8b1b-dd62-4604-a100-ebb20ccbd40e}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\Source\Common\ArgsParser.cpp">
-      <Filter>Source\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Test.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Source\Common\ArgsParser.h">
-      <Filter>Source\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Common\Types.h">
-      <Filter>Source\Common</Filter>
-    </ClInclude>
+    <ClCompile Include="Test.cpp" />
   </ItemGroup>
 </Project>

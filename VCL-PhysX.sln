@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulations", "Simulations"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Simulations\Test\Test.vcxproj", "{F7390AB9-DDA2-4300-BCD4-47BA6583D026}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysXCore", "Simulations\PhysXCore\PhysXCore.vcxproj", "{6CDE1E68-EAD1-419C-9511-67085B9C6F4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -24,12 +26,17 @@ Global
 		{F7390AB9-DDA2-4300-BCD4-47BA6583D026}.Debug|x64.Build.0 = Debug|x64
 		{F7390AB9-DDA2-4300-BCD4-47BA6583D026}.Release|x64.ActiveCfg = Release|x64
 		{F7390AB9-DDA2-4300-BCD4-47BA6583D026}.Release|x64.Build.0 = Release|x64
+		{6CDE1E68-EAD1-419C-9511-67085B9C6F4C}.Debug|x64.ActiveCfg = Debug|x64
+		{6CDE1E68-EAD1-419C-9511-67085B9C6F4C}.Debug|x64.Build.0 = Debug|x64
+		{6CDE1E68-EAD1-419C-9511-67085B9C6F4C}.Release|x64.ActiveCfg = Release|x64
+		{6CDE1E68-EAD1-419C-9511-67085B9C6F4C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F7390AB9-DDA2-4300-BCD4-47BA6583D026} = {88B55AF8-FAE7-470B-861B-9EFF40C75CF4}
+		{6CDE1E68-EAD1-419C-9511-67085B9C6F4C} = {88B55AF8-FAE7-470B-861B-9EFF40C75CF4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FF25F6D-05AD-416D-82C1-A2E523A66E8D}

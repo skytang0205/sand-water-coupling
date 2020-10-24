@@ -35,6 +35,8 @@ std::string ArgsParser::generateUsage() const
 
 void ArgsParser::parse(const int argc, char *const argv[])
 {
+	if (argc == 0) reportError("Empty command line");
+
 	addArgument<bool>("help", '?', "print this message", false);
 	progName = argv[0];
 	for (int i = 1; i < argc; i++) {
@@ -78,6 +80,7 @@ void ArgsParser::parse(const char *cmdLine)
 		}
 		else buffer[i] = 0;
 	}
+	if (argc == 0) reportError("Empty command line");
 
 	char **argv = new char *[argc];
 	argc = 0;
