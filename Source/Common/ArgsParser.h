@@ -86,9 +86,9 @@ class ArgsParser
 {
 protected:
 
-	std::string progName;
-	std::vector<std::unique_ptr<ArgDataBase>> args;
-	std::vector<std::string> extraArgs;
+	std::string _progName;
+	std::vector<std::unique_ptr<ArgDataBase>> _args;
+	std::vector<std::string> _extraArgs;
 
 public:
 
@@ -98,13 +98,10 @@ public:
 	virtual ~ArgsParser() = default;
 
 	template <typename ArgType>
-	void addArgument(const std::string &name, const char flag = 0, const std::string &desc = "", const std::any &defaultValue = std::any())
-	{
-		if (defaultValue.has_value())
-			args.push_back(std::unique_ptr<ArgDataBase>(new ArgData<ArgType>(name, flag, desc, std::any_cast<ArgType>(defaultValue))));
-		else
-			args.push_back(std::unique_ptr<ArgDataBase>(new ArgData<ArgType>(name, flag, desc)));
-	}
+	void addArgument(const std::string &name, const char flag = 0, const std::string &desc = "") { _args.push_back(std::make_unique<ArgData<ArgType>>(name, flag, desc)); }
+
+	template <typename ArgType>
+	void addArgument(const std::string &name, const char flag, const std::string &desc, const ArgType &defaultValue) { _args.push_back(std::make_unique<ArgData<ArgType>>(name, flag, desc, defaultValue)); }
 
 	std::string generateUsage() const;
 
