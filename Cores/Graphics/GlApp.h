@@ -22,7 +22,7 @@ public:
 	GlApp &operator=(const GlApp &rhs) = delete;
 	virtual ~GlApp() { glfwTerminate(); }
 
-	void Run();
+	void run();
 
 	void processInput();
 

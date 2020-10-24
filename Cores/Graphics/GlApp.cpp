@@ -28,7 +28,7 @@ GlApp::GlApp(const std::string &caption)
 	}
 }
 
-void GlApp::Run()
+void GlApp::run()
 {
 	while (!glfwWindowShouldClose(_window)) {
 		processInput();

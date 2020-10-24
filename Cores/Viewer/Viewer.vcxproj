@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{914d02a7-e011-4cbd-8918-c13e881c2469}</ProjectGuid>
+    <ProjectGuid>{40778d21-f29d-4c9c-91ef-cb227c464f44}</ProjectGuid>
     <RootNamespace>Viewer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -60,7 +60,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Graphics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Cores\Graphics</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -76,7 +76,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Graphics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Cores\Graphics</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,8 +89,8 @@
     <ClCompile Include="Viewer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphicsEngine\GraphicsEngine.vcxproj">
-      <Project>{ee347500-0f7c-49d6-92dd-9217b1ef38eb}</Project>
+    <ProjectReference Include="..\Graphics\Graphics.vcxproj">
+      <Project>{012edad3-7194-4172-8879-b26afed8410a}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,4 +1,4 @@
-#include "GlShader.h"
+#include "GlProgram.h"
 
 #include <fmt/core.h>
 
@@ -10,7 +10,7 @@
 
 namespace PhysX {
 
-GlShader::GlShader(const std::string &vsFileName, const std::string &fsFileName)
+GlProgram::GlProgram(const std::string &vsFileName, const std::string &fsFileName)
 {
 	std::string vsCode;
 	std::string fsCode;
@@ -48,24 +48,24 @@ GlShader::GlShader(const std::string &vsFileName, const std::string &fsFileName)
 		glCompileShader(fragmentShader);
 		checkCompileErrors(fragmentShader, "fragment");
 		// Link shaders to program.
-		id = glCreateProgram();
-		glAttachShader(id, vertexShader);
-		glAttachShader(id, fragmentShader);
-		glLinkProgram(id);
-		checkCompileErrors(id, "program");
+		_program = glCreateProgram();
+		glAttachShader(_program, vertexShader);
+		glAttachShader(_program, fragmentShader);
+		glLinkProgram(_program);
+		checkCompileErrors(_program, "program");
 		// Delete the shaders.
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
 	}
 }
 
-void GlShader::checkCompileErrors(GLuint object, const std::string &type) const
+void GlProgram::checkCompileErrors(GLuint object, const std::string &type) const
 {
 	static const GLsizei kLogSize = 1024;
 	GLchar *infoLog;
 
 	GLint success;
-	if (type != "PROGRAM") {
+	if (type != "program") {
 		glGetShaderiv(object, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			infoLog = new GLchar[kLogSize];
