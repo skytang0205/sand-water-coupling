@@ -13,12 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{5fac9abf-daa5-43de-b2c2-e65ea2096f21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GlApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GlProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlRenderItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,5 +35,13 @@
     <ClInclude Include="GlProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GlRenderItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GlAppShaders.inc">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

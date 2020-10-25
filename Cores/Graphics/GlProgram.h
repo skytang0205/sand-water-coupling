@@ -16,7 +16,7 @@ protected:
 
 public:
 
-	GlProgram(const std::string &vsFileName, const std::string &fsFileName);
+	GlProgram(const GLchar *vsCode, const GLchar *fsCode);
 
 	GlProgram() = delete;
 	GlProgram(const GlProgram &rhs) = delete;
@@ -25,15 +25,15 @@ public:
 
 	void use() const { glUseProgram(_program); }
 
-	void setUniform(const std::string &name, const GLfloat value) const { glUniform1f(glGetUniformLocation(_program, name.c_str()), value); }
-	void setUniform(const std::string &name, const Vector2f value) const { glUniform2f(glGetUniformLocation(_program, name.c_str()), value[0], value[1]); }
-	void setUniform(const std::string &name, const Vector3f value) const { glUniform3f(glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2]); }
-	void setUniform(const std::string &name, const Vector4f value) const { glUniform4f(glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2], value[3]); }
+	void setUniform(const std::string &name, const GLfloat value) const { glProgramUniform1f(_program, glGetUniformLocation(_program, name.c_str()), value); }
+	void setUniform(const std::string &name, const Vector2f value) const { glProgramUniform2f(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1]); }
+	void setUniform(const std::string &name, const Vector3f value) const { glProgramUniform3f(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2]); }
+	void setUniform(const std::string &name, const Vector4f value) const { glProgramUniform4f(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2], value[3]); }
 
-	void setUniform(const std::string &name, const GLint value) const { glUniform1i(glGetUniformLocation(_program, name.c_str()), value); }
-	void setUniform(const std::string &name, const Vector2i value) const { glUniform2i(glGetUniformLocation(_program, name.c_str()), value[0], value[1]); }
-	void setUniform(const std::string &name, const Vector3i value) const { glUniform3i(glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2]); }
-	void setUniform(const std::string &name, const Vector4i value) const { glUniform4i(glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2], value[3]); }
+	void setUniform(const std::string &name, const GLint value) const { glProgramUniform1i(_program, glGetUniformLocation(_program, name.c_str()), value); }
+	void setUniform(const std::string &name, const Vector2i value) const { glProgramUniform2i(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1]); }
+	void setUniform(const std::string &name, const Vector3i value) const { glProgramUniform3i(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2]); }
+	void setUniform(const std::string &name, const Vector4i value) const { glProgramUniform4i(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2], value[3]); }
 
 protected:
 

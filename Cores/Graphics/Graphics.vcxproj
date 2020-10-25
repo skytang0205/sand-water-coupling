@@ -88,10 +88,15 @@
   <ItemGroup>
     <ClCompile Include="GlApp.cpp" />
     <ClCompile Include="GlProgram.cpp" />
+    <ClCompile Include="GlRenderItem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GlApp.h" />
     <ClInclude Include="GlProgram.h" />
+    <ClInclude Include="GlRenderItem.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GlAppShaders.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

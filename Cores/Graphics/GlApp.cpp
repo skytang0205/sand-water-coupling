@@ -1,4 +1,4 @@
-#include "GLApp.h"
+#include "GlApp.h"
 
 #include <iostream>
 
@@ -6,15 +6,15 @@
 
 namespace PhysX {
 
-GlApp::GlApp(const std::string &caption)
+GlApp::GlApp(const int width, const int height, const std::string &title) : _title(title)
 {
 	// Initialize GLFW.
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	// Initialize window.
-	_window = glfwCreateWindow(1024, 768, caption.c_str(), NULL, NULL);
+	_window = glfwCreateWindow(width, height, _title.c_str(), NULL, NULL);
 	if (_window == nullptr) {
 		std::cerr << "Error: [GLApp] Failed to create GLFW window." << std::endl;
 		std::exit(-1);
@@ -30,12 +30,13 @@ GlApp::GlApp(const std::string &caption)
 
 void GlApp::run()
 {
+	buildRenderItems();
 	while (!glfwWindowShouldClose(_window)) {
 		processInput();
 
-		// Render.
-		glClearColor(176 / 255.0, 196 / 255.0, 222 / 255.0, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		update();
+		clearBuffers();
+		drawRenderItems();
 
 		// Swap buffers and poll IO events.
 		glfwSwapBuffers(_window);
@@ -43,13 +44,28 @@ void GlApp::run()
 	}
 }
 
+void GlApp::clearBuffers() const
+{
+	glClearColor(_bgColor[0], _bgColor[1], _bgColor[2], 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void GlApp::drawRenderItems() const
+{ }
+
+void GlApp::buildRenderItems()
+{ }
+
 void GlApp::processInput()
 {
 	if (glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(_window, true);
 }
 
-void GlApp::onResize(GLFWwindow *window, int width, int height)
+void GlApp::update()
+{ }
+
+void GlApp::onResize(GLFWwindow *window, int width, int height) 
 {
 	glViewport(0, 0, width, height);
 }
