@@ -43,6 +43,7 @@ void GlProgram::checkCompileErrors(GLuint object, const std::string &type) const
 			infoLog = new GLchar[kLogSize];
 			glGetShaderInfoLog(object, kLogSize, nullptr, infoLog);
 			std::cerr << fmt::format("Error: [GlShader] failed to compile {} shader.\n{}", type, infoLog) << std::endl;
+			std::exit(-1);
 		}
 	}
 	else {
@@ -51,9 +52,9 @@ void GlProgram::checkCompileErrors(GLuint object, const std::string &type) const
 			infoLog = new GLchar[kLogSize];
 			glGetProgramInfoLog(object, kLogSize, nullptr, infoLog);
 			std::cerr << fmt::format("Error: [GlShader] failed to link {}.\n{}", type, infoLog) << std::endl;
+			std::exit(-1);
 		}
 	}
-	std::exit(-1);
 }
 
 }

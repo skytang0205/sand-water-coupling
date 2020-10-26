@@ -19,6 +19,15 @@ public:
 
 	enum class RenderLayer : uint { Opaque, Text, Count };
 
+private:
+
+	const GLchar *_identityVsCode =
+#include "GlIdentityShader.vert"
+		;
+	const GLchar *_identityFsCode =
+#include "GlIdentityShader.frag"
+		;
+
 protected:
 
 	GLFWwindow *_window;
@@ -29,7 +38,7 @@ protected:
 	std::unordered_map<std::string, std::unique_ptr<GlProgram>> _programs;
 
 	std::vector<std::unique_ptr<GlRenderItem>> _ritems;
-	std::vector<GlRenderItem *> _ritemLayer[size_t(RenderLayer::Count)];
+	std::vector<GlRenderItem *> _ritemLayers[size_t(RenderLayer::Count)];
 
 public:
 

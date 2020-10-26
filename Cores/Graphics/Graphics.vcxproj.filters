@@ -40,7 +40,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GlAppShaders.inc">
+    <None Include="GlIdentityShader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="GlIdentityShader.frag">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

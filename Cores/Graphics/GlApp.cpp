@@ -11,7 +11,7 @@ GlApp::GlApp(const int width, const int height, const std::string &title) : _tit
 	// Initialize GLFW.
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	// Initialize window.
 	_window = glfwCreateWindow(width, height, _title.c_str(), NULL, NULL);
@@ -26,6 +26,11 @@ GlApp::GlApp(const int width, const int height, const std::string &title) : _tit
 		std::cerr << "Error: [GLApp] Failed to initialize GLAD." << std::endl;
 		std::exit(-1);
 	}
+
+	_programs["identity"] = std::make_unique<GlProgram>(_identityVsCode, _identityFsCode);
+
+	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["identity"].get()));
+	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
 }
 
 void GlApp::run()
@@ -51,7 +56,13 @@ void GlApp::clearBuffers() const
 }
 
 void GlApp::drawRenderItems() const
-{ }
+{
+	for (auto &layer : _ritemLayers) {
+		for (auto ritem : layer) {
+			ritem->draw();
+		}
+	}
+}
 
 void GlApp::buildRenderItems()
 { }
