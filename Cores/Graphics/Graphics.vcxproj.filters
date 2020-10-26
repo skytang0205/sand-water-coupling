@@ -46,5 +46,11 @@
     <None Include="GlIdentityShader.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="GlFlatShader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="GlFlatShader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

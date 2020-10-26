@@ -18,6 +18,7 @@ protected:
 	GLuint _baseInstance = 0;
 
 	bool _indexed = false;
+	bool _visible = false;
 
 	GlProgram *_program;
 
@@ -32,9 +33,14 @@ public:
 	GlRenderItem &operator=(const GlRenderItem &rhs) = delete;
 	virtual ~GlRenderItem() { glDeleteVertexArrays(1, &_vao); }
 
-	virtual void initDraw() const { }
+	virtual void beginDraw() const { }
+	virtual void endDraw() const { }
 
 	void draw() const;
+
+	bool isVisible() const { return _visible; }
+	void show() { _visible = true; }
+	void hide() { _visible = false; }
 };
 
 class GlRenderTest : public GlRenderItem
@@ -88,6 +94,11 @@ public:
 	{
 		glDeleteBuffers(1, &_ebo);
 		glDeleteBuffers(1, &_vbo);
+	}
+
+	virtual void beginDraw() const override
+	{
+		_program->setUniform("uColor", Vector4f(1, 0, 0, 0));
 	}
 
 };

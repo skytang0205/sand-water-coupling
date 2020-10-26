@@ -4,7 +4,7 @@ namespace PhysX {
 
 void GlRenderItem::draw() const
 {
-	initDraw();
+	beginDraw();
 
 	_program->use();
 	glBindVertexArray(_vao);
@@ -14,7 +14,7 @@ void GlRenderItem::draw() const
 		glDrawArraysInstancedBaseInstance(_mode, _first, _count, _instanceCount, _baseInstance);
 	glBindVertexArray(0);
 
-	finishDraw();
+	endDraw();
 }
 
 

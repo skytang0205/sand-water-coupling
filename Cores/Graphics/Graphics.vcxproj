@@ -96,6 +96,8 @@
     <ClInclude Include="GlRenderItem.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="GlFlatShader.frag" />
+    <None Include="GlFlatShader.vert" />
     <None Include="GlIdentityShader.frag" />
     <None Include="GlIdentityShader.vert" />
   </ItemGroup>
