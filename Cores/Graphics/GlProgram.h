@@ -8,7 +8,7 @@
 
 namespace PhysX {
 
-class GlProgram
+class GlProgram final
 {
 protected:
 

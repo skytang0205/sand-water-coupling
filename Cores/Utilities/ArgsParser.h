@@ -51,7 +51,7 @@ public:
 };
 
 template <typename ArgType>
-class ArgData : public ArgDataBase
+class ArgData final : public ArgDataBase
 {
 protected:
 
@@ -82,7 +82,7 @@ public:
 	virtual std::any getValue() const override { return _set ? _setValue : (_mandatory ? std::any() : _defaultValue); }
 };
 
-class ArgsParser
+class ArgsParser final
 {
 protected:
 

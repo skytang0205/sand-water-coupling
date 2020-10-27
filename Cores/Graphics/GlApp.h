@@ -19,7 +19,7 @@ public:
 
 	enum class RenderLayer : uint { Opaque, Text, Count };
 
-private:
+protected:
 
 	static GlApp *_this;
 
@@ -39,11 +39,12 @@ private:
 	bool _enableMsaa = false;
 	bool _enableWireframe = false;
 
-protected:
-
 	GLFWwindow *_window;
 
+	const int _width; // the default width
+	const int _height; // the default height
 	const std::string &_title;
+
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
 
 	std::unordered_map<std::string, std::unique_ptr<GlProgram>> _programs;
@@ -64,14 +65,16 @@ public:
 
 protected:
 
+	void initialize();
+
+	virtual void setCallbacks() const;
 	virtual void initPrograms();
 	virtual void buildRenderItems();
+
 	virtual void processInput();
 	virtual void update();
 	virtual void clearBuffers() const;
 	virtual void drawRenderItems() const;
-
-private:
 
 	void updateMsaaState() { _enableMsaa ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE); }
 	void updateWireframeState() { _enableWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }

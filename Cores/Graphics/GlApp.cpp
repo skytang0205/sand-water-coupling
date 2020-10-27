@@ -8,7 +8,10 @@ namespace PhysX {
 
 GlApp *GlApp::_this = nullptr;
 
-GlApp::GlApp(const int width, const int height, const std::string &title) : _title(title)
+GlApp::GlApp(const int width, const int height, const std::string &title) :
+	_width(width),
+	_height(height),
+	_title(title)
 {
 	_this = this;
 	// Initialize GLFW.
@@ -17,27 +20,23 @@ GlApp::GlApp(const int width, const int height, const std::string &title) : _tit
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
-	// Initialize window.
-	_window = glfwCreateWindow(width, height, _title.c_str(), NULL, NULL);
+	// Create window.
+	_window = glfwCreateWindow(_width, _height, _title.c_str(), NULL, NULL);
 	if (!_window) {
 		std::cerr << "Error: [GLApp] Failed to create GLFW window." << std::endl;
 		std::exit(-1);
 	}
 	glfwMakeContextCurrent(_window);
-	glfwSetFramebufferSizeCallback(_window, onResize);
-	glfwSetKeyCallback(_window, onKeyInput);
 	// Initialize GLAD.
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "Error: [GLApp] Failed to initialize GLAD." << std::endl;
 		std::exit(-1);
 	}
-
-	initPrograms();
 }
 
 void GlApp::run()
 {
-	buildRenderItems();
+	initialize();
 	while (!glfwWindowShouldClose(_window)) {
 		processInput();
 
@@ -49,6 +48,19 @@ void GlApp::run()
 		glfwSwapBuffers(_window);
 		glfwPollEvents();
 	}
+}
+
+void GlApp::initialize()
+{
+	setCallbacks();
+	initPrograms();
+	buildRenderItems();
+}
+
+void GlApp::setCallbacks() const
+{
+	glfwSetFramebufferSizeCallback(_window, onResize);
+	glfwSetKeyCallback(_window, onKeyInput);
 }
 
 void GlApp::initPrograms()
@@ -99,6 +111,9 @@ void GlApp::onKeyInput(GLFWwindow *window, int key, int scancode, int action, in
 		switch (key) {
 		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose(window, true);
+			break;
+		case GLFW_KEY_SPACE:
+			glfwSetWindowSize(window, _this->_width, _this->_height);
 			break;
 		case GLFW_KEY_F2:
 			_this->_enableMsaa = !_this->_enableMsaa;

@@ -2,6 +2,18 @@
 
 #include <iostream>
 
+class A
+{
+public:
+	A() { std::cout << this << std::endl; }
+};
+
+class B : public A
+{
+public:
+	B() : A() { std::cout << this << std::endl; }
+};
+
 int main(int argc, char *argv[])
 {
 	PhysX::ArgsParser argsParser;
@@ -20,5 +32,6 @@ int main(int argc, char *argv[])
 	auto config = std::any_cast<std::string>(argsParser.getValueByName("config"));
 
 	std::cout << fmt::format("{}\n{}\n{}\n{}\n{}\n{}\n", output, first, last, rate, step, config);
+	B();
 	return 0;
 }
