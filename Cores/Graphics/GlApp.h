@@ -51,13 +51,19 @@ public:
 
 	void run();
 
+protected:
+
 	virtual void buildRenderItems();
 	virtual void processInput();
 	virtual void update();
 	virtual void clearBuffers() const;
-	virtual void drawRenderItems() const; // Render two triangles (only for test).
+	virtual void drawRenderItems() const;
+
+	static void loadShaderCode(const GLchar *&shaderCode, const GLint &length);
 
 private:
+
+	void initDefaultPrograms();
 
 	static void onResize(GLFWwindow *window, int width, int height);
 };

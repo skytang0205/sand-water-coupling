@@ -27,10 +27,7 @@ GlApp::GlApp(const int width, const int height, const std::string &title) : _tit
 		std::exit(-1);
 	}
 
-	_programs["identity"] = std::make_unique<GlProgram>(_identityVsCode, _identityFsCode);
-
-	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["identity"].get()));
-	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
+	initDefaultPrograms();
 }
 
 void GlApp::run()
@@ -59,13 +56,20 @@ void GlApp::drawRenderItems() const
 {
 	for (auto &layer : _ritemLayers) {
 		for (auto ritem : layer) {
-			ritem->draw();
+			if (ritem->isVisible()) ritem->draw();
 		}
 	}
 }
 
+void GlApp::loadShaderCode(const GLchar *&shaderCode, const GLint &length)
+{
+}
+
 void GlApp::buildRenderItems()
-{ }
+{
+	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["identity"].get()));
+	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
+}
 
 void GlApp::processInput()
 {
@@ -76,7 +80,12 @@ void GlApp::processInput()
 void GlApp::update()
 { }
 
-void GlApp::onResize(GLFWwindow *window, int width, int height) 
+void GlApp::initDefaultPrograms()
+{
+	_programs["identity"] = std::make_unique<GlProgram>(_identityVsCode, _identityFsCode);
+}
+
+void GlApp::onResize(GLFWwindow *window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
