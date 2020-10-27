@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include "Utilities/Types.h"
 
 #include <glad/glad.h>
 
@@ -16,7 +16,7 @@ protected:
 
 public:
 
-	GlProgram(const GLchar *vsCode, const GLchar *fsCode);
+	GlProgram(const GLchar *vsCode, const GLchar *fsCode, const GLint vsLength = -1, const GLint fsLength = -1);
 
 	GlProgram() = delete;
 	GlProgram(const GlProgram &rhs) = delete;

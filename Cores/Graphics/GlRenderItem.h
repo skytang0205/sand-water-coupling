@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GlProgram.h"
+#include "Graphics/GlProgram.h"
 
 namespace PhysX {
 

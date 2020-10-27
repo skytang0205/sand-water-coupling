@@ -8,16 +8,16 @@
 
 namespace PhysX {
 
- GlProgram::GlProgram(const GLchar *vsCode, const GLchar *fsCode)
+GlProgram::GlProgram(const GLchar *vsCode, const GLchar *fsCode, const GLint vsLength, const GLint fsLength)
 {
 	// Compile VS.
 	auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vsCode, nullptr);
+	glShaderSource(vertexShader, 1, &vsCode, vsLength < 0 ? nullptr : &vsLength);
 	glCompileShader(vertexShader);
 	checkCompileErrors(vertexShader, "vertex");
 	// Compile FS.
 	auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fsCode, nullptr);
+	glShaderSource(fragmentShader, 1, &fsCode, fsLength < 0 ? nullptr : &fsLength);
 	glCompileShader(fragmentShader);
 	checkCompileErrors(fragmentShader, "fragment");
 	// Link shaders to program.

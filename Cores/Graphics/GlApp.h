@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GlRenderItem.h"
-#include "Types.h"
+#include "Graphics/GlRenderItem.h"
+#include "Utilities/Types.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
