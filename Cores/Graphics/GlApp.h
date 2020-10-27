@@ -21,12 +21,23 @@ public:
 
 private:
 
+	static GlApp *_this;
+
 	const GLchar *_identityVsCode =
 #include "GlIdentityShader.vert"
 		;
 	const GLchar *_identityFsCode =
 #include "GlIdentityShader.frag"
 		;
+	const GLchar *_flatVsCode =
+#include "GlFlatShader.vert"
+		;
+	const GLchar *_flatFsCode =
+#include "GlFlatShader.frag"
+		;
+
+	bool _enableMsaa = false;
+	bool _enableWireframe = false;
 
 protected:
 
@@ -53,19 +64,20 @@ public:
 
 protected:
 
+	virtual void initPrograms();
 	virtual void buildRenderItems();
 	virtual void processInput();
 	virtual void update();
 	virtual void clearBuffers() const;
 	virtual void drawRenderItems() const;
 
-	static void loadShaderCode(const GLchar *&shaderCode, const GLint &length);
-
 private:
 
-	void initDefaultPrograms();
+	void updateMsaaState() { _enableMsaa ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE); }
+	void updateWireframeState() { _enableWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
 
 	static void onResize(GLFWwindow *window, int width, int height);
+	static void onKeyInput(GLFWwindow *window, int key, int scancode, int action, int mods);
 };
 
 }

@@ -18,7 +18,7 @@ protected:
 	GLuint _baseInstance = 0;
 
 	bool _indexed = false;
-	bool _visible = false;
+	bool _visible = true;
 
 	GlProgram *_program;
 
@@ -84,7 +84,7 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		_indexed = true;
-		_count = 6;
+		_count = 6 / 2;
 	}
 
 	GlRenderTest() = delete;
