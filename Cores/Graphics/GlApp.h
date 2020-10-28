@@ -23,16 +23,16 @@ protected:
 
 	static GlApp *_this;
 
-	static constexpr GLchar *_identityVsCode =
+	static constexpr GLchar _identityVsCode[] =
 #include "GlIdentityShader.vert"
 		;
-	static constexpr GLchar *_identityFsCode =
+	static constexpr GLchar _identityFsCode[] =
 #include "GlIdentityShader.frag"
 		;
-	static constexpr GLchar *_flatVsCode =
+	static constexpr GLchar _flatVsCode[] =
 #include "GlFlatShader.vert"
 		;
-	static constexpr GLchar *_flatFsCode =
+	static constexpr GLchar _flatFsCode[] =
 #include "GlFlatShader.frag"
 		;
 
