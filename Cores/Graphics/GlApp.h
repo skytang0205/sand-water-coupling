@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Graphics/GlCamera.h"
 #include "Graphics/GlRenderItem.h"
 #include "Utilities/Types.h"
 
@@ -45,6 +46,9 @@ protected:
 	const std::string &_title;
 
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
+	Vector2d _lastMousePos = Vector2d::Zero();
+
+	GlPolarCamera _polarCamera;
 
 	std::unordered_map<std::string, std::unique_ptr<GlProgram>> _programs;
 
@@ -92,8 +96,11 @@ protected:
 
 	void updateFrameRate();
 
-	static void onResize(GLFWwindow *window, int width, int height);
-	static void onKeyInput(GLFWwindow *window, int key, int scancode, int action, int mods);
+	static void framebufferSizeCallback(GLFWwindow *window, int width, int height);
+	static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+	static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+	static void cursorPosCallback(GLFWwindow *window, double xpos, double ypos);
+	static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 };
 
 }

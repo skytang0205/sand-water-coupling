@@ -79,7 +79,7 @@ public:
 
 protected:
 
-	bool updateProjMatrix()
+	virtual bool updateProjMatrix()
 	{
 		if (_projDirty) {
 			_yScale = 1.0f / std::tan(_fovy / 2);
@@ -95,9 +95,9 @@ protected:
 		else return false;
 	}
 
-	bool updateViewMatrix()
+	virtual bool updateViewMatrix()
 	{
-		if (!_viewDirty) {
+		if (_viewDirty) {
 			_front = (_target - _pos).normalized();
 			_right = _front.cross(_worldUp).normalized();
 			_up = _right.cross(_front).normalized();
@@ -119,6 +119,20 @@ protected:
 	float _radius;
 
 public:
+
+	void rotate(const float dx, const float dy);
+	void translate(const float dx, const float dy);
+
+protected:
+
+	virtual bool updateViewMatrix() override
+	{
+		if (_viewDirty) {
+			_pos = Vector3f(std::sin(_phi) * std::cos(_theta), std::sin(_phi) * std::sin(_theta), std::cos(_phi)) * _radius;
+			return GlCamera::updateViewMatrix();
+		}
+		else return false;
+	}
 };
 
 }

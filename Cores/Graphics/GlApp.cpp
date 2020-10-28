@@ -67,8 +67,11 @@ void GlApp::initGlStates() const
 
 void GlApp::setCallbacks() const
 {
-	glfwSetFramebufferSizeCallback(_window, onResize);
-	glfwSetKeyCallback(_window, onKeyInput);
+	glfwSetFramebufferSizeCallback(_window, framebufferSizeCallback);
+	glfwSetKeyCallback(_window, keyCallback);
+	glfwSetMouseButtonCallback(_window, mouseButtonCallback);
+	glfwSetCursorPosCallback(_window, cursorPosCallback);
+	glfwSetScrollCallback(_window, scrollCallback);
 }
 
 void GlApp::initPrograms()
@@ -124,12 +127,12 @@ void GlApp::updateFrameRate()
 	}
 }
 
-void GlApp::onResize(GLFWwindow *window, int width, int height)
+void GlApp::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
 
-void GlApp::onKeyInput(GLFWwindow *window, int key, int scancode, int action, int mods)
+void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS) {
 		switch (key) {
@@ -148,5 +151,26 @@ void GlApp::onKeyInput(GLFWwindow *window, int key, int scancode, int action, in
 		}
 	}
 }
+
+void GlApp::mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+{
+	if (action == GLFW_PRESS) {
+		glfwGetCursorPos(window, &_this->_lastMousePos.x(), &_this->_lastMousePos.y());
+	}
+}
+
+void GlApp::cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
+{
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+		_this->_polarCamera.rotate(xpos - _this->_lastMousePos.x(), ypos - _this->_lastMousePos.y());
+	}
+	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+		_this->_polarCamera.translate(xpos - _this->_lastMousePos.x(), ypos - _this->_lastMousePos.y());
+	}
+	_this->_lastMousePos << xpos, ypos;
+}
+
+void GlApp::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
+{ }
 
 }
