@@ -33,7 +33,7 @@ GlProgram::GlProgram(const GLchar *vsCode, const GLchar *fsCode, const GLint vsL
 
 void GlProgram::checkCompileErrors(GLuint object, const std::string &type) const
 {
-	static const GLsizei kLogSize = 1024;
+	constexpr GLsizei kLogSize = 1024;
 	GLchar *infoLog;
 
 	GLint success;

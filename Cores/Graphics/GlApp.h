@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include <memory>
+#include <numbers>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -22,33 +23,39 @@ protected:
 
 	static GlApp *_this;
 
-	const GLchar *_identityVsCode =
+	static constexpr GLchar *_identityVsCode =
 #include "GlIdentityShader.vert"
 		;
-	const GLchar *_identityFsCode =
+	static constexpr GLchar *_identityFsCode =
 #include "GlIdentityShader.frag"
 		;
-	const GLchar *_flatVsCode =
+	static constexpr GLchar *_flatVsCode =
 #include "GlFlatShader.vert"
 		;
-	const GLchar *_flatFsCode =
+	static constexpr GLchar *_flatFsCode =
 #include "GlFlatShader.frag"
 		;
 
+	static constexpr float _defaultFovy = 0.25f * float(std::numbers::pi);
+	static constexpr float _defaultZNear = 1.0f;
+	static constexpr float _defaultZFar = 1000.0f;
+	static constexpr float _defaultPhi = 0.0f;
+	static constexpr float _defaultTheta = 0.5f * float(std::numbers::pi);
+	static constexpr float _defaultRadius = 10.0f;
 
 	uchar _enableMsaa = 2;
 	uchar _enableWireframe = 2;
 
 	GLFWwindow *_window;
 
-	const int _width; // the default width
-	const int _height; // the default height
-	const std::string &_title;
+	const int _defaultWidth;
+	const int _defaultHeight;
+	const std::string &_defaultTitle;
 
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
 	Vector2d _lastMousePos = Vector2d::Zero();
 
-	GlPolarCamera _polarCamera;
+	GlOrbitCamera _orbitCamera = GlOrbitCamera(_defaultFovy, 1.0f, _defaultZNear, _defaultZFar, _defaultPhi, _defaultTheta, _defaultRadius, Vector3f::Zero());
 
 	std::unordered_map<std::string, std::unique_ptr<GlProgram>> _programs;
 

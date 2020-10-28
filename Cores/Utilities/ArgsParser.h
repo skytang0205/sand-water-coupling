@@ -78,7 +78,7 @@ public:
 	virtual ~ArgData() = default;
 
 	virtual std::string getShortDesc() const override { return _mandatory ? fmt::format("--{}", _name) : fmt::format("--{}={}", _name, _defaultValue); }
-	virtual bool parseValue(const std::string &str) override { return _set = true, static_cast<bool>(std::istringstream(str) >> _setValue); }
+	virtual bool parseValue(const std::string &str) override { return _set = true, std::istringstream(str) >> _setValue; }
 	virtual std::any getValue() const override { return _set ? _setValue : (_mandatory ? std::any() : _defaultValue); }
 };
 

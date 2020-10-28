@@ -11,9 +11,9 @@ namespace PhysX {
 GlApp *GlApp::_this = nullptr;
 
 GlApp::GlApp(const int width, const int height, const std::string &title) :
-	_width(width),
-	_height(height),
-	_title(title)
+	_defaultWidth(width),
+	_defaultHeight(height),
+	_defaultTitle(title)
 {
 	_this = this;
 	// Initialize GLFW.
@@ -23,7 +23,7 @@ GlApp::GlApp(const int width, const int height, const std::string &title) :
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
 	// Create window.
-	_window = glfwCreateWindow(_width, _height, _title.c_str(), NULL, NULL);
+	_window = glfwCreateWindow(_defaultWidth, _defaultHeight, _defaultTitle.c_str(), NULL, NULL);
 	if (!_window) {
 		std::cerr << "Error: [GLApp] Failed to create GLFW window." << std::endl;
 		std::exit(-1);
@@ -130,6 +130,7 @@ void GlApp::updateFrameRate()
 void GlApp::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+	_this->_orbitCamera.setAspectRatio(float(width) / height);
 }
 
 void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -140,7 +141,7 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 			glfwSetWindowShouldClose(window, true);
 			break;
 		case GLFW_KEY_SPACE:
-			glfwSetWindowSize(window, _this->_width, _this->_height);
+			glfwSetWindowSize(window, _this->_defaultWidth, _this->_defaultHeight);
 			break;
 		case GLFW_KEY_F2:
 			_this->_enableMsaa = (_this->_enableMsaa ^ 1) | 2;
@@ -162,10 +163,10 @@ void GlApp::mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 void GlApp::cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
 {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		_this->_polarCamera.rotate(xpos - _this->_lastMousePos.x(), ypos - _this->_lastMousePos.y());
+		_this->_orbitCamera.rotate(float(xpos - _this->_lastMousePos.x()), float(ypos - _this->_lastMousePos.y()));
 	}
 	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-		_this->_polarCamera.translate(xpos - _this->_lastMousePos.x(), ypos - _this->_lastMousePos.y());
+		_this->_orbitCamera.translate(float(xpos - _this->_lastMousePos.x()), float(ypos - _this->_lastMousePos.y()));
 	}
 	_this->_lastMousePos << xpos, ypos;
 }

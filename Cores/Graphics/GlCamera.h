@@ -2,6 +2,8 @@
 
 #include <Utilities/Types.h>
 
+#include <numbers>
+
 #include <cmath>
 
 namespace PhysX {
@@ -45,7 +47,7 @@ public:
 		const Vector3f &target,
 		const Vector3f &worldUp = Vector3f::Unit(1))
 	{
-		setPerspective(fovy, aspect, zNear);
+		setPerspective(fovy, aspect, zNear, zFar);
 		lookAt(pos, target, worldUp);
 	}
 
@@ -66,6 +68,12 @@ public:
 		_aspect = aspect;
 		_zNear = zNear;
 		_zFar = zFar;
+		_projDirty = true;
+	}
+
+	void setAspectRatio(const float aspect)
+	{
+		_aspect = aspect;
 		_projDirty = true;
 	}
 
@@ -110,28 +118,56 @@ protected:
 	}
 };
 
-class GlPolarCamera : public GlCamera
+class GlOrbitCamera : public GlCamera
 {
 protected:
 
-	float _theta;
 	float _phi;
+	float _theta;
 	float _radius;
 
 public:
 
-	void rotate(const float dx, const float dy);
-	void translate(const float dx, const float dy);
+	GlOrbitCamera(
+		const float fovy,
+		const float aspect,
+		const float zNear,
+		const float zFar,
+		const float phi,
+		const float theta,
+		const float radius,
+		const Vector3f &target,
+		const Vector3f &worldUp = Vector3f::Unit(1)
+		) :
+		GlCamera(fovy, aspect, zNear, zFar, sphericalToCartesian(_phi, _theta, _radius), target, worldUp)
+	{
+	}
+
+	void rotate(const float dx, const float dy)
+	{
+		_phi -= 0.25f * dx;
+		_theta -= 0.25f * dy;
+		_viewDirty = true;
+	}
+
+	void translate(const float dx, const float dy)
+	{
+	}
 
 protected:
 
 	virtual bool updateViewMatrix() override
 	{
 		if (_viewDirty) {
-			_pos = Vector3f(std::sin(_phi) * std::cos(_theta), std::sin(_phi) * std::sin(_theta), std::cos(_phi)) * _radius;
+			_pos = sphericalToCartesian(_theta, _phi, _radius);
 			return GlCamera::updateViewMatrix();
 		}
 		else return false;
+	}
+
+	static Vector3f sphericalToCartesian(const float phi, const float theta, const float radius)
+	{
+		return Vector3f(std::sin(theta) * std::sin(phi), std::cos(theta), std::sin(theta) * std::cos(phi)) * radius;
 	}
 };
 
