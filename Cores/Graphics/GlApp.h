@@ -34,8 +34,9 @@ protected:
 #include "GlFlatShader.frag"
 		;
 
-	bool _enableMsaa = false;
-	bool _enableWireframe = false;
+
+	uchar _enableMsaa = 2;
+	uchar _enableWireframe = 2;
 
 	GLFWwindow *_window;
 
@@ -75,8 +76,20 @@ protected:
 	virtual void clearBuffers() const;
 	virtual void drawRenderItems() const;
 
-	void updateMsaaState() { _enableMsaa ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE); }
-	void updateWireframeState() { _enableWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+	void updateMsaaState()
+	{
+		if (_enableMsaa & 2)
+			_enableMsaa & 1 ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE);
+		_enableMsaa &= 1;
+	}
+
+	void updateWireframeState()
+	{
+		if (_enableWireframe & 2)
+			_enableWireframe & 1 ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		_enableWireframe &= 1;
+	}
+
 	void updateFrameRate();
 
 	static void onResize(GLFWwindow *window, int width, int height);

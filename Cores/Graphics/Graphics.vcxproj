@@ -87,7 +87,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GlApp.cpp" />
-    <ClCompile Include="GlCamera.cpp" />
     <ClCompile Include="GlProgram.cpp" />
     <ClCompile Include="GlRenderItem.cpp" />
   </ItemGroup>

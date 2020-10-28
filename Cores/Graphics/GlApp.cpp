@@ -140,10 +140,10 @@ void GlApp::onKeyInput(GLFWwindow *window, int key, int scancode, int action, in
 			glfwSetWindowSize(window, _this->_width, _this->_height);
 			break;
 		case GLFW_KEY_F2:
-			_this->_enableMsaa = !_this->_enableMsaa;
+			_this->_enableMsaa = (_this->_enableMsaa ^ 1) | 2;
 			break;
 		case GLFW_KEY_F3:
-			_this->_enableWireframe = !_this->_enableWireframe;
+			_this->_enableWireframe = (_this->_enableWireframe ^ 1) | 2;
 			break;
 		}
 	}
