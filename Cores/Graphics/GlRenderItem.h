@@ -60,10 +60,10 @@ public:
 		glBindVertexArray(_vao);
 
 		const float vertices[] = {
-			 0.5f,  0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			-0.5f, -0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f 
+			 0.5f,  0.0f,  0.5f,
+			 0.5f,  0.0f, -0.5f,
+			-0.5f,  0.0f, -0.5f,
+			-0.5f,  0.0f,  0.5f 
 		};
 		const uint indices[] = {
 			0, 1, 3,
@@ -84,7 +84,7 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		_indexed = true;
-		_count = 6 / 2;
+		_count = 6;
 	}
 
 	GlRenderTest() = delete;

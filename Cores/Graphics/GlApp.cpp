@@ -11,9 +11,9 @@ namespace PhysX {
 GlApp *GlApp::_this = nullptr;
 
 GlApp::GlApp(const int width, const int height, const std::string &title) :
-	_defaultWidth(width),
-	_defaultHeight(height),
-	_defaultTitle(title)
+	_savedWidth(width),
+	_savedHeight(height),
+	_savedTitle(title)
 {
 	_this = this;
 	// Initialize GLFW.
@@ -23,7 +23,7 @@ GlApp::GlApp(const int width, const int height, const std::string &title) :
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
 	// Create window.
-	_window = glfwCreateWindow(_defaultWidth, _defaultHeight, _defaultTitle.c_str(), NULL, NULL);
+	_window = glfwCreateWindow(_savedWidth, _savedHeight, _savedTitle.c_str(), NULL, NULL);
 	if (!_window) {
 		std::cerr << "Error: [GLApp] Failed to create GLFW window." << std::endl;
 		std::exit(-1);
@@ -54,10 +54,17 @@ void GlApp::run()
 
 void GlApp::initialize()
 {
+	resize(_savedWidth, _savedHeight);
 	initGlStates();
 	setCallbacks();
 	initPrograms();
 	buildRenderItems();
+}
+
+void GlApp::resize(const int width, const int height)
+{
+	glViewport(0, 0, width, height);
+	_orbitCamera.setAspectRatio(float(width) / height);
 }
 
 void GlApp::initGlStates() const
@@ -76,13 +83,13 @@ void GlApp::setCallbacks() const
 
 void GlApp::initPrograms()
 {
-	_programs["identity"] = std::make_unique<GlProgram>(_identityVsCode, _identityFsCode);
-	_programs["flat"] = std::make_unique<GlProgram>(_flatVsCode, _flatFsCode);
+	_programs["identity"] = std::make_unique<GlProgram>(_kIdentityVsCode, _kIdentityFsCode);
+	_programs["flat"] = std::make_unique<GlProgram>(_kFlatVsCode, _kFlatFsCode);
 }
 
 void GlApp::buildRenderItems()
 {
-	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["identity"].get()));
+	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["flat"].get()));
 	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
 }
 
@@ -94,6 +101,8 @@ void GlApp::update()
 {
 	updateMsaaState();
 	updateWireframeState();
+	_orbitCamera.update();
+	updateUniforms();
 	updateFrameRate();
 }
 
@@ -127,10 +136,14 @@ void GlApp::updateFrameRate()
 	}
 }
 
+void GlApp::updateUniforms()
+{
+	_programs["flat"]->setUniform("uWorld", _orbitCamera.projView());
+}
+
 void GlApp::framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
-	glViewport(0, 0, width, height);
-	_this->_orbitCamera.setAspectRatio(float(width) / height);
+	_this->resize(width, height);
 }
 
 void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -141,7 +154,8 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 			glfwSetWindowShouldClose(window, true);
 			break;
 		case GLFW_KEY_SPACE:
-			glfwSetWindowSize(window, _this->_defaultWidth, _this->_defaultHeight);
+			glfwSetWindowSize(window, _this->_savedWidth, _this->_savedHeight);
+			_this->_orbitCamera.reset();
 			break;
 		case GLFW_KEY_F2:
 			_this->_enableMsaa = (_this->_enableMsaa ^ 1) | 2;
@@ -172,6 +186,8 @@ void GlApp::cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
 }
 
 void GlApp::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
-{ }
+{
+	_this->_orbitCamera.scale(float(yoffset));
+}
 
 }

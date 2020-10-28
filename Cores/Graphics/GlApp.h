@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/GlCamera.h"
+#include "Graphics/GlOrbitCamera.h"
 #include "Graphics/GlRenderItem.h"
 #include "Utilities/Types.h"
 
@@ -23,39 +23,41 @@ protected:
 
 	static GlApp *_this;
 
-	static constexpr GLchar _identityVsCode[] =
+	static constexpr GLchar _kIdentityVsCode[] =
 #include "GlIdentityShader.vert"
 		;
-	static constexpr GLchar _identityFsCode[] =
+	static constexpr GLchar _kIdentityFsCode[] =
 #include "GlIdentityShader.frag"
 		;
-	static constexpr GLchar _flatVsCode[] =
+	static constexpr GLchar _kFlatVsCode[] =
 #include "GlFlatShader.vert"
 		;
-	static constexpr GLchar _flatFsCode[] =
+	static constexpr GLchar _kFlatFsCode[] =
 #include "GlFlatShader.frag"
 		;
-
-	static constexpr float _defaultFovy = 0.25f * float(std::numbers::pi);
-	static constexpr float _defaultZNear = 1.0f;
-	static constexpr float _defaultZFar = 1000.0f;
-	static constexpr float _defaultPhi = 0.0f;
-	static constexpr float _defaultTheta = 0.5f * float(std::numbers::pi);
-	static constexpr float _defaultRadius = 10.0f;
 
 	uchar _enableMsaa = 2;
 	uchar _enableWireframe = 2;
 
 	GLFWwindow *_window;
 
-	const int _defaultWidth;
-	const int _defaultHeight;
-	const std::string &_defaultTitle;
+	const int _savedWidth;
+	const int _savedHeight;
+	const std::string &_savedTitle;
 
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
 	Vector2d _lastMousePos = Vector2d::Zero();
 
-	GlOrbitCamera _orbitCamera = GlOrbitCamera(_defaultFovy, 1.0f, _defaultZNear, _defaultZFar, _defaultPhi, _defaultTheta, _defaultRadius, Vector3f::Zero());
+	GlOrbitCamera _orbitCamera = GlOrbitCamera(
+		0.25f * float(std::numbers::pi), // fovy
+		1.0f, // aspect
+		1.0f, // zNear
+		1000.0f, // zFar
+		10.0f, // radius
+		0.0, // phi
+		0.5f * float(std::numbers::pi), // theta
+		Vector3f::Zero() // target
+		);
 
 	std::unordered_map<std::string, std::unique_ptr<GlProgram>> _programs;
 
@@ -77,6 +79,7 @@ protected:
 
 	void initialize();
 
+	virtual void resize(const int width, const int height);
 	virtual void initGlStates() const;
 	virtual void setCallbacks() const;
 	virtual void initPrograms();
@@ -100,6 +103,8 @@ protected:
 			_enableWireframe & 1 ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		_enableWireframe &= 1;
 	}
+
+	void updateUniforms();
 
 	void updateFrameRate();
 

@@ -93,6 +93,7 @@
   <ItemGroup>
     <ClInclude Include="GlApp.h" />
     <ClInclude Include="GlCamera.h" />
+    <ClInclude Include="GlOrbitCamera.h" />
     <ClInclude Include="GlProgram.h" />
     <ClInclude Include="GlRenderItem.h" />
   </ItemGroup>
