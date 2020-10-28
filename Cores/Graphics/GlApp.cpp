@@ -1,5 +1,7 @@
 #include "GlApp.h"
 
+#include <fmt/core.h>
+
 #include <iostream>
 
 #include <cstdlib>
@@ -52,9 +54,15 @@ void GlApp::run()
 
 void GlApp::initialize()
 {
+	initGlStates();
 	setCallbacks();
 	initPrograms();
 	buildRenderItems();
+}
+
+void GlApp::initGlStates() const
+{
+	glEnable(GL_FRAMEBUFFER_SRGB); // gamma correction
 }
 
 void GlApp::setCallbacks() const
@@ -67,6 +75,23 @@ void GlApp::initPrograms()
 {
 	_programs["identity"] = std::make_unique<GlProgram>(_identityVsCode, _identityFsCode);
 	_programs["flat"] = std::make_unique<GlProgram>(_flatVsCode, _flatFsCode);
+}
+
+void GlApp::buildRenderItems()
+{
+	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["identity"].get()));
+	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
+}
+
+void GlApp::processInput()
+{
+}
+
+void GlApp::update()
+{
+	updateMsaaState();
+	updateWireframeState();
+	updateFrameRate();
 }
 
 void GlApp::clearBuffers() const
@@ -84,20 +109,19 @@ void GlApp::drawRenderItems() const
 	}
 }
 
-void GlApp::buildRenderItems()
+void GlApp::updateFrameRate()
 {
-	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["identity"].get()));
-	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
-}
+	static uint ticks = 0;
+	static auto lastTime = glfwGetTime();
 
-void GlApp::processInput()
-{
-}
-
-void GlApp::update()
-{
-	updateMsaaState();
-	updateWireframeState();
+	ticks++;
+	auto currentTime = glfwGetTime();
+	auto elapsed = currentTime - lastTime;
+	if (elapsed > 1) {
+		std::cout << fmt::format("FPS = {:.0f}", ticks / elapsed) << std::endl;
+		lastTime = currentTime;
+		ticks = 0;
+	}
 }
 
 void GlApp::onResize(GLFWwindow *window, int width, int height)

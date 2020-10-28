@@ -15,11 +15,9 @@ namespace PhysX {
 
 class GlApp
 {
-public:
+protected:
 
 	enum class RenderLayer : uint { Opaque, Text, Count };
-
-protected:
 
 	static GlApp *_this;
 
@@ -67,6 +65,7 @@ protected:
 
 	void initialize();
 
+	virtual void initGlStates() const;
 	virtual void setCallbacks() const;
 	virtual void initPrograms();
 	virtual void buildRenderItems();
@@ -78,6 +77,7 @@ protected:
 
 	void updateMsaaState() { _enableMsaa ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE); }
 	void updateWireframeState() { _enableWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+	void updateFrameRate();
 
 	static void onResize(GLFWwindow *window, int width, int height);
 	static void onKeyInput(GLFWwindow *window, int key, int scancode, int action, int mods);
