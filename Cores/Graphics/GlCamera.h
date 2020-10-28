@@ -2,6 +2,7 @@
 
 #include <Utilities/Types.h>
 
+#include <algorithm>
 #include <numbers>
 
 #include <cmath>
@@ -147,6 +148,7 @@ public:
 	{
 		_phi -= 0.25f * dx;
 		_theta -= 0.25f * dy;
+		std::clamp(_phi, 0.1f, float(std::numbers::pi) - 0.1f);
 		_viewDirty = true;
 	}
 
