@@ -47,7 +47,7 @@ void GlApp::run()
 
 		update();
 		clearBuffers();
-		drawRenderItems();
+		draw();
 
 		// Swap buffers and poll IO events.
 		glfwSwapBuffers(_window);
@@ -77,9 +77,6 @@ void GlApp::initGlStates() const
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(debugMessageCallback, nullptr);
 #endif
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_FRAMEBUFFER_SRGB); // gamma correction
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void GlApp::setCallbacks() const
@@ -108,7 +105,7 @@ void GlApp::processInput()
 
 void GlApp::update()
 {
-	updateBlend();
+	updateSrgb();
 	updateMsaaState();
 	updateWireframeState();
 	_orbitCamera.update();
@@ -122,13 +119,17 @@ void GlApp::clearBuffers() const
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GlApp::drawRenderItems() const
+void GlApp::draw() const
 {
-	for (auto &layer : _ritemLayers) {
-		for (auto ritem : layer) {
-			if (ritem->isVisible()) ritem->draw();
-		}
-	}
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+	drawRenderLayer(RenderLayer::Opaque);
+	glDepthMask(GL_FALSE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	drawRenderLayer(RenderLayer::Transparency);
+	glDepthMask(GL_TRUE);
 }
 
 void GlApp::updateFrameRate()
@@ -168,7 +169,7 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 			_this->_orbitCamera.reset();
 			break;
 		case GLFW_KEY_F2:
-			_this->_enableBlend = (_this->_enableBlend ^ 1) | 2;
+			_this->_enableSrgb = (_this->_enableSrgb ^ 1) | 2;
 			break;
 		case GLFW_KEY_F3:
 			_this->_enableMsaa = (_this->_enableMsaa ^ 1) | 2;

@@ -19,7 +19,7 @@ class GlApp
 {
 protected:
 
-	enum class RenderLayer : uint { Opaque, Text, Count };
+	enum class RenderLayer : uint { Opaque, Transparency, Text, Count };
 
 	static GlApp *_this;
 
@@ -30,7 +30,7 @@ protected:
 #include "GlShadedShader.frag"
 		;
 
-	uchar _enableBlend = 3;
+	uchar _enableSrgb = 3;
 	uchar _enableMsaa = 2;
 	uchar _enableWireframe = 2;
 
@@ -83,13 +83,19 @@ protected:
 	virtual void processInput();
 	virtual void update();
 	virtual void clearBuffers() const;
-	virtual void drawRenderItems() const;
+	virtual void draw() const;
 
-	void updateBlend()
+	void drawRenderLayer(const RenderLayer layer) const
 	{
-		if (_enableBlend & 2)
-			_enableBlend & 1 ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
-		_enableBlend &= 1;
+		for (auto ritem : _ritemLayers[size_t(layer)])
+			if (ritem->isVisible()) ritem->draw();
+	}
+
+	void updateSrgb()
+	{
+		if (_enableSrgb & 2)
+			_enableSrgb & 1 ? glEnable(GL_FRAMEBUFFER_SRGB) : glDisable(GL_FRAMEBUFFER_SRGB);
+		_enableSrgb &= 1;
 	}
 
 	void updateMsaaState()
