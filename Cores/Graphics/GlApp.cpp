@@ -22,6 +22,9 @@ GlApp::GlApp(const int width, const int height, const std::string &title) :
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
+#ifdef _DEBUG
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 	// Create window.
 	_window = glfwCreateWindow(_savedWidth, _savedHeight, _savedTitle.c_str(), NULL, NULL);
 	if (!_window) {
@@ -69,7 +72,14 @@ void GlApp::resize(const int width, const int height)
 
 void GlApp::initGlStates() const
 {
+#ifdef _DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glDebugMessageCallback(debugMessageCallback, nullptr);
+#endif
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_FRAMEBUFFER_SRGB); // gamma correction
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void GlApp::setCallbacks() const
@@ -83,13 +93,12 @@ void GlApp::setCallbacks() const
 
 void GlApp::initPrograms()
 {
-	_programs["identity"] = std::make_unique<GlProgram>(_kIdentityVsCode, _kIdentityFsCode);
-	_programs["flat"] = std::make_unique<GlProgram>(_kFlatVsCode, _kFlatFsCode);
+	_programs["shaded"] = std::make_unique<GlProgram>(_kShadedVsCode, _kShadedFsCode);
 }
 
 void GlApp::buildRenderItems()
 {
-	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["flat"].get()));
+	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["shaded"].get()));
 	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
 }
 
@@ -99,6 +108,7 @@ void GlApp::processInput()
 
 void GlApp::update()
 {
+	updateBlend();
 	updateMsaaState();
 	updateWireframeState();
 	_orbitCamera.update();
@@ -109,7 +119,7 @@ void GlApp::update()
 void GlApp::clearBuffers() const
 {
 	glClearColor(_bgColor[0], _bgColor[1], _bgColor[2], 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GlApp::drawRenderItems() const
@@ -138,7 +148,7 @@ void GlApp::updateFrameRate()
 
 void GlApp::updateUniforms()
 {
-	_programs["flat"]->setUniform("uWorld", _orbitCamera.projView());
+	_programs["shaded"]->setUniform("uWorld", _orbitCamera.projView());
 }
 
 void GlApp::framebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -158,9 +168,12 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 			_this->_orbitCamera.reset();
 			break;
 		case GLFW_KEY_F2:
-			_this->_enableMsaa = (_this->_enableMsaa ^ 1) | 2;
+			_this->_enableBlend = (_this->_enableBlend ^ 1) | 2;
 			break;
 		case GLFW_KEY_F3:
+			_this->_enableMsaa = (_this->_enableMsaa ^ 1) | 2;
+			break;
+		case GLFW_KEY_F4:
 			_this->_enableWireframe = (_this->_enableWireframe ^ 1) | 2;
 			break;
 		}
@@ -188,6 +201,42 @@ void GlApp::cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
 void GlApp::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	_this->_orbitCamera.scale(float(yoffset));
+}
+
+void APIENTRY GlApp::debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+{
+	std::cerr << "Debug message (" << id << "): " << message << std::endl;
+
+	switch (source) {
+	case GL_DEBUG_SOURCE_API:				std::cerr << "Source: API";					break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:		std::cerr << "Source: Window System";		break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER:	std::cerr << "Source: Shader Compiler";		break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:		std::cerr << "Source: Third Party";			break;
+	case GL_DEBUG_SOURCE_APPLICATION:		std::cerr << "Source: Application";			break;
+	case GL_DEBUG_SOURCE_OTHER:				std::cerr << "Source: Other";				break;
+	}
+	std::cerr << std::endl;
+
+	switch (type) {
+	case GL_DEBUG_TYPE_ERROR:				std::cerr << "Type: Error";					break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:	std::cerr << "Type: Deprecated Behaviour";	break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:	std::cerr << "Type: Undefined Behaviour";	break;
+	case GL_DEBUG_TYPE_PORTABILITY:			std::cerr << "Type: Portability";			break;
+	case GL_DEBUG_TYPE_PERFORMANCE:			std::cerr << "Type: Performance";			break;
+	case GL_DEBUG_TYPE_MARKER:				std::cerr << "Type: Marker";				break;
+	case GL_DEBUG_TYPE_PUSH_GROUP:			std::cerr << "Type: Push Group";			break;
+	case GL_DEBUG_TYPE_POP_GROUP:			std::cerr << "Type: Pop Group";				break;
+	case GL_DEBUG_TYPE_OTHER:				std::cerr << "Type: Other";					break;
+	}
+	std::cerr << std::endl;
+
+	switch (severity) {
+	case GL_DEBUG_SEVERITY_HIGH:			std::cerr << "Severity: high";				break;
+	case GL_DEBUG_SEVERITY_MEDIUM:			std::cerr << "Severity: medium";			break;
+	case GL_DEBUG_SEVERITY_LOW:				std::cerr << "Severity: low";				break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:	std::cerr << "Severity: notification";		break;
+	}
+	std::cerr << std::endl << std::endl;
 }
 
 }

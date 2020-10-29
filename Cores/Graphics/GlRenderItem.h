@@ -60,10 +60,10 @@ public:
 		glBindVertexArray(_vao);
 
 		const float vertices[] = {
-			 0.5f,  0.0f,  0.5f,
-			 0.5f,  0.0f, -0.5f,
-			-0.5f,  0.0f, -0.5f,
-			-0.5f,  0.0f,  0.5f 
+			 0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f, 0.3f,
+			 0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f, 0.3f,
+			-0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  1.0f, 0.3f,
+			-0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f, 0.3f
 		};
 		const uint indices[] = {
 			0, 1, 3,
@@ -76,8 +76,10 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)0);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -98,7 +100,6 @@ public:
 
 	virtual void beginDraw() const override
 	{
-		_program->setUniform("uColor", Vector4f(1, 0, 0, 0));
 	}
 
 };

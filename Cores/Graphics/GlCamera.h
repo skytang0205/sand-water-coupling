@@ -45,7 +45,7 @@ public:
 		const float zFar,
 		const Vector3f &pos,
 		const Vector3f &target
-	) :
+		) :
 		_savedPos(pos),
 		_savedTarget(target)
 	{

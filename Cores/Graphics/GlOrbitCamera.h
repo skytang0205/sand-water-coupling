@@ -30,7 +30,7 @@ public:
 		const float phi,
 		const float theta,
 		const Vector3f &target
-	) :
+		) :
 		GlCamera(fovy, aspect, zNear, zFar, sphericalToCartesian(radius, phi, theta), target),
 		_savedRadius(radius),
 		_savedPhi(phi),
@@ -77,7 +77,7 @@ public:
 
 	void scale(const float dy)
 	{
-		static constexpr float kScaleRatio = 0.1f;
+		static constexpr float kScaleRatio = 0.05f;
 		_radius /= std::exp(kScaleRatio * dy);
 		_radius = std::clamp(_radius, 0.1f, 150.0f);
 		lookAt(sphericalToCartesian(_radius, _phi, _theta), _target);

@@ -23,19 +23,14 @@ protected:
 
 	static GlApp *_this;
 
-	static constexpr GLchar _kIdentityVsCode[] =
-#include "GlIdentityShader.vert"
+	static constexpr GLchar _kShadedVsCode[] =
+#include "GlShadedShader.vert"
 		;
-	static constexpr GLchar _kIdentityFsCode[] =
-#include "GlIdentityShader.frag"
-		;
-	static constexpr GLchar _kFlatVsCode[] =
-#include "GlFlatShader.vert"
-		;
-	static constexpr GLchar _kFlatFsCode[] =
-#include "GlFlatShader.frag"
+	static constexpr GLchar _kShadedFsCode[] =
+#include "GlShadedShader.frag"
 		;
 
+	uchar _enableBlend = 3;
 	uchar _enableMsaa = 2;
 	uchar _enableWireframe = 2;
 
@@ -90,6 +85,13 @@ protected:
 	virtual void clearBuffers() const;
 	virtual void drawRenderItems() const;
 
+	void updateBlend()
+	{
+		if (_enableBlend & 2)
+			_enableBlend & 1 ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
+		_enableBlend &= 1;
+	}
+
 	void updateMsaaState()
 	{
 		if (_enableMsaa & 2)
@@ -113,6 +115,8 @@ protected:
 	static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
 	static void cursorPosCallback(GLFWwindow *window, double xpos, double ypos);
 	static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+
+	static void APIENTRY debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
 };
 
 }
