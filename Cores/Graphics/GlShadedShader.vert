@@ -6,11 +6,14 @@ layout (location = 1) in vec4 aColor;
 
 out vec4 vertColor;
 
-uniform mat4 uWorld;
+layout (std140, binding = 0) uniform Matrices
+{
+	mat4 uProjView;
+};
 
 void main()
 {
-    gl_Position = uWorld * vec4(aPos, 1.0);
+    gl_Position = uProjView * vec4(aPos, 1.0);
 	vertColor = aColor;
 }
 )"

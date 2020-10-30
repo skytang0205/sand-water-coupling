@@ -30,9 +30,11 @@ protected:
 #include "GlShadedShader.frag"
 		;
 
-	uchar _enableSrgb = 3;
-	uchar _enableMsaa = 2;
-	uchar _enableWireframe = 2;
+	GLuint _uboMatrices = 0;
+
+	bool _enableSrgb = true;
+	bool _enableMsaa = false;
+	bool _enableWireframe = false;
 
 	GLFWwindow *_window;
 
@@ -66,7 +68,11 @@ public:
 	GlApp() = delete;
 	GlApp(const GlApp &rhs) = delete;
 	GlApp &operator=(const GlApp &rhs) = delete;
-	virtual ~GlApp() { glfwTerminate(); }
+	virtual ~GlApp()
+	{
+		glDeleteBuffers(1, &_uboMatrices);
+		glfwTerminate();
+	}
 
 	void run();
 
@@ -78,6 +84,7 @@ protected:
 	virtual void initGlStates() const;
 	virtual void setCallbacks() const;
 	virtual void initPrograms();
+	virtual void initUboProjView();
 	virtual void buildRenderItems();
 
 	virtual void processInput();
@@ -91,30 +98,16 @@ protected:
 			if (ritem->isVisible()) ritem->draw();
 	}
 
-	void updateSrgb()
-	{
-		if (_enableSrgb & 2)
-			_enableSrgb & 1 ? glEnable(GL_FRAMEBUFFER_SRGB) : glDisable(GL_FRAMEBUFFER_SRGB);
-		_enableSrgb &= 1;
-	}
-
-	void updateMsaaState()
-	{
-		if (_enableMsaa & 2)
-			_enableMsaa & 1 ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE);
-		_enableMsaa &= 1;
-	}
-
-	void updateWireframeState()
-	{
-		if (_enableWireframe & 2)
-			_enableWireframe & 1 ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		_enableWireframe &= 1;
-	}
+	void updateFrameRate();
 
 	void updateUniforms();
 
-	void updateFrameRate();
+	void updateGlStates()
+	{
+		_enableSrgb ? glEnable(GL_FRAMEBUFFER_SRGB) : glDisable(GL_FRAMEBUFFER_SRGB);
+		_enableMsaa ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE);
+		_enableWireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 
 	static void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 	static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);

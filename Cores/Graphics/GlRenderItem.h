@@ -26,7 +26,7 @@ protected:
 
 public:
 
-	GlRenderItem(GlProgram *program) : _program(program) { glGenVertexArrays(1, &_vao); }
+	GlRenderItem(GlProgram *program) : _program(program) { glCreateVertexArrays(1, &_vao); }
 
 	GlRenderItem() = delete;
 	GlRenderItem(const GlRenderItem &rhs) = delete;
@@ -54,39 +54,48 @@ public:
 
 	GlRenderTest(GlProgram *program) : GlRenderItem(program)
 	{
-		glGenBuffers(1, &_vbo);
-		glGenBuffers(1, &_ebo);
-
-		glBindVertexArray(_vao);
-
-		const float vertices[] = {
-			 0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f, 0.3f,
-			 0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f, 0.3f,
-			-0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  1.0f, 0.3f,
-			-0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f, 0.3f
+		static constexpr float vertices[] = {
+			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.5f,
+			-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.5f,
+			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f,
+			-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f,
+			0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f,
+			0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.5f,
+			0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.5f,
+			0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.5f
 		};
-		const uint indices[] = {
-			3, 1, 0,
-			3, 2, 1
+		static constexpr uint indices[] = {
+			3, 2, 0,
+			0, 1, 3,
+			4, 6, 7,
+			7, 5, 4,
+			7, 3, 1,
+			1, 5, 7,
+			0, 2, 6,
+			6, 4, 0,
+			5, 1, 0,
+			0, 4, 5,
+			2, 3, 7,
+			7, 6, 2
 		};
 
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glCreateBuffers(1, &_vbo);
+		glNamedBufferStorage(_vbo, sizeof(vertices), vertices, 0);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		glVertexArrayVertexBuffer(_vao, 0, _vbo, 0, 7 * sizeof(float));
+		glVertexArrayAttribFormat(_vao, 0, 3, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(_vao, 1, 4, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+		glVertexArrayAttribBinding(_vao, 0, 0);
+		glVertexArrayAttribBinding(_vao, 1, 0);
+		glEnableVertexArrayAttrib(_vao, 0);
+		glEnableVertexArrayAttrib(_vao, 1);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glCreateBuffers(1, &_ebo);
+		glNamedBufferStorage(_ebo, sizeof(indices), indices, 0);
+		glVertexArrayElementBuffer(_vao, _ebo);
 
 		_indexed = true;
-		_count = 6;
+		_count = 36;
 	}
 
 	GlRenderTest() = delete;

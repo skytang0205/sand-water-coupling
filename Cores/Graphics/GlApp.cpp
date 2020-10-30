@@ -61,6 +61,7 @@ void GlApp::initialize()
 	initGlStates();
 	setCallbacks();
 	initPrograms();
+	initUboProjView();
 	buildRenderItems();
 }
 
@@ -93,6 +94,13 @@ void GlApp::initPrograms()
 	_programs["shaded"] = std::make_unique<GlProgram>(_kShadedVsCode, _kShadedFsCode);
 }
 
+void GlApp::initUboProjView()
+{
+	glCreateBuffers(1, &_uboMatrices);
+	glNamedBufferStorage(_uboMatrices, sizeof(Matrix4f), nullptr, GL_DYNAMIC_STORAGE_BIT);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, _uboMatrices);
+}
+
 void GlApp::buildRenderItems()
 {
 	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["shaded"].get()));
@@ -105,12 +113,10 @@ void GlApp::processInput()
 
 void GlApp::update()
 {
-	updateSrgb();
-	updateMsaaState();
-	updateWireframeState();
 	_orbitCamera.update();
-	updateUniforms();
 	updateFrameRate();
+	updateUniforms();
+	updateGlStates();
 }
 
 void GlApp::clearBuffers() const
@@ -149,7 +155,8 @@ void GlApp::updateFrameRate()
 
 void GlApp::updateUniforms()
 {
-	_programs["shaded"]->setUniform("uWorld", _orbitCamera.projView());
+	// For proj-view matrix.
+	glNamedBufferSubData(_uboMatrices, 0, sizeof(Matrix4f), _orbitCamera.projView().data());
 }
 
 void GlApp::framebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -169,13 +176,13 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 			_this->_orbitCamera.reset();
 			break;
 		case GLFW_KEY_F2:
-			_this->_enableSrgb = (_this->_enableSrgb ^ 1) | 2;
+			_this->_enableSrgb = !_this->_enableSrgb;
 			break;
 		case GLFW_KEY_F3:
-			_this->_enableMsaa = (_this->_enableMsaa ^ 1) | 2;
+			_this->_enableMsaa = !_this->_enableMsaa;
 			break;
 		case GLFW_KEY_F4:
-			_this->_enableWireframe = (_this->_enableWireframe ^ 1) | 2;
+			_this->_enableWireframe = !_this->_enableWireframe;
 			break;
 		}
 	}
