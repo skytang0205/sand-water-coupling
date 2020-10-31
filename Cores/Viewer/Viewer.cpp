@@ -1,4 +1,5 @@
 #include "Graphics/GlApp.h"
+#include "Graphics/GlText.h"
 
 #include <memory>
 

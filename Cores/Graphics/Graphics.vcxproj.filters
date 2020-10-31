@@ -47,13 +47,18 @@
     <ClInclude Include="BitmapFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GlText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GlShadedShader.frag">
       <Filter>Inline Files</Filter>
     </None>
-    <None Include="GlShadedShader.vert" />
-    <None Include="BmConsolas.inc">
+    <None Include="BitmapConsolas.inc">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="GlShadedShader.vert">
       <Filter>Inline Files</Filter>
     </None>
   </ItemGroup>
