@@ -4,7 +4,7 @@ namespace PhysX {
 
 struct BitmapFont final
 {
-	struct CharDesc
+	struct FontChar
 	{
 		int x;
 		int y;
@@ -15,6 +15,19 @@ struct BitmapFont final
 		int xAdvance;
 	};
 
+	struct FontCharN
+	{
+		float x;
+		float y;
+		float width;
+		float texWidth;
+		float height;
+		float texHeight;
+		float xOffset;
+		float yOffset;
+		float xAdvance;
+	};
+
 #include "BitmapConsolas.inc"
 
 	int lineHeight;
@@ -23,8 +36,14 @@ struct BitmapFont final
 	int scaleH;
 	int nChnls;
 	int count;
-	const char *data;
-	const CharDesc *chars;
+	const unsigned char *data;
+	const FontChar *chars;
+
+	float lineHeightN;
+	float baseN;
+	FontCharN charsN[128];
+
+	void normalize(const int clientWidth, const int clientHeight);
 };
 
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/GlOrbitCamera.h"
-#include "Graphics/GlRenderItem.h"
+#include "Graphics/GlText.h"
 #include "Utilities/Types.h"
 
 #include <glad/glad.h>
@@ -28,6 +28,12 @@ protected:
 		;
 	static constexpr GLchar _kShadedFsCode[] =
 #include "GlShadedShader.frag"
+		;
+	static constexpr GLchar _kTextVsCode[] =
+#include "GlTextShader.vert"
+		;
+	static constexpr GLchar _kTextFsCode[] =
+#include "GlTextShader.frag"
 		;
 
 	GLuint _uboMatrices = 0;
@@ -60,6 +66,7 @@ protected:
 
 	std::vector<std::unique_ptr<GlRenderItem>> _ritems;
 	std::vector<GlRenderItem *> _ritemLayers[size_t(RenderLayer::Count)];
+	GlText *_text = nullptr;
 
 public:
 

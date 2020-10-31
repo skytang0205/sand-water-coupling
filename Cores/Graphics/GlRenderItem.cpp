@@ -17,5 +17,4 @@ void GlRenderItem::draw() const
 	endDraw();
 }
 
-
 }

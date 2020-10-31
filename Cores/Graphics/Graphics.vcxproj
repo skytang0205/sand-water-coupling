@@ -86,13 +86,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BitmapFont.cpp" />
     <ClCompile Include="GlApp.cpp" />
     <ClCompile Include="GlProgram.cpp" />
     <ClCompile Include="GlRenderItem.cpp" />
-    <None Include="BitmapConsolas.inc" />
-    <None Include="GlShadedShader.vert">
-      <FileType>CppCode</FileType>
-    </None>
+    <ClCompile Include="GlText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GlApp.h" />
@@ -104,7 +102,11 @@
     <ClInclude Include="GlText.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BitmapConsolas.inc" />
     <None Include="GlShadedShader.frag" />
+    <None Include="GlShadedShader.vert" />
+    <None Include="GlTextShader.frag" />
+    <None Include="GlTextShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

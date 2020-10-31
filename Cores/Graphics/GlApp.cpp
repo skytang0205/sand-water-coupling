@@ -92,6 +92,7 @@ void GlApp::setCallbacks() const
 void GlApp::initPrograms()
 {
 	_programs["shaded"] = std::make_unique<GlProgram>(_kShadedVsCode, _kShadedFsCode);
+	_programs["text"] = std::make_unique<GlProgram>(_kTextVsCode, _kTextFsCode);
 }
 
 void GlApp::initUboProjView()
@@ -105,6 +106,10 @@ void GlApp::buildRenderItems()
 {
 	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["shaded"].get()));
 	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
+
+	_ritems.push_back(std::make_unique<GlText>(_programs["text"].get()));
+	_ritemLayers[size_t(RenderLayer::Text)].push_back(_ritems.back().get());
+	_text = dynamic_cast<GlText *>(_ritems.back().get());
 }
 
 void GlApp::processInput()
@@ -115,6 +120,8 @@ void GlApp::update()
 {
 	_orbitCamera.update();
 	updateFrameRate();
+	_text->reset();
+	_text->set("Hello world!", Vector2f(0.2, 0.2), Vector2f(1.0, 1.0), Vector4f(0, 0, 0, 1));
 	updateUniforms();
 	updateGlStates();
 }
@@ -135,6 +142,9 @@ void GlApp::draw() const
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	drawRenderLayer(RenderLayer::Transparency);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	drawRenderLayer(RenderLayer::Text);
 	glDepthMask(GL_TRUE);
 }
 

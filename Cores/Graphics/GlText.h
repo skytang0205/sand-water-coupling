@@ -7,22 +7,57 @@ namespace PhysX {
 
 class GlText : public GlRenderItem
 {
+public:
+
+	enum class Alignment { Left, Right };
+
 protected:
 
-	static inline BitmapFont _bmConsolas = {
+	static constexpr size_t _kTextBufferSize = 1024;
+
+	struct Vertex
+	{
+		Vector4f pos;
+		Vector4f texCoord;
+		Vector4f color;
+	};
+
+	Vertex _vertices[_kTextBufferSize];
+
+	GLuint _texture;
+	GLuint _vbo;
+
+	BitmapFont _bmConsolas = {
 			64,
 			51,
 			512,
 			512,
 			1,
 			128,
-			reinterpret_cast<const char *>(BitmapFont::kBitmapConsolas[0]),
+			reinterpret_cast<const uchar *>(BitmapFont::kBitmapConsolas[0]),
 			BitmapFont::kBitmapConsolasChars
 		};
 
 public:
 
-	GlText(GlProgram *program) : GlRenderItem(program) { }
+	GlText(GlProgram *program);
+
+	GlText() = delete;
+	GlText(const GlText &rhs) = delete;
+	GlText &operator=(const GlText &rhs) = delete;
+	virtual ~GlText() { glDeleteBuffers(1, &_vbo); }
+
+	void reset() { _instanceCount = 0; }
+	void set(
+		const std::string &text,
+		const Vector2f &pos,
+		const Vector2f &scale,
+		const Vector4f &color,
+		const Alignment alignment = Alignment::Left
+		);
+
+	virtual void beginDraw() const override;
+	virtual void endDraw() const override;
 };
 
 

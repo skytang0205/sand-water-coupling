@@ -15,6 +15,7 @@
     </Filter>
     <Filter Include="Inline Files">
       <UniqueIdentifier>{5fac9abf-daa5-43de-b2c2-e65ea2096f21}</UniqueIdentifier>
+      <Extensions>inc;frag;vert</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,6 +26,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GlRenderItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BitmapFont.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -52,13 +59,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GlShadedShader.frag">
-      <Filter>Inline Files</Filter>
-    </None>
     <None Include="BitmapConsolas.inc">
       <Filter>Inline Files</Filter>
     </None>
+    <None Include="GlShadedShader.frag">
+      <Filter>Inline Files</Filter>
+    </None>
     <None Include="GlShadedShader.vert">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="GlTextShader.frag">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="GlTextShader.vert">
       <Filter>Inline Files</Filter>
     </None>
   </ItemGroup>
