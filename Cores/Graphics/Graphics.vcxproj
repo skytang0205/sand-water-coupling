@@ -89,6 +89,7 @@
     <ClCompile Include="GlApp.cpp" />
     <ClCompile Include="GlProgram.cpp" />
     <ClCompile Include="GlRenderItem.cpp" />
+    <None Include="BmConsolas.inc" />
     <None Include="GlShadedShader.vert">
       <FileType>CppCode</FileType>
     </None>
@@ -99,6 +100,7 @@
     <ClInclude Include="GlOrbitCamera.h" />
     <ClInclude Include="GlProgram.h" />
     <ClInclude Include="GlRenderItem.h" />
+    <ClInclude Include="BitmapFont.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GlShadedShader.frag" />
