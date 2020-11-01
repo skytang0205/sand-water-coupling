@@ -48,6 +48,9 @@ protected:
 	const int _savedHeight;
 	const std::string &_savedTitle;
 
+
+	int _width = 0;
+	int _height = 0;
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
 	Vector2d _lastMousePos = Vector2d::Zero();
 

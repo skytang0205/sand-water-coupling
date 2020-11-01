@@ -57,17 +57,20 @@ void GlApp::run()
 
 void GlApp::initialize()
 {
-	resize(_savedWidth, _savedHeight);
 	initGlStates();
 	setCallbacks();
 	initPrograms();
 	initUboProjView();
 	buildRenderItems();
+	resize(_savedWidth, _savedHeight);
 }
 
 void GlApp::resize(const int width, const int height)
 {
+	_width = width;
+	_height = height;
 	glViewport(0, 0, width, height);
+	_text->resize(width, height);
 	_orbitCamera.setAspectRatio(float(width) / height);
 }
 
@@ -121,7 +124,17 @@ void GlApp::update()
 	_orbitCamera.update();
 	updateFrameRate();
 	_text->reset();
-	_text->set("Hello world!", Vector2f(0.2, 0.2), Vector2f(1.0, 1.0), Vector4f(0, 0, 0, 1));
+	_text->set(
+		fmt::format(
+			"Gamma correction: {}\n"
+			"Anti-aliasing:    {}\n"
+			"Wireframe mode:   {}",
+			_enableSrgb ? "On" : "Off", _enableMsaa ? "On" : "Off", _enableWireframe ? "On" : "Off"
+			),
+		Vector2f(70.0f / _width, 70.0f / _height),
+		Vector2f(1.0, 1.0),
+		Vector4f(0, 0, 0, 1)
+		);
 	updateUniforms();
 	updateGlStates();
 }
@@ -144,6 +157,7 @@ void GlApp::draw() const
 	drawRenderLayer(RenderLayer::Transparency);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	drawRenderLayer(RenderLayer::Text);
 	glDepthMask(GL_TRUE);
 }

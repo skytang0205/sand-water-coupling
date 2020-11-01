@@ -55,6 +55,7 @@ public:
 		const Vector4f &color,
 		const Alignment alignment = Alignment::Left
 		);
+	void resize(const int width, const int height) { _bmConsolas.normalize(width, height); }
 
 	virtual void beginDraw() const override;
 	virtual void endDraw() const override;

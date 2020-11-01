@@ -12,10 +12,11 @@ GlText::GlText(GlProgram *program) :
 	glCreateTextures(GL_TEXTURE_2D, 1, &_texture);
 	glTextureParameteri(_texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTextureParameteri(_texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTextureParameteri(_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTextureStorage2D(_texture, 1, GL_R8, _bmConsolas.scaleW, _bmConsolas.scaleH);
+	glTextureParameteri(_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTextureParameteri(_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTextureStorage2D(_texture, 5, GL_R8, _bmConsolas.scaleW, _bmConsolas.scaleH);
 	glTextureSubImage2D(_texture, 0, 0, 0, _bmConsolas.scaleW, _bmConsolas.scaleH, GL_RED, GL_UNSIGNED_BYTE, _bmConsolas.data);
+	glGenerateTextureMipmap(_texture);
 
 	glCreateBuffers(1, &_vbo);
 	glNamedBufferStorage(_vbo, sizeof(Vertex) * _kTextBufferSize, nullptr, GL_DYNAMIC_STORAGE_BIT);
@@ -32,6 +33,7 @@ GlText::GlText(GlProgram *program) :
 	glEnableVertexArrayAttrib(_vao, 1);
 	glEnableVertexArrayAttrib(_vao, 2);
 
+	_mode = GL_TRIANGLE_STRIP;
 	_count = 4;
 }
 

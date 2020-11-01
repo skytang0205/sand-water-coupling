@@ -10,7 +10,7 @@ out vec2 vertTexCoord;
 
 void main()
 {
-	vec2 uv = vec2(gl_InstanceID & 1, (gl_InstanceID >> 1) &1); 
+	vec2 uv = vec2(gl_VertexID & 1, (gl_VertexID >> 1) &1); 
     gl_Position = vec4(aPos.x + (aPos.z * uv.x), aPos.y - (aPos.w * uv.y), 0, 1);
 	vertColor = aColor;
 	vertTexCoord = vec2(aTexCoord.x + (aTexCoord.z * uv.x), aTexCoord.y + (aTexCoord.w * uv.y));
