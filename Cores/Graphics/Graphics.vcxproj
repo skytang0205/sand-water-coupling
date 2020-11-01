@@ -100,11 +100,14 @@
     <ClInclude Include="GlRenderItem.h" />
     <ClInclude Include="BitmapFont.h" />
     <ClInclude Include="GlText.h" />
+    <ClInclude Include="StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BitmapConsolas.inc" />
     <None Include="GlShadedShader.frag" />
     <None Include="GlShadedShader.vert" />
+    <None Include="GlSunlightShader.frag" />
+    <None Include="GlSunlightShader.vert" />
     <None Include="GlTextShader.frag" />
     <None Include="GlTextShader.vert" />
   </ItemGroup>

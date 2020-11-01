@@ -57,6 +57,9 @@
     <ClInclude Include="GlText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StepTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BitmapConsolas.inc">
@@ -72,6 +75,12 @@
       <Filter>Inline Files</Filter>
     </None>
     <None Include="GlTextShader.vert">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="GlSunlightShader.frag">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="GlSunlightShader.vert">
       <Filter>Inline Files</Filter>
     </None>
   </ItemGroup>

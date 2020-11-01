@@ -37,12 +37,15 @@ GlApp::GlApp(const int width, const int height, const std::string &title) :
 		std::cerr << "Error: [GLApp] Failed to initialize GLAD." << std::endl;
 		std::exit(-1);
 	}
+	glfwSetWindowSizeLimits(_window, _kMinimalWidth, _kMinimalHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);
 }
 
 void GlApp::run()
 {
 	initialize();
+	_timer.reset();
 	while (!glfwWindowShouldClose(_window)) {
+		_timer.tick();
 		processInput();
 
 		update();
@@ -60,7 +63,7 @@ void GlApp::initialize()
 	initGlStates();
 	setCallbacks();
 	initPrograms();
-	initUboProjView();
+	initUniformBuffers();
 	buildRenderItems();
 	resize(_savedWidth, _savedHeight);
 }
@@ -98,7 +101,7 @@ void GlApp::initPrograms()
 	_programs["text"] = std::make_unique<GlProgram>(_kTextVsCode, _kTextFsCode);
 }
 
-void GlApp::initUboProjView()
+void GlApp::initUniformBuffers()
 {
 	glCreateBuffers(1, &_uboMatrices);
 	glNamedBufferStorage(_uboMatrices, sizeof(Matrix4f), nullptr, GL_DYNAMIC_STORAGE_BIT);
@@ -123,18 +126,7 @@ void GlApp::update()
 {
 	_orbitCamera.update();
 	updateFrameRate();
-	_text->reset();
-	_text->set(
-		fmt::format(
-			"Gamma correction: {}\n"
-			"Anti-aliasing:    {}\n"
-			"Wireframe mode:   {}",
-			_enableSrgb ? "On" : "Off", _enableMsaa ? "On" : "Off", _enableWireframe ? "On" : "Off"
-			),
-		Vector2f(70.0f / _width, 70.0f / _height),
-		Vector2f(1.0, 1.0),
-		Vector4f(0, 0, 0, 1)
-		);
+	updateText();
 	updateUniforms();
 	updateGlStates();
 }
@@ -164,20 +156,42 @@ void GlApp::draw() const
 
 void GlApp::updateFrameRate()
 {
-	static uint ticks = 0;
-	static auto lastTime = glfwGetTime();
+	using namespace std::chrono_literals;
+	static uint framesCnt = 0;
+	static auto elapsedTime = StepTimer::duration::zero();
 
-	ticks++;
-	auto currentTime = glfwGetTime();
-	auto elapsed = currentTime - lastTime;
-	if (elapsed > 1) {
-		std::cout << fmt::format("FPS = {:.0f}", ticks / elapsed) << std::endl;
-		lastTime = currentTime;
-		ticks = 0;
+	framesCnt++;
+	if (_timer.getTotalTime() - elapsedTime >= 1s) {
+		_framesPerSecond = framesCnt;
+		framesCnt = 0;
+		elapsedTime = _timer.getTotalTime();
 	}
 }
 
-void GlApp::updateUniforms()
+void GlApp::updateText()
+{
+	_text->reset();
+	_text->set(
+		fmt::format(
+			"Gamma correction (F2):  {}\n"
+			"   Multisampling (F3):  {}\n"
+			"  Wireframe mode (F4):  {}",
+			_enableSrgb ? "on" : "off", _enableMsaa ? "on" : "off", _enableWireframe ? "on" : "off"
+		),
+		Vector2f(10.24f / _width, 7.68f / _height),
+		Vector2f(0.75, 0.75),
+		Vector4f(0, 0, 0, 1)
+	);
+	_text->set(
+		fmt::format("FPS: {:>3}", _framesPerSecond),
+		Vector2f(1.0f - 10.24f / _width, 7.68f / _height),
+		Vector2f(0.75, 0.75),
+		Vector4f(0, 0, 0, 1),
+		GlText::Alignment::Right
+	);
+}
+
+void GlApp::updateUniforms() const
 {
 	// For proj-view matrix.
 	glNamedBufferSubData(_uboMatrices, 0, sizeof(Matrix4f), _orbitCamera.projView().data());

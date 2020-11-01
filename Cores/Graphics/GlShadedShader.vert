@@ -13,7 +13,7 @@ layout (std140, binding = 0) uniform Matrices
 
 void main()
 {
-    gl_Position = uProjView * vec4(aPos, 1.0);
+	gl_Position = uProjView * vec4(aPos, 1.0);
 	vertColor = aColor;
 }
 )"

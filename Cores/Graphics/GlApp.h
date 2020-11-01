@@ -2,6 +2,7 @@
 
 #include "Graphics/GlOrbitCamera.h"
 #include "Graphics/GlText.h"
+#include "Graphics/StepTimer.h"
 #include "Utilities/Types.h"
 
 #include <glad/glad.h>
@@ -22,6 +23,9 @@ protected:
 	enum class RenderLayer : uint { Opaque, Transparency, Text, Count };
 
 	static GlApp *_this;
+
+	static constexpr int _kMinimalWidth = 640;
+	static constexpr int _kMinimalHeight = 480;
 
 	static constexpr GLchar _kShadedVsCode[] =
 #include "GlShadedShader.vert"
@@ -64,6 +68,8 @@ protected:
 		0.5f * float(std::numbers::pi), // theta
 		Vector3f::Zero() // target
 		);
+	StepTimer _timer;
+	uint _framesPerSecond = 0;
 
 	std::unordered_map<std::string, std::unique_ptr<GlProgram>> _programs;
 
@@ -94,11 +100,11 @@ protected:
 	virtual void initGlStates() const;
 	virtual void setCallbacks() const;
 	virtual void initPrograms();
-	virtual void initUboProjView();
+	virtual void initUniformBuffers();
 	virtual void buildRenderItems();
 
 	virtual void processInput();
-	virtual void update();
+	void update();
 	virtual void clearBuffers() const;
 	virtual void draw() const;
 
@@ -109,10 +115,10 @@ protected:
 	}
 
 	void updateFrameRate();
+	virtual void updateText();
+	virtual void updateUniforms() const;
 
-	void updateUniforms();
-
-	void updateGlStates()
+	virtual void updateGlStates()
 	{
 		_enableSrgb ? glEnable(GL_FRAMEBUFFER_SRGB) : glDisable(GL_FRAMEBUFFER_SRGB);
 		_enableMsaa ? glEnable(GL_MULTISAMPLE) : glDisable(GL_MULTISAMPLE);
