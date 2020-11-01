@@ -6,9 +6,15 @@ layout (location = 1) in vec4 aColor;
 
 out vec4 vertColor;
 
-layout (std140, binding = 0) uniform Matrices
+layout (std140, binding = 0) uniform PassConstants
 {
-	mat4 uProjView;
+	mat4 uProjView;			// 0
+	vec4 uViewPos;			// 64
+	vec3 uAmbientStrength;	// 80
+	vec3 uLightStrength;	// 96
+	vec3 uLightDir;			// 112
+	float uTotalTime;		// 128
+	float uDeltaTime;		// 132
 };
 
 void main()

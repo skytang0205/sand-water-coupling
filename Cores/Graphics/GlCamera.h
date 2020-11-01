@@ -70,6 +70,7 @@ public:
 		_viewDirty = false;
 	}
 
+	const Vector3f &pos() const { return _pos; }
 	const Matrix4f &projView() const { return _projView; }
 
 	virtual void reset() { lookAt(_savedPos, _savedTarget); }

@@ -9,7 +9,7 @@ void BitmapFont::normalize(const int clientWidth, const int clientHeight)
 	lineHeightN = float(lineHeight) / clientHeight;
 	baseN = float(base) / clientHeight;
 
-	for (size_t i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 		charsN[i] = {
 				float(chars[i].x) / scaleW,
 				float(chars[i].y) / scaleH,

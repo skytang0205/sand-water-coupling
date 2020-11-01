@@ -103,9 +103,9 @@ void GlApp::initPrograms()
 
 void GlApp::initUniformBuffers()
 {
-	glCreateBuffers(1, &_uboMatrices);
-	glNamedBufferStorage(_uboMatrices, sizeof(Matrix4f), nullptr, GL_DYNAMIC_STORAGE_BIT);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, _uboMatrices);
+	glCreateBuffers(1, &_uboPassConstants);
+	glNamedBufferStorage(_uboPassConstants, sizeof(PassConstants), nullptr, GL_DYNAMIC_STORAGE_BIT);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, _uboPassConstants);
 }
 
 void GlApp::buildRenderItems()
@@ -124,7 +124,6 @@ void GlApp::processInput()
 
 void GlApp::update()
 {
-	_orbitCamera.update();
 	updateFrameRate();
 	updateText();
 	updateUniforms();
@@ -156,15 +155,15 @@ void GlApp::draw() const
 
 void GlApp::updateFrameRate()
 {
-	using namespace std::chrono_literals;
 	static uint framesCnt = 0;
-	static auto elapsedTime = StepTimer::duration::zero();
+	static double lastTotTime = _timer.getTotalTime().count();
+	double currTotTime = _timer.getTotalTime().count();
 
 	framesCnt++;
-	if (_timer.getTotalTime() - elapsedTime >= 1s) {
-		_framesPerSecond = framesCnt;
+	if (currTotTime - lastTotTime >= 1.0) {
+		_framesPerSecond = uint(framesCnt / (currTotTime - lastTotTime) + 0.5);
 		framesCnt = 0;
-		elapsedTime = _timer.getTotalTime();
+		lastTotTime = currTotTime;
 	}
 }
 
@@ -179,22 +178,31 @@ void GlApp::updateText()
 			_enableSrgb ? "on" : "off", _enableMsaa ? "on" : "off", _enableWireframe ? "on" : "off"
 		),
 		Vector2f(10.24f / _width, 7.68f / _height),
-		Vector2f(0.75, 0.75),
+		Vector2f(0.75f, 0.75f),
 		Vector4f(0, 0, 0, 1)
 	);
 	_text->set(
 		fmt::format("FPS: {:>3}", _framesPerSecond),
 		Vector2f(1.0f - 10.24f / _width, 7.68f / _height),
-		Vector2f(0.75, 0.75),
+		Vector2f(0.75f, 0.75f),
 		Vector4f(0, 0, 0, 1),
 		GlText::Alignment::Right
 	);
 }
 
-void GlApp::updateUniforms() const
+void GlApp::updateUniforms()
 {
-	// For proj-view matrix.
-	glNamedBufferSubData(_uboMatrices, 0, sizeof(Matrix4f), _orbitCamera.projView().data());
+	_orbitCamera.update();
+	// Construct pass constants.
+	_passConstants.projView = _orbitCamera.projView();
+	_passConstants.viewPos = _orbitCamera.pos();
+	_passConstants.ambientStrength = Vector3f(0.25f, 0.25f, 0.35f);
+	_passConstants.lightStrength = Vector3f(1.0f, 1.0f, 0.9f),
+	_passConstants.lightDir = Vector3f::Unit(0);
+	_passConstants.totalTime = float(_timer.getTotalTime().count());
+	_passConstants.deltaTime = float(_timer.deltaTime().count());
+	// Upload to Graphics Memory.
+	glNamedBufferSubData(_uboPassConstants, 0, sizeof(_passConstants), &_passConstants);
 }
 
 void GlApp::framebufferSizeCallback(GLFWwindow *window, int width, int height)

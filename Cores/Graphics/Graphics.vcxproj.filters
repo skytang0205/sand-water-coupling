@@ -34,6 +34,9 @@
     <ClCompile Include="BitmapFont.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeometryGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GlApp.h">
@@ -60,6 +63,9 @@
     <ClInclude Include="StepTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeometryGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BitmapConsolas.inc">
@@ -77,10 +83,10 @@
     <None Include="GlTextShader.vert">
       <Filter>Inline Files</Filter>
     </None>
-    <None Include="GlSunlightShader.frag">
+    <None Include="GlDefaultShader.frag">
       <Filter>Inline Files</Filter>
     </None>
-    <None Include="GlSunlightShader.vert">
+    <None Include="GlDefaultShader.vert">
       <Filter>Inline Files</Filter>
     </None>
   </ItemGroup>

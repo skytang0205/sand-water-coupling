@@ -22,6 +22,21 @@ protected:
 
 	enum class RenderLayer : uint { Opaque, Transparency, Text, Count };
 
+	struct PassConstants
+	{
+		Matrix4f projView;			// 0
+		Vector3f viewPos;			// 64
+		float _pad1 = 0.0f;
+		Vector3f ambientStrength;	// 80
+		float _pad2 = 0.0f;
+		Vector3f lightStrength;		// 96
+		float _pad3 = 0.0f;
+		Vector3f lightDir;			// 112
+		float _pad4 = 0.0f;
+		float totalTime;			// 128
+		float deltaTime;			// 132
+	};
+
 	static GlApp *_this;
 
 	static constexpr int _kMinimalWidth = 640;
@@ -40,7 +55,7 @@ protected:
 #include "GlTextShader.frag"
 		;
 
-	GLuint _uboMatrices = 0;
+	GLuint _uboPassConstants = 0;
 
 	bool _enableSrgb = true;
 	bool _enableMsaa = false;
@@ -77,6 +92,8 @@ protected:
 	std::vector<GlRenderItem *> _ritemLayers[size_t(RenderLayer::Count)];
 	GlText *_text = nullptr;
 
+	PassConstants _passConstants;
+
 public:
 
 	GlApp(const int width, const int height, const std::string &caption);
@@ -86,7 +103,7 @@ public:
 	GlApp &operator=(const GlApp &rhs) = delete;
 	virtual ~GlApp()
 	{
-		glDeleteBuffers(1, &_uboMatrices);
+		glDeleteBuffers(1, &_uboPassConstants);
 		glfwTerminate();
 	}
 
@@ -116,7 +133,7 @@ protected:
 
 	void updateFrameRate();
 	virtual void updateText();
-	virtual void updateUniforms() const;
+	virtual void updateUniforms();
 
 	virtual void updateGlStates()
 	{

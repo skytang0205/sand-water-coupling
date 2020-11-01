@@ -87,12 +87,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BitmapFont.cpp" />
+    <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="GlApp.cpp" />
     <ClCompile Include="GlProgram.cpp" />
     <ClCompile Include="GlRenderItem.cpp" />
     <ClCompile Include="GlText.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="GlApp.h" />
     <ClInclude Include="GlCamera.h" />
     <ClInclude Include="GlOrbitCamera.h" />
@@ -106,8 +108,8 @@
     <None Include="BitmapConsolas.inc" />
     <None Include="GlShadedShader.frag" />
     <None Include="GlShadedShader.vert" />
-    <None Include="GlSunlightShader.frag" />
-    <None Include="GlSunlightShader.vert" />
+    <None Include="GlDefaultShader.frag" />
+    <None Include="GlDefaultShader.vert" />
     <None Include="GlTextShader.frag" />
     <None Include="GlTextShader.vert" />
   </ItemGroup>

@@ -25,26 +25,29 @@ inline void testArgsParser(int argc, char *argv[])
 
 }
 
+struct PassConstants
+{
+	PhysX::Matrix4f projView;			// 0
+	PhysX::Vector3f viewPos;			// 64
+	float pad0;
+	PhysX::Vector3f ambientStrength;	// 80
+	float pad1;
+	PhysX::Vector3f lightStrength;		// 96
+	float pad2;
+	PhysX::Vector3f lightDir;			// 112
+	float pad3;
+	float totalTime;			// 128
+	float deltaTime;			// 132
+} test;
+
 inline void testEigen()
 {
-	using namespace PhysX;
-	using namespace std::chrono;
-	using namespace std::chrono_literals;
-	Vector3f a = Vector3f::Zero();
-	Vector3f b = Vector3f::Ones();
-	Vector4f c = Vector4f::Zero();
-	Vector4f d = Vector4f::Ones();
-	const int T = 1000000000;
-	auto t1 = steady_clock::now();
-	for (int i = 0; i < T; i++) {
-		a += (b * T).normalized();
-	}
-	auto t2 = steady_clock::now();
-	for (int i = 0; i < T; i++) {
-		c += (d * i).normalized();
-	}
-	auto t3 = steady_clock::now();
-	std::cout << duration<double>(t2 - t1).count() << std::endl << duration<double>(t3 - t2).count() << std::endl;
+	std::cout << (char *)(&test.viewPos) - (char *)(&test) << std::endl;
+	std::cout << (char *)(&test.ambientStrength) - (char *)(&test) << std::endl;
+	std::cout << (char *)(&test.lightStrength) - (char *)(&test) << std::endl;
+	std::cout << (char *)(&test.lightDir) - (char *)(&test) << std::endl;
+	std::cout << (char *)(&test.totalTime) - (char *)(&test) << std::endl;
+	std::cout << (char *)(&test.deltaTime) - (char *)(&test) << std::endl;
 }
 
 int main(int argc, char *argv[])
