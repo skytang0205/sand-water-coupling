@@ -92,6 +92,7 @@
     <ClCompile Include="GlProgram.cpp" />
     <ClCompile Include="GlRenderItem.cpp" />
     <ClCompile Include="GlText.cpp" />
+    <ClCompile Include="GlRenderTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeometryGenerator.h" />
@@ -102,6 +103,7 @@
     <ClInclude Include="GlRenderItem.h" />
     <ClInclude Include="BitmapFont.h" />
     <ClInclude Include="GlText.h" />
+    <ClInclude Include="GlRenderTest.h" />
     <ClInclude Include="StepTimer.h" />
   </ItemGroup>
   <ItemGroup>

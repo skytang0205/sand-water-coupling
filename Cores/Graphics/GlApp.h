@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics/GlOrbitCamera.h"
+#include "Graphics/GlRenderTest.h"
 #include "Graphics/GlText.h"
 #include "Graphics/StepTimer.h"
 #include "Utilities/Types.h"

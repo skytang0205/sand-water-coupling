@@ -10,7 +10,11 @@ class GeometryGenerator
 {
 public:
 
-	struct Vertex { Vector3f pos, normal; };
+	struct Vertex
+	{
+		Vector3f pos;
+		Vector3f normal;
+	};
 
 	struct Data
 	{
