@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <numbers>
 
+#include <cmath>
+
 namespace PhysX {
 
 class GlOrbitCamera : public GlCamera
@@ -64,6 +66,8 @@ public:
 		static constexpr float kRotateRatio = 0.25f * float(std::numbers::pi) / 180.0f;
 		_phi += kRotateRatio * dx;
 		_theta += kRotateRatio * dy;
+		_phi = std::fmod(_phi, 2.0f * float(std::numbers::pi));
+		if (_phi < 0.0f) _phi += 2.0f * float(std::numbers::pi);
 		_theta = std::clamp(_theta, 0.1f, float(std::numbers::pi) - 0.1f);
 		lookAt(sphericalToCartesian(_radius, _phi, _theta), _target);
 	}
@@ -82,8 +86,6 @@ public:
 		_radius = std::clamp(_radius, 0.1f, 150.0f);
 		lookAt(sphericalToCartesian(_radius, _phi, _theta), _target);
 	}
-
-protected:
 
 	static Vector3f sphericalToCartesian(const float radius, const float phi, const float theta)
 	{

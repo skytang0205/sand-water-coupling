@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 
+#include <algorithm>
 #include <iostream>
 
 #include <cstdlib>
@@ -46,12 +47,11 @@ void GlApp::run()
 	_timer.reset();
 	while (!glfwWindowShouldClose(_window)) {
 		_timer.tick();
-		processInput();
-
+		const float dt = float(_timer.deltaTime().count());
+		processInput(dt);
 		update();
 		clearBuffers();
 		draw();
-
 		// Swap buffers and poll IO events.
 		glfwSwapBuffers(_window);
 		glfwPollEvents();
@@ -98,6 +98,7 @@ void GlApp::setCallbacks() const
 void GlApp::initPrograms()
 {
 	_programs["shaded"] = std::make_unique<GlProgram>(_kShadedVsCode, _kShadedFsCode);
+	_programs["default"] = std::make_unique<GlProgram>(_kDefaultVsCode, _kDefaultFsCode);
 	_programs["text"] = std::make_unique<GlProgram>(_kTextVsCode, _kTextFsCode);
 }
 
@@ -110,7 +111,7 @@ void GlApp::initUniformBuffers()
 
 void GlApp::buildRenderItems()
 {
-	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["shaded"].get()));
+	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["default"].get()));
 	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
 
 	_ritems.push_back(std::make_unique<GlText>(_programs["text"].get()));
@@ -118,8 +119,19 @@ void GlApp::buildRenderItems()
 	_text = dynamic_cast<GlText *>(_ritems.back().get());
 }
 
-void GlApp::processInput()
+void GlApp::processInput(const float dt)
 {
+	if (glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		_lightPhi -= 1.0f * dt;
+	if (glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		_lightPhi += 1.0f * dt;
+	if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
+		_lightTheta -= 1.0f * dt;
+	if (glfwGetKey(_window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		_lightTheta += 1.0f * dt;
+	_lightPhi = std::fmod(_lightPhi, 2.0f * float(std::numbers::pi));
+	if (_lightPhi < 0.0f) _lightPhi += 2.0f * float(std::numbers::pi);
+	_lightTheta = std::clamp(_lightTheta, 0.1f, 0.5f * float(std::numbers::pi));
 }
 
 void GlApp::update()
@@ -170,24 +182,36 @@ void GlApp::updateFrameRate()
 void GlApp::updateText()
 {
 	_text->reset();
-	_text->set(
-		fmt::format(
-			"Gamma correction (F2):  {}\n"
-			"   Multisampling (F3):  {}\n"
-			"  Wireframe mode (F4):  {}",
-			_enableSrgb ? "on" : "off", _enableMsaa ? "on" : "off", _enableWireframe ? "on" : "off"
-		),
-		Vector2f(10.24f / _width, 7.68f / _height),
-		Vector2f(0.75f, 0.75f),
-		Vector4f(0, 0, 0, 1)
-	);
-	_text->set(
-		fmt::format("FPS: {:>3}", _framesPerSecond),
-		Vector2f(1.0f - 10.24f / _width, 7.68f / _height),
-		Vector2f(0.75f, 0.75f),
-		Vector4f(0, 0, 0, 1),
-		GlText::Alignment::Right
-	);
+	if (_enableInfo) {
+		_text->set(
+			fmt::format(
+				"  Rendering info (F1):  {}\n"
+				"Gamma correction (F2):  {}\n"
+				"   Multisampling (F3):  {}\n"
+				"  Wireframe mode (F4):  {}",
+				_enableInfo ? "on" : "off",
+				_enableSrgb ? "on" : "off",
+				_enableMsaa ? "on" : "off",
+				_enableWireframe ? "on" : "off"
+				),
+			Vector2f(10.24f / _width, 7.68f / _height),
+			Vector2f(0.75f, 0.75f),
+			Vector4f(0, 0, 0, 1)
+			);
+		_text->set(
+			fmt::format("FPS: {:>3}", _framesPerSecond),
+			Vector2f(1.0f - 10.24f / _width, 7.68f / _height),
+			Vector2f(0.75f, 0.75f),
+			Vector4f(0, 0, 0, 1),
+			GlText::Alignment::Right
+			);
+		_text->set(
+			fmt::format("Light direction: ({:.2f}, {:.2f})", _lightPhi, _lightTheta),
+			Vector2f(10.24f / _width, 1.0f - (24.0f + 7.68f) / _height),
+			Vector2f(0.75f, 0.75f),
+			Vector4f(0, 0, 0, 1)
+			);
+	}
 }
 
 void GlApp::updateUniforms()
@@ -197,8 +221,8 @@ void GlApp::updateUniforms()
 	_passConstants.projView = _orbitCamera.projView();
 	_passConstants.viewPos = _orbitCamera.pos();
 	_passConstants.ambientStrength = Vector3f(0.25f, 0.25f, 0.35f);
-	_passConstants.lightStrength = Vector3f(1.0f, 1.0f, 0.9f),
-	_passConstants.lightDir = Vector3f::Unit(0);
+	_passConstants.lightStrength = Vector3f(1.0f, 1.0f, 0.9f);
+	_passConstants.lightDir = GlOrbitCamera::sphericalToCartesian(1.0f, _lightPhi, _lightTheta);
 	_passConstants.totalTime = float(_timer.getTotalTime().count());
 	_passConstants.deltaTime = float(_timer.deltaTime().count());
 	// Upload to Graphics Memory.
@@ -220,6 +244,11 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 		case GLFW_KEY_SPACE:
 			glfwSetWindowSize(window, _this->_savedWidth, _this->_savedHeight);
 			_this->_orbitCamera.reset();
+			_this->_lightPhi = _kSavedLightPhi;
+			_this->_lightTheta = _kSavedLightTheta;
+			break;
+		case GLFW_KEY_F1:
+			_this->_enableInfo = !_this->_enableInfo;
 			break;
 		case GLFW_KEY_F2:
 			_this->_enableSrgb = !_this->_enableSrgb;

@@ -33,21 +33,28 @@ protected:
 		Vector3f lightStrength;		// 96
 		float _pad3 = 0.0f;
 		Vector3f lightDir;			// 112
-		float _pad4 = 0.0f;
-		float totalTime;			// 128
-		float deltaTime;			// 132
+		float totalTime;			// 124
+		float deltaTime;			// 128
 	};
 
 	static GlApp *_this;
 
 	static constexpr int _kMinimalWidth = 640;
 	static constexpr int _kMinimalHeight = 480;
+	static constexpr float _kSavedLightPhi = 0.0f;
+	static constexpr float _kSavedLightTheta = 0.25f * float(std::numbers::pi);
 
 	static constexpr GLchar _kShadedVsCode[] =
 #include "GlShadedShader.vert"
 		;
 	static constexpr GLchar _kShadedFsCode[] =
 #include "GlShadedShader.frag"
+		;
+	static constexpr GLchar _kDefaultVsCode[] =
+#include "GlDefaultShader.vert"
+		;
+	static constexpr GLchar _kDefaultFsCode[] =
+#include "GlDefaultShader.frag"
 		;
 	static constexpr GLchar _kTextVsCode[] =
 #include "GlTextShader.vert"
@@ -58,6 +65,7 @@ protected:
 
 	GLuint _uboPassConstants = 0;
 
+	bool _enableInfo = true;
 	bool _enableSrgb = true;
 	bool _enableMsaa = false;
 	bool _enableWireframe = false;
@@ -80,10 +88,13 @@ protected:
 		1.0f, // zNear
 		1000.0f, // zFar
 		10.0f, // radius
-		0.0, // phi
+		0.0f, // phi
 		0.5f * float(std::numbers::pi), // theta
 		Vector3f::Zero() // target
 		);
+	float _lightPhi = _kSavedLightPhi;
+	float _lightTheta = _kSavedLightTheta;
+
 	StepTimer _timer;
 	uint _framesPerSecond = 0;
 
@@ -121,7 +132,7 @@ protected:
 	virtual void initUniformBuffers();
 	virtual void buildRenderItems();
 
-	virtual void processInput();
+	virtual void processInput(const float dt);
 	void update();
 	virtual void clearBuffers() const;
 	virtual void draw() const;
