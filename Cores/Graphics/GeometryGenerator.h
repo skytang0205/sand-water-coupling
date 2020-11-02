@@ -24,7 +24,9 @@ public:
 
 public:
 
-	static Data createBox(float width, float height, float depth);
+	static Data createBox(const Vector3f &lengths);
+	static Data createBox(const float width, const float height, const float depth) { return createBox(Vector3f(width, height, depth)); }
+	static Data createUVSphere(const float radius, const uint sliceCnt, const uint stackCnt);
 };
 
 }
