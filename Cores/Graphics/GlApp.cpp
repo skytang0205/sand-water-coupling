@@ -27,7 +27,7 @@ GlApp::GlApp(const int width, const int height, const std::string &title) :
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 	// Create window.
-	_window = glfwCreateWindow(_savedWidth, _savedHeight, _savedTitle.c_str(), NULL, NULL);
+	_window = glfwCreateWindow(_savedWidth, _savedHeight, _savedTitle.c_str(), nullptr, nullptr);
 	if (!_window) {
 		std::cerr << "Error: [GLApp] Failed to create GLFW window." << std::endl;
 		std::exit(-1);

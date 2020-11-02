@@ -61,5 +61,4 @@ public:
 	virtual void endDraw() const override;
 };
 
-
 }

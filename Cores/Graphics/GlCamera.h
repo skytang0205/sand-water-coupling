@@ -8,7 +8,6 @@ namespace PhysX {
 
 class GlCamera
 {
-
 protected:
 
 	float _fovy;

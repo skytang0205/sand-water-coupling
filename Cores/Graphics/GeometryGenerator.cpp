@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 namespace PhysX {
+
 GeometryGenerator::Data GeometryGenerator::createBox(const Vector3f &lengths)
 {
 	Data ret;
