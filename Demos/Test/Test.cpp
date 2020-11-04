@@ -52,6 +52,7 @@ inline void testEigen()
 
 int main(int argc, char *argv[])
 {
+	testArgsParser(argc, argv);
 	testEigen();
 	return 0;
 }

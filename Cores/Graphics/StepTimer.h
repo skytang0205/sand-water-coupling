@@ -31,7 +31,7 @@ public:
 	StepTimer &operator=(const StepTimer &rhs) = default;
 	virtual ~StepTimer() = default;
 
-	auto getTotalTime() const { return (_stopped ? _stopTime : _currTime) - _baseTime - _pausedTime; }
+	auto totalTime() const { return (_stopped ? _stopTime : _currTime) - _baseTime - _pausedTime; }
 	auto deltaTime() const { return _deltaTime; }
 
 	void reset()

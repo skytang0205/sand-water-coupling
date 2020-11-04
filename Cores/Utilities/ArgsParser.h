@@ -39,10 +39,10 @@ public:
 	ArgDataBase &operator=(const ArgDataBase &rhs) = default;
 	virtual ~ArgDataBase() = default;
 
-	const std::type_info &getType() const { return _type; }
-	const std::string &getName() const { return _name; }
-	char getFlag() const { return _flag; }
-	const std::string &getDesc() const { return _desc; }
+	const std::type_info &type() const { return _type; }
+	const std::string &name() const { return _name; }
+	char flag() const { return _flag; }
+	const std::string &desc() const { return _desc; }
 	bool isMandatory() const { return _mandatory; }
 	bool isSet() const { return _set; }
 	virtual std::string getShortDesc() const = 0;

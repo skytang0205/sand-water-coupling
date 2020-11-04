@@ -2,7 +2,9 @@ R"(
 #version 450 core
 
 in vec3 vertPos;
+flat in uint vertEnableColorMap;
 in vec3 vertNormal;
+in float vertHeat;
 
 out vec4 fragColor;
 
@@ -10,6 +12,8 @@ uniform mat4 uWorld;
 uniform vec4 uDiffuseAlbedo;
 uniform vec3 uFresnelR0;
 uniform float uRoughness;
+
+vec3 diffuseColor;
 
 layout (std140, binding = 0) uniform PassConstants
 {
@@ -38,7 +42,7 @@ vec3 calcDiffuseAndSpecular(const vec3 lightStrength, const vec3 lightDir, const
 	vec3 specularAlbedo = fresnelFactor * roughnessFactor;
 	// Apply LDR.
 	specularAlbedo = specularAlbedo / (specularAlbedo + 1.0);
-	return (uDiffuseAlbedo.rgb + specularAlbedo) * lightStrength;
+	return (diffuseColor + specularAlbedo) * lightStrength;
 }
 
 vec3 ComputeDirectionalLight(const vec3 normal, const vec3 viewDir)
@@ -47,9 +51,24 @@ vec3 ComputeDirectionalLight(const vec3 normal, const vec3 viewDir)
 	return calcDiffuseAndSpecular(lightStrength, uLightDir, normal, viewDir);
 }
 
+float jetBase(const float val)
+{
+	if (val <= 0.125) return 0.0;
+	else if (val <= 0.375) return 4.0 * val - 0.5;
+	else if (val <= 0.625) return 1.0;
+	else if (val <= 0.875) return 3.5 - 4.0 * val;
+	else return 0.0;
+}
+
+vec3 getJet(const float heat)
+{
+	return vec3(jetBase(heat - 0.25), jetBase(heat), jetBase(heat + 0.25));
+}
+
 void main()
 {
-	vec3 ambient = uAmbientStrength * uDiffuseAlbedo.rgb;
+	diffuseColor = vertEnableColorMap == 0 ? uDiffuseAlbedo.rgb : getJet(vertHeat);
+	vec3 ambient = uAmbientStrength * diffuseColor;
 	vec3 diffspec = ComputeDirectionalLight(normalize(vertNormal), normalize(uViewPos - vertPos));
 	fragColor = vec4(ambient + diffspec, uDiffuseAlbedo.a);
 }

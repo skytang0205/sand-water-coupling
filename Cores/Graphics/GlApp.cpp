@@ -168,8 +168,8 @@ void GlApp::draw() const
 void GlApp::updateFrameRate()
 {
 	static uint framesCnt = 0;
-	static double lastTotTime = _timer.getTotalTime().count();
-	double currTotTime = _timer.getTotalTime().count();
+	static double lastTotTime = _timer.totalTime().count();
+	double currTotTime = _timer.totalTime().count();
 
 	framesCnt++;
 	if (currTotTime - lastTotTime >= 1.0) {
@@ -223,7 +223,7 @@ void GlApp::updateUniforms()
 	_passConstants.ambientStrength = Vector3f(0.25f, 0.25f, 0.35f);
 	_passConstants.lightStrength = Vector3f(1.0f, 1.0f, 0.9f);
 	_passConstants.lightDir = GlOrbitCamera::sphericalToCartesian(1.0f, _lightPhi, _lightTheta);
-	_passConstants.totalTime = float(_timer.getTotalTime().count());
+	_passConstants.totalTime = float(_timer.totalTime().count());
 	_passConstants.deltaTime = float(_timer.deltaTime().count());
 	// Upload to Graphics Memory.
 	glNamedBufferSubData(_uboPassConstants, 0, sizeof(_passConstants), &_passConstants);

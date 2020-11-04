@@ -23,11 +23,11 @@ std::string ArgsParser::generateUsage() const
 	usage += "\nOptions:\n";
 	// Usage body.
 	std::size_t maxWidth = 0;
-	for (const auto &arg : _args) maxWidth = std::max(maxWidth, arg->getName().length());
+	for (const auto &arg : _args) maxWidth = std::max(maxWidth, arg->name().length());
 	for (const auto &arg : _args) {
-		if (arg->getFlag()) usage += fmt::format("  -{}, ", arg->getFlag());
+		if (arg->flag()) usage += fmt::format("  -{}, ", arg->flag());
 		else usage += fmt::format("{:^6}", "");
-		usage += fmt::format("--{:<{}}{}\n", arg->getName(), maxWidth + 4, arg->getDesc());
+		usage += fmt::format("--{:<{}}{}\n", arg->name(), maxWidth + 4, arg->desc());
 	}
 	// Return usage.
 	return usage;
@@ -46,7 +46,7 @@ void ArgsParser::parse(const int argc, char *const argv[])
 			else arg = findArgByFlag(argv[i][1]);
 			if (arg) {
 				// Handle options without value, assuming default_value == false.
-				if (arg->getType() == typeid(bool) && !arg->isMandatory()) arg->parseValue("1");
+				if (arg->type() == typeid(bool) && !arg->isMandatory()) arg->parseValue("1");
 				else {
 					if (i + 1 == argc) reportError(fmt::format("missing value for option {}", argv[i]));
 					else if (!arg->parseValue(argv[i + 1]))
@@ -63,7 +63,7 @@ void ArgsParser::parse(const int argc, char *const argv[])
 		std::exit(0);
 	}
 	for (const auto &arg : _args)
-		if (arg->isMandatory() && !arg->isSet()) reportError(fmt::format("unassigned argument {}", arg->getName()));
+		if (arg->isMandatory() && !arg->isSet()) reportError(fmt::format("unassigned argument {}", arg->name()));
 }
 
 void ArgsParser::parse(const char *cmdLine)
@@ -100,14 +100,14 @@ void ArgsParser::parse(const char *cmdLine)
 ArgDataBase *ArgsParser::findArgByName(const std::string &name) const
 {
 	for (const auto &arg : _args)
-		if (name == arg->getName()) return arg.get();
+		if (name == arg->name()) return arg.get();
 	return nullptr;
 }
 
 ArgDataBase *ArgsParser::findArgByFlag(const char flag) const
 {
 	for (const auto &arg : _args)
-		if (flag == arg->getFlag()) return arg.get();
+		if (flag == arg->flag()) return arg.get();
 	return nullptr;
 }
 
