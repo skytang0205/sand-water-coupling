@@ -12,9 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Simulation.h" />
+    <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

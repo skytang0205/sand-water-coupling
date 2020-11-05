@@ -1,6 +1,8 @@
 #include "Utilities/ArgsParser.h"
 #include "Utilities/Types.h"
 
+#include <fmt/core.h>
+
 #include <iostream>
 #include <chrono>
 
@@ -54,5 +56,6 @@ int main(int argc, char *argv[])
 {
 	testArgsParser(argc, argv);
 	testEigen();
+	std::cout << fmt::format("{:>9.2f}", 3.1415926) << std::endl;
 	return 0;
 }
