@@ -51,12 +51,6 @@
     <ClInclude Include="GlRenderItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GlCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GlOrbitCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BitmapFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,7 +66,13 @@
     <ClInclude Include="GlRenderTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GlOrthoCamera.h">
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OrbitCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OrthoCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

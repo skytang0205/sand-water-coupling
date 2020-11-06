@@ -4,7 +4,7 @@
 
 namespace PhysX {
 
-class GlCamera
+class Camera
 {
 protected:
 
@@ -19,10 +19,10 @@ protected:
 
 public:
 
-	GlCamera() = default;
-	GlCamera(const GlCamera &rhs) = default;
-	GlCamera &operator=(const GlCamera &rhs) = default;
-	virtual ~GlCamera() = default;
+	Camera() = default;
+	Camera(const Camera &rhs) = default;
+	Camera &operator=(const Camera &rhs) = default;
+	virtual ~Camera() = default;
 
 	virtual void update() = 0;
 	virtual void reset() = 0;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/GlCamera.h"
+#include "Graphics/Camera.h"
 
 #include <algorithm>
 #include <numbers>
@@ -9,7 +9,7 @@
 
 namespace PhysX {
 
-class GlOrbitCamera : public GlCamera
+class OrbitCamera : public Camera
 {
 protected:
 
@@ -38,7 +38,7 @@ protected:
 
 public:
 
-	GlOrbitCamera(
+	OrbitCamera(
 		const float fovy,
 		const float zNear,
 		const float zFar,
@@ -56,10 +56,10 @@ public:
 		setSpherical(radius, phi, theta, target);
 	}
 
-	GlOrbitCamera() = delete;
-	GlOrbitCamera(const GlOrbitCamera &rhs) = default;
-	GlOrbitCamera &operator=(const GlOrbitCamera &rhs) = default;
-	virtual ~GlOrbitCamera() = default;
+	OrbitCamera() = delete;
+	OrbitCamera(const OrbitCamera &rhs) = default;
+	OrbitCamera &operator=(const OrbitCamera &rhs) = default;
+	virtual ~OrbitCamera() = default;
 
 	virtual void update() override
 	{

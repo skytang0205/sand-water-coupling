@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/GlCamera.h"
+#include "Graphics/Camera.h"
 
 #include <algorithm>
 
@@ -8,7 +8,7 @@
 
 namespace PhysX {
 
-class GlOrthoCamera : public GlCamera
+class OrthoCamera : public Camera
 {
 protected:
 
@@ -18,7 +18,7 @@ protected:
 
 public:
 
-	GlOrthoCamera(const Vector3f &pos, const float yScale, const float zScale) :
+	OrthoCamera(const Vector3f &pos, const float yScale, const float zScale) :
 		_savedPos(pos),
 		_savedYScale(yScale),
 		_zScale(zScale)
@@ -27,10 +27,10 @@ public:
 		_projDirty = true;
 	}
 
-	GlOrthoCamera() = delete;
-	GlOrthoCamera(const GlOrthoCamera &rhs) = default;
-	GlOrthoCamera &operator=(const GlOrthoCamera &rhs) = default;
-	virtual ~GlOrthoCamera() = default;
+	OrthoCamera() = delete;
+	OrthoCamera(const OrthoCamera &rhs) = default;
+	OrthoCamera &operator=(const OrthoCamera &rhs) = default;
+	virtual ~OrthoCamera() = default;
 
 	void update()
 	{

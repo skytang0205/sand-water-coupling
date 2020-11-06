@@ -1,7 +1,7 @@
 #include "GlApp.h"
 
-#include "Graphics/GlOrbitCamera.h"
-#include "Graphics/GlOrthoCamera.h"
+#include "Graphics/OrbitCamera.h"
+#include "Graphics/OrthoCamera.h"
 
 #include <fmt/core.h>
 
@@ -50,14 +50,18 @@ void GlApp::run()
 	_timer.reset();
 	while (!glfwWindowShouldClose(_window)) {
 		_timer.tick();
-		const float dt = float(_timer.deltaTime().count());
-		processInput(dt);
-		update();
-		clearBuffers();
-		draw();
-		// Swap buffers and poll IO events.
-		glfwSwapBuffers(_window);
-		glfwPollEvents();
+		if (!_paused) {
+			const float dt = float(_timer.deltaTime().count());
+			processInput(dt);
+			update();
+			clearBuffers();
+			draw();
+			// Swap buffers and poll IO events.
+			glfwSwapBuffers(_window);
+			glfwPollEvents();
+		}
+		else
+			glfwWaitEvents();
 	}
 }
 
@@ -97,6 +101,7 @@ void GlApp::setCallbacks() const
 	glfwSetMouseButtonCallback(_window, mouseButtonCallback);
 	glfwSetCursorPosCallback(_window, cursorPosCallback);
 	glfwSetScrollCallback(_window, scrollCallback);
+	glfwSetWindowIconifyCallback(_window, windowIconifyCallback);
 }
 
 void GlApp::initPrograms()
@@ -126,7 +131,7 @@ void GlApp::buildRenderItems()
 void GlApp::initCamera()
 {
 	if (_dim > 2) {
-		_camera = std::make_unique<GlOrbitCamera>(
+		_camera = std::make_unique<OrbitCamera>(
 			0.25f * float(std::numbers::pi), // fovy
 			1.0f, // zNear
 			1000.0f, // zFar
@@ -137,7 +142,7 @@ void GlApp::initCamera()
 			);
 	}
 	else {
-		_camera = std::make_unique<GlOrthoCamera>(
+		_camera = std::make_unique<OrthoCamera>(
 			Vector3f::Unit(2) * 15.0f, // pos
 			0.2f, // yScale
 			1 / 150.0f // zScale
@@ -248,7 +253,7 @@ void GlApp::updateUniforms()
 	_passConstants.viewPos = _camera->pos();
 	_passConstants.ambientStrength = Vector3f(0.25f, 0.25f, 0.35f);
 	_passConstants.lightStrength = Vector3f(1.0f, 1.0f, 0.9f);
-	_passConstants.lightDir = GlOrbitCamera::sphericalToCartesian(1.0f, _lightPhi, _lightTheta);
+	_passConstants.lightDir = OrbitCamera::sphericalToCartesian(1.0f, _lightPhi, _lightTheta);
 	_passConstants.totalTime = float(_timer.totalTime().count());
 	_passConstants.deltaTime = float(_timer.deltaTime().count());
 	// Upload to Graphics Memory.
@@ -310,6 +315,18 @@ void GlApp::cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
 void GlApp::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	_this->_camera->scale(float(yoffset));
+}
+
+void GlApp::windowIconifyCallback(GLFWwindow *window, int iconified)
+{
+	if (iconified) {
+		_this->_paused = true;
+		_this->_timer.stop();
+	}
+	else {
+		_this->_paused = false;
+		_this->_timer.start();
+	}
 }
 
 void APIENTRY GlApp::debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)

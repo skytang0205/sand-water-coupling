@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/GlCamera.h"
+#include "Graphics/Camera.h"
 #include "Graphics/GlRenderTest.h"
 #include "Graphics/GlText.h"
 #include "Graphics/StepTimer.h"
@@ -65,6 +65,7 @@ protected:
 
 	GLuint _uboPassConstants = 0;
 
+	bool _paused = false;
 	bool _enableInfo = true;
 	bool _enableSrgb = true;
 	bool _enableMsaa = false;
@@ -82,8 +83,8 @@ protected:
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
 	Vector2d _lastMousePos = Vector2d::Zero();
 
-	int _dim = 2;
-	std::unique_ptr<GlCamera> _camera;
+	int _dim = 3;
+	std::unique_ptr<Camera> _camera;
 	float _lightPhi = _kSavedLightPhi;
 	float _lightTheta = _kSavedLightTheta;
 
@@ -152,6 +153,7 @@ protected:
 	static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
 	static void cursorPosCallback(GLFWwindow *window, double xpos, double ypos);
 	static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+	static void windowIconifyCallback(GLFWwindow *window, int iconified);
 
 	static void APIENTRY debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
 };

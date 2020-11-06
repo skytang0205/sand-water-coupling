@@ -105,9 +105,9 @@
   <ItemGroup>
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="GlApp.h" />
-    <ClInclude Include="GlCamera.h" />
-    <ClInclude Include="GlOrbitCamera.h" />
-    <ClInclude Include="GlOrthoCamera.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="OrbitCamera.h" />
+    <ClInclude Include="OrthoCamera.h" />
     <ClInclude Include="GlProgram.h" />
     <ClInclude Include="GlRenderItem.h" />
     <ClInclude Include="BitmapFont.h" />
