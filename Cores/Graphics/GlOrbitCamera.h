@@ -118,15 +118,15 @@ protected:
 
 		_proj << _xScale, 0, 0, 0,
 			0, _yScale, 0, 0,
-			0, 0, -(_zFar + _zNear) / (_zFar - _zNear), -1,
-			0, 0, -2 * _zNear * _zFar / (_zFar - _zNear), 0;
+			0, 0, -(_zFar + _zNear) / (_zFar - _zNear), -2 * _zNear * _zFar / (_zFar - _zNear),
+			0, 0, -1, 0;
 	}
 
 	void updateViewMatrix()
 	{
-		_view << _right.x(), _up.x(), -_front.x(), -_right.dot(_pos),
-			_right.y(), _up.y(), -_front.y(), -_up.dot(_pos),
-			_right.z(), _up.z(), -_front.z(), _front.dot(_pos),
+		_view << _right.x(), _right.y(), _right.z(), -_right.dot(_pos),
+			_up.x(), _up.y(), _up.z(), -_up.dot(_pos),
+			-_front.x(), -_front.y(), -_front.z(), _front.dot(_pos),
 			0, 0, 0, 1;
 	}
 

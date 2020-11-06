@@ -139,7 +139,8 @@ void GlApp::initCamera()
 	else {
 		_camera = std::make_unique<GlOrthoCamera>(
 			Vector3f::Unit(2) * 15.0f, // pos
-			0.15f // yScale
+			0.2f, // yScale
+			1 / 150.0f // zScale
 			);
 	}
 }

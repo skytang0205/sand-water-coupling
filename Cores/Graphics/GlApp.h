@@ -82,7 +82,7 @@ protected:
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
 	Vector2d _lastMousePos = Vector2d::Zero();
 
-	int _dim = 3;
+	int _dim = 2;
 	std::unique_ptr<GlCamera> _camera;
 	float _lightPhi = _kSavedLightPhi;
 	float _lightTheta = _kSavedLightTheta;
