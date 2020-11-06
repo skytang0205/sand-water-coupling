@@ -72,6 +72,9 @@
     <ClInclude Include="GlRenderTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GlOrthoCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BitmapConsolas.inc">

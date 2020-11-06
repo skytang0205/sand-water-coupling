@@ -6,7 +6,7 @@ namespace PhysX {
 
 GlRenderTest::GlRenderTest(GlProgram *program) : GlRenderItem(program)
 {
-	auto geo = GeometryGenerator::createBox(1.0, 1.0, 1.0);
+	auto geo = GeometryGenerator::createCircle(5.0, 36);
 
 	glCreateBuffers(1, &_vbo);
 	glNamedBufferStorage(_vbo, geo.vertices.size() * sizeof(geo.vertices[0]), geo.vertices.data(), 0);

@@ -55,8 +55,8 @@ GeometryGenerator::Data GeometryGenerator::createUVSphere(const float radius, co
 			const float lambda = j * deltaLambda - float(std::numbers::pi);
 			Vertex vert;
 			vert.normal = Vector3f(std::cos(phi) * std::sin(lambda), std::sin(phi), std::cos(phi) * std::cos(lambda));
-			vert.enableColorMap = 0;
 			vert.pos = vert.normal * radius;
+			vert.enableColorMap = 0;
 			vert.heat = 0;
 			ret.vertices.push_back(vert);
 		}
@@ -78,6 +78,25 @@ GeometryGenerator::Data GeometryGenerator::createUVSphere(const float radius, co
 	for (uint i = 1; i <= sliceCnt; i++)
 		ret.indices32.insert(ret.indices32.end(), { topIndex, topIndex - i % sliceCnt - 1, topIndex - i });
 
+	return ret;
+}
+
+GeometryGenerator::Data GeometryGenerator::createCircle(const float radius, const uint edgeCnt)
+{
+	Data ret;
+	const float deltaAlpha = float(std::numbers::pi) * 2.0f / edgeCnt;
+	for (uint i = 0; i < edgeCnt; i++) {
+		const float alpha = i * deltaAlpha;
+		Vertex vert;
+		vert.pos = Vector3f(std::cos(alpha), std::sin(alpha), 0) * radius;
+		vert.normal = Vector3f::Unit(2);
+		vert.enableColorMap = 0;
+		vert.heat = 0;
+		ret.vertices.push_back(vert);
+	}
+	for (uint i = 1; i < edgeCnt; i++) {
+		ret.indices32.insert(ret.indices32.end(), { 0, i, (i + 1) % edgeCnt });
+	}
 	return ret;
 }
 

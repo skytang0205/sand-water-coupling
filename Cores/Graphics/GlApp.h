@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/GlOrbitCamera.h"
+#include "Graphics/GlCamera.h"
 #include "Graphics/GlRenderTest.h"
 #include "Graphics/GlText.h"
 #include "Graphics/StepTimer.h"
@@ -82,16 +82,8 @@ protected:
 	Vector3f _bgColor = Vector3f(176, 196, 222) / 255;
 	Vector2d _lastMousePos = Vector2d::Zero();
 
-	GlOrbitCamera _orbitCamera = GlOrbitCamera(
-		0.25f * float(std::numbers::pi), // fovy
-		1.0f, // aspect
-		1.0f, // zNear
-		1000.0f, // zFar
-		10.0f, // radius
-		0.0f, // phi
-		0.5f * float(std::numbers::pi), // theta
-		Vector3f::Zero() // target
-		);
+	int _dim = 3;
+	std::unique_ptr<GlCamera> _camera;
 	float _lightPhi = _kSavedLightPhi;
 	float _lightTheta = _kSavedLightTheta;
 
@@ -131,6 +123,7 @@ protected:
 	virtual void initPrograms();
 	virtual void initUniformBuffers();
 	virtual void buildRenderItems();
+	virtual void initCamera();
 
 	virtual void processInput(const float dt);
 	void update();

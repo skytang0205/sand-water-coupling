@@ -13,19 +13,33 @@ class GlOrbitCamera : public GlCamera
 {
 protected:
 
+	float _fovy;
+	float _zNear;
+	float _zFar;
+
 	const float _savedRadius;
 	const float _savedPhi;
 	const float _savedTheta;
+	const Vector3f _savedTarget;
 
 	float _radius;
 	float _phi;
 	float _theta;
+	Vector3f _target;
+
+	Vector3f _front = Vector3f::Zero();
+	Vector3f _up = Vector3f::Zero();
+	Vector3f _right = Vector3f::Zero();
+
+	Matrix4f _proj = Matrix4f::Identity();
+	Matrix4f _view = Matrix4f::Identity();
+
+	bool _viewDirty = true;
 
 public:
 
 	GlOrbitCamera(
 		const float fovy,
-		const float aspect,
 		const float zNear,
 		const float zFar,
 		const float radius,
@@ -33,35 +47,38 @@ public:
 		const float theta,
 		const Vector3f &target
 		) :
-		GlCamera(fovy, aspect, zNear, zFar, sphericalToCartesian(radius, phi, theta), target),
 		_savedRadius(radius),
 		_savedPhi(phi),
 		_savedTheta(theta),
-		_radius(radius),
-		_phi(phi),
-		_theta(theta)
-	{ }
+		_savedTarget(target)
+	{
+		setPerspective(fovy, zNear, zFar);
+		setSpherical(radius, phi, theta, target);
+	}
 
 	GlOrbitCamera() = delete;
 	GlOrbitCamera(const GlOrbitCamera &rhs) = default;
 	GlOrbitCamera &operator=(const GlOrbitCamera &rhs) = default;
 	virtual ~GlOrbitCamera() = default;
 
+	virtual void update() override
+	{
+		if (_projDirty)
+			updateProjMatrix();
+		if (_viewDirty)
+			updateViewMatrix();
+		if (_projDirty || _viewDirty)
+			_projView = _proj * _view;
+		_projDirty = false;
+		_viewDirty = false;
+	}
+
 	virtual void reset() override
 	{
-		GlCamera::reset();
-		setSpherical(_savedRadius, _savedPhi, _savedTheta);
+		setSpherical(_savedRadius, _savedPhi, _savedTheta, _savedTarget);
 	}
 
-	void setSpherical(const float radius, const float phi, const float theta)
-	{
-		_radius = radius;
-		_phi = phi;
-		_theta = theta;
-		lookAt(sphericalToCartesian(_radius, _phi, _theta), _target);
-	}
-
-	void rotate(const float dx, const float dy)
+	virtual void rotate(const float dx, const float dy) override
 	{
 		static constexpr float kRotateRatio = 0.25f * float(std::numbers::pi) / 180.0f;
 		_phi += kRotateRatio * dx;
@@ -72,14 +89,14 @@ public:
 		lookAt(sphericalToCartesian(_radius, _phi, _theta), _target);
 	}
 
-	void translate(const float dx, const float dy)
+	virtual void translate(const float dx, const float dy) override
 	{
 		static constexpr float kTranslateRatio = 0.001f;
 		_target += kTranslateRatio * _radius * (dy * _up - dx * _right);
 		lookAt(sphericalToCartesian(_radius, _phi, _theta), _target);
 	}
 
-	void scale(const float dy)
+	virtual void scale(const float dy) override
 	{
 		static constexpr float kScaleRatio = 0.05f;
 		_radius /= std::exp(kScaleRatio * dy);
@@ -90,6 +107,55 @@ public:
 	static Vector3f sphericalToCartesian(const float radius, const float phi, const float theta)
 	{
 		return Vector3f(std::sin(theta) * std::sin(phi), std::cos(theta), std::sin(theta) * std::cos(phi)) * radius;
+	}
+
+protected:
+
+	void updateProjMatrix()
+	{
+		_yScale = 1.0f / std::tan(_fovy / 2);
+		_xScale = _yScale / _aspect;
+
+		_proj << _xScale, 0, 0, 0,
+			0, _yScale, 0, 0,
+			0, 0, -(_zFar + _zNear) / (_zFar - _zNear), -1,
+			0, 0, -2 * _zNear * _zFar / (_zFar - _zNear), 0;
+	}
+
+	void updateViewMatrix()
+	{
+		_view << _right.x(), _up.x(), -_front.x(), -_right.dot(_pos),
+			_right.y(), _up.y(), -_front.y(), -_up.dot(_pos),
+			_right.z(), _up.z(), -_front.z(), _front.dot(_pos),
+			0, 0, 0, 1;
+	}
+
+	void setPerspective(const float fovy, const float zNear, const float zFar)
+	{
+		_fovy = fovy;
+		_zNear = zNear;
+		_zFar = zFar;
+		_projDirty = true;
+	}
+
+	void setSpherical(const float radius, const float phi, const float theta, const Vector3f &target)
+	{
+		_radius = radius;
+		_phi = phi;
+		_theta = theta;
+		lookAt(sphericalToCartesian(radius, phi, theta), target);
+	}
+
+	void lookAt(const Vector3f &pos, const Vector3f &target)
+	{
+		_pos = pos;
+		_target = target;
+
+		_front = (_target - _pos).normalized();
+		_right = _front.cross(Vector3f::Unit(1)).normalized();
+		_up = _right.cross(_front).normalized();
+
+		_viewDirty = true;
 	}
 };
 

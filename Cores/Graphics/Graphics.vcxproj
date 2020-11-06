@@ -107,6 +107,7 @@
     <ClInclude Include="GlApp.h" />
     <ClInclude Include="GlCamera.h" />
     <ClInclude Include="GlOrbitCamera.h" />
+    <ClInclude Include="GlOrthoCamera.h" />
     <ClInclude Include="GlProgram.h" />
     <ClInclude Include="GlRenderItem.h" />
     <ClInclude Include="BitmapFont.h" />

@@ -1,5 +1,8 @@
 #include "GlApp.h"
 
+#include "Graphics/GlOrbitCamera.h"
+#include "Graphics/GlOrthoCamera.h"
+
 #include <fmt/core.h>
 
 #include <algorithm>
@@ -65,6 +68,7 @@ void GlApp::initialize()
 	initPrograms();
 	initUniformBuffers();
 	buildRenderItems();
+	initCamera();
 	resize(_savedWidth, _savedHeight);
 }
 
@@ -74,7 +78,7 @@ void GlApp::resize(const int width, const int height)
 	_height = height;
 	glViewport(0, 0, width, height);
 	_text->resize(width, height);
-	_orbitCamera.setAspectRatio(float(width) / height);
+	_camera->setAspectRatio(float(width) / height);
 }
 
 void GlApp::initGlStates() const
@@ -117,6 +121,27 @@ void GlApp::buildRenderItems()
 	_ritems.push_back(std::make_unique<GlText>(_programs["text"].get()));
 	_ritemLayers[size_t(RenderLayer::Text)].push_back(_ritems.back().get());
 	_text = dynamic_cast<GlText *>(_ritems.back().get());
+}
+
+void GlApp::initCamera()
+{
+	if (_dim > 2) {
+		_camera = std::make_unique<GlOrbitCamera>(
+			0.25f * float(std::numbers::pi), // fovy
+			1.0f, // zNear
+			1000.0f, // zFar
+			10.0f, // radius
+			0.0f, // phi
+			0.5f * float(std::numbers::pi), // theta
+			Vector3f::Zero() // target
+			);
+	}
+	else {
+		_camera = std::make_unique<GlOrthoCamera>(
+			Vector3f::Unit(2) * 15.0f, // pos
+			0.15f // yScale
+			);
+	}
 }
 
 void GlApp::processInput(const float dt)
@@ -216,10 +241,10 @@ void GlApp::updateText()
 
 void GlApp::updateUniforms()
 {
-	_orbitCamera.update();
+	_camera->update();
 	// Construct pass constants.
-	_passConstants.projView = _orbitCamera.projView();
-	_passConstants.viewPos = _orbitCamera.pos();
+	_passConstants.projView = _camera->projView();
+	_passConstants.viewPos = _camera->pos();
 	_passConstants.ambientStrength = Vector3f(0.25f, 0.25f, 0.35f);
 	_passConstants.lightStrength = Vector3f(1.0f, 1.0f, 0.9f);
 	_passConstants.lightDir = GlOrbitCamera::sphericalToCartesian(1.0f, _lightPhi, _lightTheta);
@@ -243,7 +268,7 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 			break;
 		case GLFW_KEY_SPACE:
 			glfwSetWindowSize(window, _this->_savedWidth, _this->_savedHeight);
-			_this->_orbitCamera.reset();
+			_this->_camera->reset();
 			_this->_lightPhi = _kSavedLightPhi;
 			_this->_lightTheta = _kSavedLightTheta;
 			break;
@@ -273,17 +298,17 @@ void GlApp::mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 void GlApp::cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
 {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		_this->_orbitCamera.rotate(float(xpos - _this->_lastMousePos.x()), float(ypos - _this->_lastMousePos.y()));
+		_this->_camera->rotate(float(xpos - _this->_lastMousePos.x()), float(ypos - _this->_lastMousePos.y()));
 	}
 	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-		_this->_orbitCamera.translate(float(xpos - _this->_lastMousePos.x()), float(ypos - _this->_lastMousePos.y()));
+		_this->_camera->translate(float(xpos - _this->_lastMousePos.x()), float(ypos - _this->_lastMousePos.y()));
 	}
 	_this->_lastMousePos << xpos, ypos;
 }
 
 void GlApp::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
-	_this->_orbitCamera.scale(float(yoffset));
+	_this->_camera->scale(float(yoffset));
 }
 
 void APIENTRY GlApp::debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)

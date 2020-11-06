@@ -9,7 +9,7 @@ class GlText : public GlRenderItem
 {
 public:
 
-	enum class Alignment { Left, Right };
+	enum class Alignment : uchar { Left, Right };
 
 protected:
 
