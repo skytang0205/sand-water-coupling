@@ -1,6 +1,6 @@
 #include "GlRenderTest.h"
 
-#include "GeometryGenerator.h"
+#include "Graphics/GeometryGenerator.h"
 
 namespace PhysX {
 

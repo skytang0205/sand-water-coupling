@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
