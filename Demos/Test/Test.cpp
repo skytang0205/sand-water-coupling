@@ -1,3 +1,5 @@
+#include "Physics/Projectile.h"
+#include "Physics/Simulator.h"
 #include "Utilities/ArgsParser.h"
 #include "Utilities/Types.h"
 
@@ -27,35 +29,11 @@ inline void testArgsParser(int argc, char *argv[])
 
 }
 
-struct PassConstants
-{
-	PhysX::Matrix4f projView;			// 0
-	PhysX::Vector3f viewPos;			// 64
-	float pad0;
-	PhysX::Vector3f ambientStrength;	// 80
-	float pad1;
-	PhysX::Vector3f lightStrength;		// 96
-	float pad2;
-	PhysX::Vector3f lightDir;			// 112
-	float pad3;
-	float totalTime;			// 128
-	float deltaTime;			// 132
-} test;
-
-inline void testEigen()
-{
-	std::cout << (char *)(&test.viewPos) - (char *)(&test) << std::endl;
-	std::cout << (char *)(&test.ambientStrength) - (char *)(&test) << std::endl;
-	std::cout << (char *)(&test.lightStrength) - (char *)(&test) << std::endl;
-	std::cout << (char *)(&test.lightDir) - (char *)(&test) << std::endl;
-	std::cout << (char *)(&test.totalTime) - (char *)(&test) << std::endl;
-	std::cout << (char *)(&test.deltaTime) - (char *)(&test) << std::endl;
-}
-
 int main(int argc, char *argv[])
 {
-	testArgsParser(argc, argv);
-	testEigen();
-	std::cout << fmt::format("{:>9.2f}", 3.1415926) << std::endl;
+	using namespace PhysX;
+	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(1.0, 1.0));
+	auto simulator = new Simulator("output", 0, 100, 50, 1, simulation);
+	simulator->Simulate();
 	return 0;
 }

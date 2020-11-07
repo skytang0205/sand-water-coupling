@@ -97,6 +97,9 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Cores\Physics\Physics.vcxproj">
+      <Project>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Cores\Utilities\Utilities.vcxproj">
       <Project>{35ea6b7d-75ec-44b7-a6ae-7f6a9b018155}</Project>
     </ProjectReference>

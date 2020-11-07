@@ -11,7 +11,7 @@ class Simulator
 {
 protected:
 
-	const std::string &_outputDir;
+	const std::string _outputDir;
 	uint _beginFrame;
 	uint _endFrame;
 	const uint _frameRate; // number of frames per second

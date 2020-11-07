@@ -18,8 +18,7 @@ void Simulator::Simulate()
 		createOutputDirectory();
 		writeAndSaveToFrameDirectory(0);
 
-		std::string fileName = _outputDir + "/description.yaml";
-		std::ofstream output(fileName);
+		std::ofstream output(_outputDir + "/description.yaml");
 		_simulation->writeDescription(output);
 		_beginFrame = 1;
 	}
@@ -46,7 +45,7 @@ void Simulator::Simulate()
 			"   Prediction:        {:>9.2f}s\n",
 			duration<double>(currentTime - lastTime).count(),
 			duration<double>(currentTime - initialTime).count(),
-			duration<double>(currentTime - beginTime).count() / (frame - _beginFrame + 1) * (_endFrame - _beginFrame)
+			duration<double>(currentTime - beginTime).count() / (frame - _beginFrame + 1.0) * (_endFrame - _beginFrame)
 				+ duration<double>(beginTime - initialTime).count()
 			) << std::endl;
 		lastTime = currentTime;
@@ -68,9 +67,8 @@ void Simulator::writeAndSaveToFrameDirectory(const uint frame) const
 	_simulation->writeFrame(frameDir);
 	_simulation->saveFrame(frameDir);
 	// Write the last frame.
-	const std::string fileName = _outputDir + "/last_frame.txt";
-	std::ofstream output(fileName);
-	output << frame << std::endl;
+	std::ofstream output(_outputDir + "/end_frame.txt");
+	output << frame + 1 << std::endl;
 }
 
 void Simulator::loadFromFrameDirectory(const uint frame)

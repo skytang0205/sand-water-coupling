@@ -75,7 +75,7 @@ protected:
 
 	const int _savedWidth;
 	const int _savedHeight;
-	const std::string &_savedTitle;
+	const std::string _savedTitle;
 
 
 	int _width = 0;
