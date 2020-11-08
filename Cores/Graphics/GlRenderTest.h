@@ -24,7 +24,7 @@ public:
 		glDeleteBuffers(1, &_vbo);
 	}
 
-	virtual void beginDraw() const override;
+	virtual void beginDraw() override;
 };
 
 }

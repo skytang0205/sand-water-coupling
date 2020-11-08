@@ -74,13 +74,13 @@ void GlText::set(const std::string &text, const Vector2f &pos, const Vector2f &s
 	}
 }
 
-void GlText::beginDraw() const
+void GlText::beginDraw()
 {
 	glNamedBufferSubData(_vbo, 0, sizeof(Vertex) * _instanceCount, _vertices);
 	glBindTextureUnit(0, _texture);
 }
 
-void GlText::endDraw() const
+void GlText::endDraw()
 {
 	glBindTextureUnit(0, 0);
 }

@@ -21,16 +21,19 @@ public:
 
 protected:
 
+	GLuint _vbo;
+	GLuint _ebo;
+
 	Vector4f _diffuseAlbedo;
 	Vector3f _fresnelR0;
 	float _roughness;
 	bool _enableColorMap;
 
-	uint _frame = 0;
+	uint _currentFrame = 0;
 
 	std::vector<uint> _vtxFrameOffset;
 	std::vector<uint> _idxFrameOffset;
-	std::vector<Matrix4f> _worldMats;
+	std::vector<Matrix4f> _frameWorlds;
 
 public:
 
@@ -39,15 +42,26 @@ public:
 	GlSimulated() = delete;
 	GlSimulated(const GlSimulated &rhs) = delete;
 	GlSimulated &operator=(const GlSimulated &rhs) = delete;
-	virtual ~GlSimulated() { }
+	virtual ~GlSimulated()
+	{
+		glDeleteBuffers(1, &_ebo);
+		glDeleteBuffers(1, &_vbo);
+	}
 
-	virtual void beginDraw() const override;
-	void setFrame(const uint frame) { _frame = frame; }
+	virtual void beginDraw() override;
+	void setCurrentFrame(const uint frame) { _currentFrame = frame; }
 	bool isTransparent() const { return _diffuseAlbedo.w() < 1.0f; }
 
 protected:
 
-	void loadMesh(const std::string &fileName, const int dim);
+	void loadMesh(
+		const std::string &fileName,
+		const int dim,
+		std::vector<Vector3f> &positions,
+		std::vector<Vector3f> &normals,
+		std::vector<float> &heats,
+		std::vector<uint> &indices
+		);
 };
 
 }

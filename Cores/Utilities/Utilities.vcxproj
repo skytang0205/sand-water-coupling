@@ -99,6 +99,7 @@
   <ItemGroup>
     <ClInclude Include="ArgsParser.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Yaml.h" />
   </ItemGroup>

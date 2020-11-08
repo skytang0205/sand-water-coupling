@@ -1,51 +1,53 @@
-#pragma warning (disable : 4996)
-
 #include "Projectile.h"
 
 #include "Utilities/Constants.h"
-
-#include <yaml-cpp/yaml.h>
-
-#include <fstream>
+#include "Utilities/IO.h"
+#include "Utilities/Yaml.h"
 
 namespace PhysX {
 
 template<int Dim>
-void Projectile<Dim>::writeDescription(std::ofstream &output) const
+void Projectile<Dim>::writeDescription(std::ofstream &fout) const
 {
-	YAML::Node node;
-	node["dimension"] = Dim;
-	node["objects"][1]["name"] = "ball";
-	node["objects"][1]["mode"] = "dynamic";
-	node["objects"][1]["primitive"] = "ball_list";
-	node["objects"][1]["material"]["type"] = "heatmap";
-	output << node << std::endl;
+	YAML::Node root;
+	root["dimension"] = Dim;
+	// Description of ball.
+	{
+		YAML::Node node;
+		node["name"] = "ball";
+		node["data_mode"] = "dynamic";
+		node["primitive_type"] = "point_list";
+		node["indexed"] = false;
+		node["enable_color_map"] = false;
+		node["diffuse_albedo"] = Vector4f(0, 0, 1, 1);
+		root["objects"].push_back(node);
+	}
+	fout << root << std::endl;
 }
 
 template<int Dim>
 void Projectile<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
-	std::ofstream output(frameDir + "/ball.mesh", std::ios::binary);
+	std::ofstream fout(frameDir + "/ball.mesh", std::ios::binary);
+	IO::writeValue(fout, uint(1));
 	const VectorDf pos = _position.cast<float>();
-	const float vel = float(_velocity.norm());
-	output.write(reinterpret_cast<const char *>(&pos), sizeof(pos));
-	output.write(reinterpret_cast<const char *>(&vel), sizeof(vel));
+	IO::writeValue(fout, pos);
 }
 
 template<int Dim>
 void Projectile<Dim>::saveFrame(const std::string &frameDir) const
 {
-	std::ofstream output(frameDir + "/state.sav", std::ios::binary);
-	output.write(reinterpret_cast<const char *>(&_position), sizeof(_position));
-	output.write(reinterpret_cast<const char *>(&_velocity), sizeof(_velocity));
+	std::ofstream fout(frameDir + "/state.sav", std::ios::binary);
+	IO::writeValue(fout, _position);
+	IO::writeValue(fout, _velocity);
 }
 
 template<int Dim>
 void Projectile<Dim>::loadFrame(const std::string &frameDir)
 {
-	std::ifstream input(frameDir + "/state.sav", std::ios::binary);
-	input.read(reinterpret_cast<char *>(&_position), sizeof(_position));
-	input.read(reinterpret_cast<char *>(&_velocity), sizeof(_velocity));
+	std::ifstream fin(frameDir + "/state.sav", std::ios::binary);
+	IO::readValue(fin, _position);
+	IO::readValue(fin, _velocity);
 }
 
 template <int Dim>

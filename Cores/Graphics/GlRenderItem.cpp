@@ -2,7 +2,7 @@
 
 namespace PhysX {
 
-void GlRenderItem::draw() const
+void GlRenderItem::draw()
 {
 	beginDraw();
 

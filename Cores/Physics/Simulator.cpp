@@ -18,8 +18,8 @@ void Simulator::Simulate()
 		createOutputDirectory();
 		writeAndSaveToFrameDirectory(0, true);
 
-		std::ofstream output(_outputDir + "/description.yaml");
-		_simulation->writeDescription(output);
+		std::ofstream fout(_outputDir + "/description.yaml");
+		_simulation->writeDescription(fout);
 		_beginFrame = 1;
 	}
 	else {
@@ -67,8 +67,8 @@ void Simulator::writeAndSaveToFrameDirectory(const uint frame, const bool static
 	_simulation->writeFrame(frameDir);
 	_simulation->saveFrame(frameDir);
 	// Write the last frame.
-	std::ofstream output(_outputDir + "/end_frame.txt");
-	output << frame + 1 << std::endl;
+	std::ofstream fout(_outputDir + "/end_frame.txt");
+	fout << frame + 1 << std::endl;
 }
 
 void Simulator::loadFromFrameDirectory(const uint frame)

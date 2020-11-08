@@ -27,7 +27,7 @@ GlRenderTest::GlRenderTest(GlProgram *program) : GlRenderItem(program)
 	_count = uint(geo.indices32.size());
 }
 
-void GlRenderTest::beginDraw() const
+void GlRenderTest::beginDraw()
 {
 	_program->setUniform("uWorld", Matrix4f::Identity().eval());
 	_program->setUniform("uDiffuseAlbedo", Vector4f(1, 0, 0, 1));

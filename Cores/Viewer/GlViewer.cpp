@@ -12,12 +12,12 @@ GlViewer::GlViewer(const std::string &outputDir, const uint frameRate) :
 {
 	_this = this;
 	{ // Load desciption.yaml.
-		std::ifstream input(_outputDir + "/description.yaml");
-		if (!input) {
+		std::ifstream fin(_outputDir + "/description.yaml");
+		if (!fin) {
 			std::cerr << fmt::format("Error: [GlViewer] failed to load {}/description.yaml.", _outputDir) << std::endl;
 			std::exit(-1);
 		}
-		_root = YAML::Load(input);
+		_root = YAML::Load(fin);
 		if (_root["dimension"]) _dim = _root["dimension"].as<int>();
 		else {
 			std::cerr << "Error: [GlViewer] cannot find dimension in description.yaml." << std::endl;
@@ -25,12 +25,12 @@ GlViewer::GlViewer(const std::string &outputDir, const uint frameRate) :
 		}
 	}
 	{ // load end_frame.txt
-		std::ifstream input(_outputDir + "/end_frame.txt");
-		if (!input) {
+		std::ifstream fin(_outputDir + "/end_frame.txt");
+		if (!fin) {
 			std::cerr << fmt::format("Error: [GlViewer] failed to load {}/end_frame.txt.", _outputDir) << std::endl;
 			std::exit(-1);
 		}
-		input >> _endFrame;
+		fin >> _endFrame;
 	}
 }
 
@@ -48,12 +48,12 @@ void GlViewer::buildRenderItems()
 	}
 
 	for (const auto &node : _root["objects"]) {
-		auto _simulated = std::make_unique<GlSimulated>(_programs["defult"].get(), _outputDir, _endFrame, _dim, node);
+		auto _simulated = std::make_unique<GlSimulated>(_programs["default"].get(), _outputDir, _endFrame, _dim, node);
 
 		// Push the item into vectors.
 		_ritemLayers[uint(_simulated->isTransparent() ? RenderLayer::Transparency : RenderLayer::Opaque)].push_back(_simulated.get());
 		_simulatedObjects.push_back(_simulated.get());
-		_ritems.emplace_back(_simulated);
+		_ritems.push_back(std::move(_simulated));
 	}
 
 	GlApp::buildRenderItems();
@@ -68,6 +68,8 @@ void GlViewer::update(const double dt)
 			_playing = false;
 		}
 	}
+	for (auto simulated : _simulatedObjects)
+		simulated->setCurrentFrame(uint(_currentFrame));
 	GlApp::update(dt);
 }
 

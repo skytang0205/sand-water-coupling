@@ -118,8 +118,8 @@ void GlApp::initUniformBuffers()
 
 void GlApp::buildRenderItems()
 {
-	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["default"].get()));
-	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
+//	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["default"].get()));
+//	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
 
 	_ritems.push_back(std::make_unique<GlText>(_programs["text"].get()));
 	_ritemLayers[size_t(RenderLayer::Text)].push_back(_ritems.back().get());

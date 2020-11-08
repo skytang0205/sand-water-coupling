@@ -1,5 +1,4 @@
 #pragma once
-#pragma warning (disable : 4996)
 
 #include "GlSimulated.h"
 
@@ -20,7 +19,7 @@ protected:
 
 	static inline GlViewer *_this = nullptr;
 
-	const std::string &_outputDir;
+	const std::string _outputDir;
 	YAML::Node _root;
 
 	uint _endFrame;

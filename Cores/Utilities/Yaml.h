@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning (disable : 4996)
 
 #include "Utilities/Types.h"
 
@@ -15,6 +16,7 @@ struct convert<PhysX::Vector<Scalar, Dim>>
 		for (int i = 0; i < rhs.size(); i++) {
 			node.push_back(rhs(i));
 		}
+		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
 	static bool decode(const Node &node, PhysX::Vector<Scalar, Dim> &rhs)

@@ -57,8 +57,8 @@ public:
 		);
 	void resize(const int width, const int height) { _bmConsolas.normalize(width, height); }
 
-	virtual void beginDraw() const override;
-	virtual void endDraw() const override;
+	virtual void beginDraw() override;
+	virtual void endDraw() override;
 };
 
 }

@@ -33,10 +33,10 @@ public:
 	GlRenderItem &operator=(const GlRenderItem &rhs) = delete;
 	virtual ~GlRenderItem() { glDeleteVertexArrays(1, &_vao); }
 
-	virtual void beginDraw() const { }
-	virtual void endDraw() const { }
+	virtual void beginDraw() { }
+	virtual void endDraw() { }
 
-	void draw() const;
+	void draw();
 
 	bool isVisible() const { return _visible; }
 	void show() { _visible = true; }
