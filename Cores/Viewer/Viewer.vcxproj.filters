@@ -21,9 +21,15 @@
     <ClCompile Include="GlViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GlSimulated.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GlViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlSimulated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

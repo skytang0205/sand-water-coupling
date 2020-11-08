@@ -23,7 +23,7 @@ GeometryGenerator::Data GeometryGenerator::createBox(const Vector3f &lengths)
 				coeff[(axis + 2) % 3] = (i & 2) - 1;
 				Vector3f pos = halfLengths.cwiseProduct(coeff.cast<float>());
 				Vector3f normal = Vector3f::Unit(axis) * coeff[axis];
-				ret.vertices.push_back({ pos, 0, normal, 0 });
+				ret.vertices.push_back({ pos, normal });
 			}
 			if (dir) {
 				ret.indices32.insert(ret.indices32.end(), { base + 0, base + 1, base + 3 });
@@ -48,7 +48,7 @@ GeometryGenerator::Data GeometryGenerator::createUVSphere(const float radius, co
 	const float deltaPhi = float(std::numbers::pi) / stackCnt; // latitude, in [-pi / 2, +pi / 2]
 	const float deltaLambda = float(std::numbers::pi) * 2.0f / sliceCnt; // longitude, in [-pi, pi]
 
-	ret.vertices.push_back({ Vector3f::Unit(1) * (-radius), 0, Vector3f::Unit(1) * (-1), 0 });
+	ret.vertices.push_back({ Vector3f::Unit(1) * (-radius), Vector3f::Unit(1) * (-1) });
 	for (uint i = 1; i <= stackCnt - 1; i++) {
 		const float phi = i * deltaPhi - float(std::numbers::pi) * 0.5f;
 		for (uint j = 0; j < sliceCnt; j++) {
@@ -56,12 +56,10 @@ GeometryGenerator::Data GeometryGenerator::createUVSphere(const float radius, co
 			Vertex vert;
 			vert.normal = Vector3f(std::cos(phi) * std::sin(lambda), std::sin(phi), std::cos(phi) * std::cos(lambda));
 			vert.pos = vert.normal * radius;
-			vert.enableColorMap = 0;
-			vert.heat = 0;
 			ret.vertices.push_back(vert);
 		}
 	}
-	ret.vertices.push_back({ Vector3f::Unit(1) * radius, 0, Vector3f::Unit(1), 0 });
+	ret.vertices.push_back({ Vector3f::Unit(1) * radius, Vector3f::Unit(1) });
 
 	for (uint i = 1; i <= sliceCnt; i++)
 		ret.indices32.insert(ret.indices32.end(), { 0, 1 + i % sliceCnt, i });
@@ -90,8 +88,6 @@ GeometryGenerator::Data GeometryGenerator::createCircle(const float radius, cons
 		Vertex vert;
 		vert.pos = Vector3f(std::cos(alpha), std::sin(alpha), 0) * radius;
 		vert.normal = Vector3f::Unit(2);
-		vert.enableColorMap = 0;
-		vert.heat = 0;
 		ret.vertices.push_back(vert);
 	}
 	for (uint i = 1; i < edgeCnt; i++) {

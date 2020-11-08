@@ -2,7 +2,6 @@ R"(
 #version 450 core
 
 in vec3 vertPos;
-flat in uint vertEnableColorMap;
 in vec3 vertNormal;
 in float vertHeat;
 
@@ -12,6 +11,7 @@ uniform mat4 uWorld;
 uniform vec4 uDiffuseAlbedo;
 uniform vec3 uFresnelR0;
 uniform float uRoughness;
+uniform uint uEnableColorMap;
 
 vec3 diffuseColor;
 
@@ -67,7 +67,7 @@ vec3 getJet(const float heat)
 
 void main()
 {
-	diffuseColor = vertEnableColorMap == 0 ? uDiffuseAlbedo.rgb : getJet(vertHeat);
+	diffuseColor = uEnableColorMap == 0 ? uDiffuseAlbedo.rgb : getJet(vertHeat);
 	vec3 ambient = uAmbientStrength * diffuseColor;
 	vec3 diffspec = ComputeDirectionalLight(normalize(vertNormal), normalize(uViewPos - vertPos));
 	fragColor = vec4(ambient + diffspec, uDiffuseAlbedo.a);

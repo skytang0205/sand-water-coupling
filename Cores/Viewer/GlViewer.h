@@ -1,9 +1,10 @@
 #pragma once
 #pragma warning (disable : 4996)
 
-#include "Graphics/GlApp.h"
+#include "GlSimulated.h"
 
-#include <yaml-cpp/yaml.h>
+#include "Graphics/GlApp.h"
+#include "Utilities/Yaml.h"
 
 #include <fmt/core.h>
 
@@ -17,12 +18,18 @@ class GlViewer : public GlApp
 {
 protected:
 
+	static inline GlViewer *_this = nullptr;
+
 	const std::string &_outputDir;
 	YAML::Node _root;
 
 	uint _endFrame;
 	uint _frameRate;
-	uint _currentFrame = 0;
+
+	bool _playing = false;
+	double _currentFrame = 0;
+
+	std::vector<GlSimulated *> _simulatedObjects;
 
 public:
 
@@ -35,17 +42,13 @@ public:
 
 protected:
 
+	virtual void setCallbacks() const override;
+	virtual void buildRenderItems() override;
+
+	virtual void update(const double dt) override;
 	virtual void updateText() override;
 
-	template <typename Type>
-	Type loadItem(const std::string &name)
-	{
-		if (_root[name]) return _root[name].as<Type>();
-		else {
-			std::cerr << fmt::format("Error: [GlViewer] cannot find {} in description.yaml.", name) << std::endl;
-			std::exit(-1);
-		}
-	}
+	static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 };
 
 }

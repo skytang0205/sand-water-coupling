@@ -1,5 +1,6 @@
 #include "GlViewer.h"
 
+#include <algorithm>
 #include <fstream>
 
 namespace PhysX {
@@ -9,6 +10,7 @@ GlViewer::GlViewer(const std::string &outputDir, const uint frameRate) :
 	_outputDir(outputDir),
 	_frameRate(frameRate)
 {
+	_this = this;
 	{ // Load desciption.yaml.
 		std::ifstream input(_outputDir + "/description.yaml");
 		if (!input) {
@@ -16,7 +18,11 @@ GlViewer::GlViewer(const std::string &outputDir, const uint frameRate) :
 			std::exit(-1);
 		}
 		_root = YAML::Load(input);
-		_dim = loadItem<int>("dimension");
+		if (_root["dimension"]) _dim = _root["dimension"].as<int>();
+		else {
+			std::cerr << "Error: [GlViewer] cannot find dimension in description.yaml." << std::endl;
+			std::exit(-1);
+		}
 	}
 	{ // load end_frame.txt
 		std::ifstream input(_outputDir + "/end_frame.txt");
@@ -28,16 +34,97 @@ GlViewer::GlViewer(const std::string &outputDir, const uint frameRate) :
 	}
 }
 
+void GlViewer::setCallbacks() const
+{
+	GlApp::setCallbacks();
+	glfwSetKeyCallback(_window, keyCallback);
+}
+
+void GlViewer::buildRenderItems()
+{
+	if (!_root["objects"].IsSequence()) {
+		std::cerr << fmt::format("Error: [GlViewer] cannot find objects sequence in description.yaml.") << std::endl;
+		std::exit(-1);
+	}
+
+	for (const auto &node : _root["objects"]) {
+		auto _simulated = std::make_unique<GlSimulated>(_programs["defult"].get(), _outputDir, _endFrame, _dim, node);
+
+		// Push the item into vectors.
+		_ritemLayers[uint(_simulated->isTransparent() ? RenderLayer::Transparency : RenderLayer::Opaque)].push_back(_simulated.get());
+		_simulatedObjects.push_back(_simulated.get());
+		_ritems.emplace_back(_simulated);
+	}
+
+	GlApp::buildRenderItems();
+}
+
+void GlViewer::update(const double dt)
+{
+	if (_playing) {
+		_currentFrame += 1.0 / (dt * _frameRate);
+		if (_currentFrame >= _endFrame - 1) {
+			_currentFrame = _endFrame - 1;
+			_playing = false;
+		}
+	}
+	GlApp::update(dt);
+}
+
 void GlViewer::updateText()
 {
 	GlApp::updateText();
 	_text->set(
-		fmt::format("Frame: {:>4}", _currentFrame),
+		fmt::format("Frame: {:>4}", uint(_currentFrame)),
 		Vector2f(1.0f - 10.24f / _width, 1.0f - (24.0f + 7.68f) / _height),
 		Vector2f(0.75f, 0.75f),
 		Vector4f(0, 0, 0, 1),
 		GlText::Alignment::Right
 	);
+}
+
+void GlViewer::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS) {
+		switch (key) {
+		case GLFW_KEY_P:
+			_this->_playing = !_this->_playing;
+			break;
+		case GLFW_KEY_R:
+			_this->_currentFrame = 0;
+			break;
+		case GLFW_KEY_LEFT_BRACKET:
+			if (!_this->_playing) {
+				_this->_currentFrame = std::max(_this->_currentFrame - 1.0, 0.0);
+			}
+			break;
+		case GLFW_KEY_RIGHT_BRACKET:
+			if (!_this->_playing) {
+				_this->_currentFrame = std::min(_this->_currentFrame + 1.0, _this->_endFrame - 1.0);
+			}
+			break;
+		default:
+			GlApp::keyCallback(window, key, scancode, action, mods);
+			break;
+		}
+	}
+	else if (action == GLFW_REPEAT) {
+		switch (key) {
+		case GLFW_KEY_LEFT_BRACKET:
+			if (!_this->_playing) {
+				_this->_currentFrame = std::max(_this->_currentFrame - 1.0, 0.0);
+			}
+			break;
+		case GLFW_KEY_RIGHT_BRACKET:
+			if (!_this->_playing) {
+				_this->_currentFrame = std::min(_this->_currentFrame + 1.0, _this->_endFrame - 1.0);
+			}
+			break;
+		default:
+			GlApp::keyCallback(window, key, scancode, action, mods);
+			break;
+		}
+	}
 }
 
 }

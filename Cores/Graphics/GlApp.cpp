@@ -12,8 +12,6 @@
 
 namespace PhysX {
 
-GlApp *GlApp::_this = nullptr;
-
 GlApp::GlApp(const int width, const int height, const std::string &title) :
 	_savedWidth(width),
 	_savedHeight(height),
@@ -51,9 +49,9 @@ void GlApp::run()
 	while (!glfwWindowShouldClose(_window)) {
 		_timer.tick();
 		if (!_paused) {
-			const float dt = float(_timer.deltaTime().count());
+			const double dt = _timer.deltaTime().count();
 			processInput(dt);
-			update();
+			update(dt);
 			clearBuffers();
 			draw();
 			// Swap buffers and poll IO events.
@@ -150,22 +148,22 @@ void GlApp::initCamera()
 	}
 }
 
-void GlApp::processInput(const float dt)
+void GlApp::processInput(const double dt)
 {
 	if (glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		_lightPhi -= 1.0f * dt;
+		_lightPhi -= float(dt);
 	if (glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		_lightPhi += 1.0f * dt;
+		_lightPhi += float(dt);
 	if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-		_lightTheta -= 1.0f * dt;
+		_lightTheta -= float(dt);
 	if (glfwGetKey(_window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		_lightTheta += 1.0f * dt;
+		_lightTheta += float(dt);
 	_lightPhi = std::fmod(_lightPhi, 2.0f * float(std::numbers::pi));
 	if (_lightPhi < 0.0f) _lightPhi += 2.0f * float(std::numbers::pi);
 	_lightTheta = std::clamp(_lightTheta, 0.1f, 0.5f * float(std::numbers::pi));
 }
 
-void GlApp::update()
+void GlApp::update(const double dt)
 {
 	updateFrameRate();
 	updateText();

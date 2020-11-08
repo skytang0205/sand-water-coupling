@@ -13,9 +13,7 @@ public:
 	struct Vertex
 	{
 		Vector3f pos;
-		uint enableColorMap;
 		Vector3f normal;
-		float heat;
 	};
 
 	struct Data

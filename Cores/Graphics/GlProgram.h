@@ -35,6 +35,8 @@ public:
 	void setUniform(const std::string &name, const Vector3i &value) const { glProgramUniform3i(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2]); }
 	void setUniform(const std::string &name, const Vector4i &value) const { glProgramUniform4i(_program, glGetUniformLocation(_program, name.c_str()), value[0], value[1], value[2], value[3]); }
 
+	void setUniform(const std::string &name, const GLuint value) const { glProgramUniform1ui(_program, glGetUniformLocation(_program, name.c_str()), value); }
+
 	void setUniform(const std::string &name, const Matrix2f &value) const { glProgramUniformMatrix2fv(_program, glGetUniformLocation(_program, name.c_str()), 1, GL_FALSE, value.data()); }
 	void setUniform(const std::string &name, const Matrix3f &value) const { glProgramUniformMatrix3fv(_program, glGetUniformLocation(_program, name.c_str()), 1, GL_FALSE, value.data()); }
 	void setUniform(const std::string &name, const Matrix4f &value) const { glProgramUniformMatrix4fv(_program, glGetUniformLocation(_program, name.c_str()), 1, GL_FALSE, value.data()); }

@@ -37,7 +37,7 @@ protected:
 		float deltaTime;			// 128
 	};
 
-	static GlApp *_this;
+	static inline GlApp *_this = nullptr;
 
 	static constexpr int _kMinimalWidth = 640;
 	static constexpr int _kMinimalHeight = 480;
@@ -126,8 +126,8 @@ protected:
 	virtual void buildRenderItems();
 	virtual void initCamera();
 
-	virtual void processInput(const float dt);
-	void update();
+	virtual void processInput(const double dt);
+	virtual void update(const double dt);
 	virtual void clearBuffers() const;
 	virtual void draw() const;
 
