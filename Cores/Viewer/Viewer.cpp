@@ -1,11 +1,10 @@
-#include "Graphics/GeometryGenerator.h"
-#include "Graphics/GlApp.h"
+#include "GlViewer.h"
 
 #include <memory>
 
 int main()
 {
-	auto glApp = std::make_unique<PhysX::GlApp>(1024, 768, "PhysX Viewer");
+	auto glApp = std::make_unique<PhysX::GlViewer>("output", 50);
 	glApp->run();
 	return 0;
 }

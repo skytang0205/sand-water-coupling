@@ -16,7 +16,7 @@ void Simulator::Simulate()
 
 	if (_beginFrame == 0) {
 		createOutputDirectory();
-		writeAndSaveToFrameDirectory(0);
+		writeAndSaveToFrameDirectory(0, true);
 
 		std::ofstream output(_outputDir + "/description.yaml");
 		_simulation->writeDescription(output);
@@ -58,7 +58,7 @@ void Simulator::createOutputDirectory() const
 	std::filesystem::create_directories(_outputDir);
 }
 
-void Simulator::writeAndSaveToFrameDirectory(const uint frame) const
+void Simulator::writeAndSaveToFrameDirectory(const uint frame, const bool staticDraw) const
 {
 	// Create, write and save to the frame directory.
 	std::cout << fmt::format("** Write output files for frame {}...", frame) << std::endl;

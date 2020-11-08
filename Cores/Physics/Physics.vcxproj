@@ -17,7 +17,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

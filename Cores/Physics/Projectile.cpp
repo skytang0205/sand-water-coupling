@@ -1,6 +1,10 @@
+#pragma warning (disable : 4996)
+
 #include "Projectile.h"
 
 #include "Utilities/Constants.h"
+
+#include <yaml-cpp/yaml.h>
 
 #include <fstream>
 
@@ -9,10 +13,17 @@ namespace PhysX {
 template<int Dim>
 void Projectile<Dim>::writeDescription(std::ofstream &output) const
 {
+	YAML::Node node;
+	node["dimension"] = Dim;
+	node["objects"][1]["name"] = "ball";
+	node["objects"][1]["mode"] = "dynamic";
+	node["objects"][1]["primitive"] = "ball_list";
+	node["objects"][1]["material"]["type"] = "heatmap";
+	output << node << std::endl;
 }
 
 template<int Dim>
-void Projectile<Dim>::writeFrame(const std::string &frameDir) const
+void Projectile<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
 	std::ofstream output(frameDir + "/ball.mesh", std::ios::binary);
 	const VectorDf pos = _position.cast<float>();

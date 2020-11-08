@@ -47,7 +47,7 @@ public:
 protected:
 
 	void createOutputDirectory() const;
-	void writeAndSaveToFrameDirectory(const uint frame) const;
+	void writeAndSaveToFrameDirectory(const uint frame, const bool staticDraw) const;
 	void loadFromFrameDirectory(const uint frame);
 	void advanceTimeBySteps(const real targetTime);
 };
