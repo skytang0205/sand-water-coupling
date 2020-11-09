@@ -44,7 +44,7 @@ void GlViewer::buildRenderItems()
 {
 	GlApp::buildRenderItems();
 
-	if (!_root["objects"].IsSequence()) {
+	if (!_root["objects"] || !_root["objects"].IsSequence()) {
 		std::cerr << fmt::format("Error: [GlViewer] cannot find objects sequence in description.yaml.") << std::endl;
 		std::exit(-1);
 	}

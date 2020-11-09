@@ -115,7 +115,7 @@ protected:
 
 	ArgDataBase *findArgByName(const std::string &name) const;
 	ArgDataBase *findArgByFlag(const char flag) const;
-	void reportError(const std::string &msg);
+	void reportError(const std::string &msg) const;
 };
 
 } // namespace PhysX

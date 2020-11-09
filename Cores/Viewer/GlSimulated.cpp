@@ -4,31 +4,53 @@
 
 #include <fmt/core.h>
 
+#include <iostream>
+
 #include <cstdlib>
 
 namespace PhysX {
 GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const uint endFrame, const int dim, const YAML::Node &node) :
 	GlRenderItem(program)
 {
-	// Read basic properties.
+	// Read name.
+	if (!node["name"]) reportError("unnamed object");
 	const std::string name = node["name"].as<std::string>();
-	const std::string dataMode = node["data_mode"].as<std::string>();
-	const std::string primitiveType = node["primitive_type"].as<std::string>();
-	if (name.empty() || dataMode.empty() || strToMode.find(primitiveType) == strToMode.end()) {
-		std::cerr << fmt::format("Error: [GlSimulated] encountered invalid simulated object \"{}\".", name) << std::endl;
-		std::exit(-1);
-	}
-	_mode = strToMode[primitiveType];
-	_indexed = node["indexed"].as<bool>();
 
-	// Read properties used in shader.
-	_enableColorMap = node["enable_color_map"].as<bool>();
+	// Read data mode.
+	if (!node["data_mode"]) reportError("missing data mode");
+	const std::string dataMode = node["data_mode"].as<std::string>();
+	if (dataMode != "static" && dataMode != "dynamic") reportError("invalid data mode");
+
+	// Read primitive type.
+	if (!node["primitive_type"]) reportError("missing primitive type");
+	const std::string primitiveType = node["primitive_type"].as<std::string>();
+	if (strToMode.find(primitiveType) == strToMode.end()) reportError("invalid primive type");
+	_mode = strToMode[primitiveType];
+
+	// Read indexed.
+	if (node["indexed"]) _indexed = node["indexed"].as<bool>();
+	else _indexed = false;
+
+	// Read color map.
+	if (node["color_map"] && node["color_map"]["enabled"])
+		_enableColorMap = node["color_map"]["enabled"].as<bool>();
+	else _enableColorMap = false;
+	bool normalizedHeat = false;
+	if (node["color_map"] && node["color_map"]["normalized"])
+		normalizedHeat = node["color_map"]["normalized"].as<bool>();
+
+	// Read material.
 	_diffuseAlbedo = Vector4f(0.5f, 0.5f, 0.5f, 1.0f);
-	if (node["diffuse_albedo"]) _diffuseAlbedo = node["diffuse_albedo"].as<Vector4f>();
 	_fresnelR0 = Vector3f(0.02041f, 0.02041f, 0.02041f);
-	if (node["fresnel_r0"]) _fresnelR0 = node["fresnel_r0"].as<Vector3f>();
 	_roughness = dim > 2 ? 0.75f : 1.03125f;
-	if (node["roughness"]) _roughness = node["roughness"].as<float>();
+	if (node["material"]) {
+		if (node["material"]["diffuse_albedo"])
+			_diffuseAlbedo = node["material"]["diffuse_albedo"].as<Vector4f>();
+		if (node["material"]["fresnel_r0"])
+			_fresnelR0 = node["material"]["fresnel_r0"].as<Vector3f>();
+		if (node["material"]["roughness"])
+			_roughness = node["material"]["roughness"].as<float>();
+	}
 
 	// Initialize meshes.
 	std::vector<Vector3f> positions;
@@ -52,6 +74,14 @@ GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const
 	for (size_t frame = 1; frame < _vtxFrameOffset.size(); frame++) {
 		_vtxFrameOffset[frame] += _vtxFrameOffset[frame - 1];
 		if (_indexed) _idxFrameOffset[frame] += _idxFrameOffset[frame - 1];
+	}
+
+	// Normalized heats.
+	if (_enableColorMap && !normalizedHeat) {
+		const auto minmax = std::minmax_element(heats.begin(), heats.end());
+		const float minimum = *minmax.first;
+		const float maximum = *minmax.second;
+		for (auto &x : heats) x = (x - minimum) / (maximum - minimum);
 	}
 
 	// Create vertex buffers.
@@ -157,6 +187,12 @@ void GlSimulated::loadMesh(
 		indices.resize(indices.size() + idxCnt);
 		IO::readArray(fin, indices.data() + indices.size() - idxCnt, idxCnt);
 	}
+}
+
+void GlSimulated::reportError(const std::string &msg) const
+{
+	std::cerr << fmt::format("Error: [GlSimulated] encountered {}.", msg) << std::endl;
+	std::exit(-1);
 }
 
 }

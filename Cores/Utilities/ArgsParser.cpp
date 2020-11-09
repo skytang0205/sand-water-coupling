@@ -111,7 +111,7 @@ ArgDataBase *ArgsParser::findArgByFlag(const char flag) const
 	return nullptr;
 }
 
-void ArgsParser::reportError(const std::string &msg)
+void ArgsParser::reportError(const std::string &msg) const
 {
 	std::cerr << fmt::format("Error: [ArgsParser] encountered {}.\n{}", msg, generateUsage()) << std::flush;
 	std::exit(-1);

@@ -62,6 +62,8 @@ protected:
 		std::vector<float> &heats,
 		std::vector<uint> &indices
 		);
+
+	void reportError(const std::string &msg) const;
 };
 
 }

@@ -18,8 +18,8 @@ void Projectile<Dim>::writeDescription(std::ofstream &fout) const
 		node["data_mode"] = "dynamic";
 		node["primitive_type"] = "triangle_list";
 		node["indexed"] = true;
-		node["enable_color_map"] = false;
-		node["diffuse_albedo"] = Vector4f(0, 0, 1, 1);
+		node["color_map"]["enabled"] = true;
+		node["material"]["diffuse_albedo"] = Vector4f(0, 0, 1, 1);
 		root["objects"].push_back(node);
 	}
 	fout << root << std::endl;
@@ -37,8 +37,12 @@ void Projectile<Dim>::writeFrame(const std::string &frameDir, const bool staticD
 		IO::writeValue(fout, (_position + a - b).cast<float>().eval());
 		IO::writeValue(fout, (_position - a + b).cast<float>().eval());
 		IO::writeValue(fout, (_position + a + b).cast<float>().eval());
-		if constexpr (Dim > 2)
-			IO::writeValue(fout, VectorDf::Unit(2).eval());
+
+		IO::writeValue(fout, float(_velocity.norm()));
+		IO::writeValue(fout, float(_velocity.norm()));
+		IO::writeValue(fout, float(_velocity.norm()));
+		IO::writeValue(fout, float(_velocity.norm()));
+
 		static constexpr uint indices[] = { 6, 1, 2, 0, 1, 3, 2 };
 		IO::write(fout, indices, sizeof(indices));
 	}
