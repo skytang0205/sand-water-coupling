@@ -39,8 +39,7 @@ public:
 	void draw();
 
 	bool isVisible() const { return _visible; }
-	void show() { _visible = true; }
-	void hide() { _visible = false; }
+	void flipVisibility() { _visible = !_visible; }
 };
 
 }

@@ -42,6 +42,8 @@ void GlViewer::setCallbacks() const
 
 void GlViewer::buildRenderItems()
 {
+	GlApp::buildRenderItems();
+
 	if (!_root["objects"].IsSequence()) {
 		std::cerr << fmt::format("Error: [GlViewer] cannot find objects sequence in description.yaml.") << std::endl;
 		std::exit(-1);
@@ -55,8 +57,6 @@ void GlViewer::buildRenderItems()
 		_simulatedObjects.push_back(_simulated.get());
 		_ritems.push_back(std::move(_simulated));
 	}
-
-	GlApp::buildRenderItems();
 }
 
 void GlViewer::update(const double dt)
@@ -104,6 +104,18 @@ void GlViewer::keyCallback(GLFWwindow *window, int key, int scancode, int action
 			if (!_this->_playing) {
 				_this->_currentFrame = std::min(_this->_currentFrame + 1.0, _this->_endFrame - 1.0);
 			}
+			break;
+		case GLFW_KEY_1:
+		case GLFW_KEY_2:
+		case GLFW_KEY_3:
+		case GLFW_KEY_4:
+		case GLFW_KEY_5:
+		case GLFW_KEY_6:
+		case GLFW_KEY_7:
+		case GLFW_KEY_8:
+		case GLFW_KEY_9:
+			if (key - size_t('1') < _this->_simulatedObjects.size())
+				_this->_simulatedObjects[key - size_t('1')]->flipVisibility();
 			break;
 		default:
 			GlApp::keyCallback(window, key, scancode, action, mods);

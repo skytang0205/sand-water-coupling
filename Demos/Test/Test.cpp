@@ -32,7 +32,7 @@ inline void testArgsParser(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace PhysX;
-	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(1.0, 1.0));
+	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(10.0, 10.0));
 	auto simulator = new Simulator("output", 0, 100, 50, 1, simulation);
 	simulator->Simulate();
 	return 0;

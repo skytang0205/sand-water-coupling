@@ -27,7 +27,7 @@ GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const
 	if (node["diffuse_albedo"]) _diffuseAlbedo = node["diffuse_albedo"].as<Vector4f>();
 	_fresnelR0 = Vector3f(0.02041f, 0.02041f, 0.02041f);
 	if (node["fresnel_r0"]) _fresnelR0 = node["fresnel_r0"].as<Vector3f>();
-	_roughness = dim > 2 ? 0.75f : 1.03125;
+	_roughness = dim > 2 ? 0.75f : 1.03125f;
 	if (node["roughness"]) _roughness = node["roughness"].as<float>();
 
 	// Initialize meshes.
@@ -91,13 +91,16 @@ void GlSimulated::beginDraw()
 {
 	// Set parameters according to current frame.
 	if (_indexed) {
-		_count = _idxFrameOffset[_currentFrame + size_t(1)] - _idxFrameOffset[_currentFrame];
-		_indices = reinterpret_cast<const void *>(_idxFrameOffset[_currentFrame] * sizeof(uint));
-		_baseVertex = _vtxFrameOffset[_currentFrame];
+		const size_t vtxFrame = _currentFrame < _vtxFrameOffset.size() - 1 ? _currentFrame : 0;
+		const size_t idxFrame = _currentFrame < _idxFrameOffset.size() - 1 ? _currentFrame : 0;
+		_count = _idxFrameOffset[idxFrame + 1] - _idxFrameOffset[idxFrame];
+		_indices = reinterpret_cast<const void *>(_idxFrameOffset[idxFrame] * sizeof(uint));
+		_baseVertex = _vtxFrameOffset[vtxFrame];
 	}
 	else {
-		_first = _vtxFrameOffset[_currentFrame];
-		_count = _vtxFrameOffset[_currentFrame + size_t(1)] - _vtxFrameOffset[_currentFrame];
+		const size_t vtxFrame = _currentFrame < _vtxFrameOffset.size() - 1 ? _currentFrame : 0;
+		_first = _vtxFrameOffset[vtxFrame];
+		_count = _vtxFrameOffset[vtxFrame + 1] - _vtxFrameOffset[vtxFrame];
 	}
 	// Set uniforms.
 	_program->setUniform("uWorld", _frameWorlds[_currentFrame < _frameWorlds.size() ? _currentFrame : 0]);
@@ -117,6 +120,10 @@ void GlSimulated::loadMesh(
 	)
 {
 	std::ifstream fin(fileName, std::ios::binary);
+	if (!fin) {
+		std::cerr << fmt::format("Error: [GlSimulated] failed to open {}.", fileName) << std::endl;
+		std::exit(-1);
+	}
 	uint vtxCnt;
 	IO::readValue(fin, vtxCnt);
 	_vtxFrameOffset.push_back(vtxCnt);

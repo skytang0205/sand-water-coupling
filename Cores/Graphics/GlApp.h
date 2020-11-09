@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/Camera.h"
-#include "Graphics/GlRenderTest.h"
+#include "Graphics/GlAxes.h"
 #include "Graphics/GlText.h"
 #include "Graphics/StepTimer.h"
 #include "Utilities/Types.h"
@@ -95,6 +95,7 @@ protected:
 
 	std::vector<std::unique_ptr<GlRenderItem>> _ritems;
 	std::vector<GlRenderItem *> _ritemLayers[size_t(RenderLayer::Count)];
+	GlAxes *_axes = nullptr;
 	GlText *_text = nullptr;
 
 	PassConstants _passConstants;

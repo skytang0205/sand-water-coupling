@@ -29,7 +29,7 @@ public:
 	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return real(1) / frameRate / stepRate; }
 
 	virtual void writeDescription(std::ofstream &fout) const;
-	virtual void writeFrame(const std::string &frameDir, const bool staticDraw = false) const;
+	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const;
 	virtual void saveFrame(const std::string &frameDir) const;
 	virtual void loadFrame(const std::string &framdDir);
 

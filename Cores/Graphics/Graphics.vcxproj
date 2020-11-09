@@ -106,6 +106,7 @@
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="GlApp.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="GlAxes.h" />
     <ClInclude Include="OrbitCamera.h" />
     <ClInclude Include="OrthoCamera.h" />
     <ClInclude Include="GlProgram.h" />

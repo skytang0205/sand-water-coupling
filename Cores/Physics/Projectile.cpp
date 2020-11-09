@@ -11,6 +11,17 @@ void Projectile<Dim>::writeDescription(std::ofstream &fout) const
 {
 	YAML::Node root;
 	root["dimension"] = Dim;
+	// Description of ground.
+	{
+		YAML::Node node;
+		node["name"] = "ground";
+		node["data_mode"] = "static";
+		node["primitive_type"] = "line_list";
+		node["indexed"] = false;
+		node["enable_color_map"] = false;
+		node["diffuse_albedo"] = Vector4f(0, 0, 0, 1);
+		root["objects"].push_back(node);
+	}
 	// Description of ball.
 	{
 		YAML::Node node;
@@ -28,10 +39,19 @@ void Projectile<Dim>::writeDescription(std::ofstream &fout) const
 template<int Dim>
 void Projectile<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
-	std::ofstream fout(frameDir + "/ball.mesh", std::ios::binary);
-	IO::writeValue(fout, uint(1));
-	const VectorDf pos = _position.cast<float>();
-	IO::writeValue(fout, pos);
+	{ // Write ball.
+		std::ofstream fout(frameDir + "/ball.mesh", std::ios::binary);
+		IO::writeValue(fout, uint(1));
+		const VectorDf pos = _position.cast<float>();
+		IO::writeValue(fout, pos);
+	}
+	if (staticDraw) {
+		// Write ground.
+		std::ofstream fout(frameDir + "/ground.mesh", std::ios::binary);
+		IO::writeValue(fout, uint(2));
+		IO::writeValue(fout, (VectorDf::Unit(0) * -15.0f).eval());
+		IO::writeValue(fout, (VectorDf::Unit(0) * +15.0f).eval());
+	}
 }
 
 template<int Dim>

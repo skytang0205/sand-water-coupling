@@ -90,6 +90,8 @@ void GlApp::initGlStates() const
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(debugMessageCallback, nullptr);
 #endif
+	glPointSize(4.8f);
+	glLineWidth(1.5f);
 }
 
 void GlApp::setCallbacks() const
@@ -118,8 +120,9 @@ void GlApp::initUniformBuffers()
 
 void GlApp::buildRenderItems()
 {
-//	_ritems.push_back(std::make_unique<GlRenderTest>(_programs["default"].get()));
-//	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
+	_ritems.push_back(std::make_unique<GlAxes>(_programs["shaded"].get(), _dim, 2.0f));
+	_ritemLayers[size_t(RenderLayer::Opaque)].push_back(_ritems.back().get());
+	_axes = dynamic_cast<GlAxes *>(_ritems.back().get());
 
 	_ritems.push_back(std::make_unique<GlText>(_programs["text"].get()));
 	_ritemLayers[size_t(RenderLayer::Text)].push_back(_ritems.back().get());
@@ -287,6 +290,9 @@ void GlApp::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
 			break;
 		case GLFW_KEY_F4:
 			_this->_enableWireframe = !_this->_enableWireframe;
+			break;
+		case GLFW_KEY_0:
+			_this->_axes->flipVisibility();
 			break;
 		}
 	}

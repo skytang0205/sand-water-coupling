@@ -75,6 +75,9 @@
     <ClInclude Include="OrthoCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GlAxes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BitmapConsolas.inc">

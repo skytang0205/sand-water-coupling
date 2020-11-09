@@ -64,7 +64,7 @@ void Simulator::writeAndSaveToFrameDirectory(const uint frame, const bool static
 	std::cout << fmt::format("** Write output files for frame {}...", frame) << std::endl;
 	const std::string frameDir = fmt::format("{}/{}", _outputDir, frame);
 	std::filesystem::create_directory(frameDir);
-	_simulation->writeFrame(frameDir);
+	_simulation->writeFrame(frameDir, staticDraw);
 	_simulation->saveFrame(frameDir);
 	// Write the last frame.
 	std::ofstream fout(_outputDir + "/end_frame.txt");
