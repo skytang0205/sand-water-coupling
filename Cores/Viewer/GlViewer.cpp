@@ -62,7 +62,7 @@ void GlViewer::buildRenderItems()
 void GlViewer::update(const double dt)
 {
 	if (_playing) {
-		_currentFrame += 1.0 / (dt * _frameRate);
+		_currentFrame += dt * _frameRate;
 		if (_currentFrame >= _endFrame - 1) {
 			_currentFrame = _endFrame - 1;
 			_playing = false;
