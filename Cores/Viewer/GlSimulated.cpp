@@ -65,8 +65,7 @@ GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const
 			&positions,
 			&normals,
 			_enableColorMap ? &heats : nullptr,
-			_indexed ? &indices : nullptr
-			);
+			_indexed ? &indices : nullptr);
 	}
 	else if (dataMode == "dynamic") {
 		_vtxFrameOffset.push_back(0);
@@ -78,17 +77,31 @@ GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const
 				&positions,
 				&normals,
 				_enableColorMap ? &heats : nullptr,
-				_indexed ? &indices : nullptr
-				);
+				_indexed ? &indices : nullptr);
 		}
 	}
 	else if (dataMode == "semi-dynamic") {
-
+		_vtxFrameOffset.push_back(0);
+		if (_indexed) _idxFrameOffset.push_back(0);
+		for (uint frame = 0; frame < endFrame; frame++) {
+			loadMesh(
+				fmt::format("{}/{}/{}.mesh", outputDir, frame, name),
+				dim,
+				&positions,
+				&normals,
+				_enableColorMap ? &heats : nullptr,
+				_indexed && !frame ? &indices : nullptr);
+		}
 	}
 	else reportError("invalid data mode");
+
 	for (size_t frame = 1; frame < _vtxFrameOffset.size(); frame++) {
 		_vtxFrameOffset[frame] += _vtxFrameOffset[frame - 1];
-		if (_indexed) _idxFrameOffset[frame] += _idxFrameOffset[frame - 1];
+	}
+	if (_indexed) {
+		for (size_t frame = 1; frame < _idxFrameOffset.size(); frame++) {
+			_idxFrameOffset[frame] += _idxFrameOffset[frame - 1];
+		}
 	}
 
 	// Normalized heats.

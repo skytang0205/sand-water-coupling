@@ -15,7 +15,7 @@ void Projectile<Dim>::writeDescription(std::ofstream &fout) const
 	{
 		YAML::Node node;
 		node["name"] = "ball";
-		node["data_mode"] = "dynamic";
+		node["data_mode"] = "semi-dynamic";
 		node["primitive_type"] = "triangle_list";
 		node["indexed"] = true;
 		node["color_map"]["enabled"] = true;
@@ -43,8 +43,10 @@ void Projectile<Dim>::writeFrame(const std::string &frameDir, const bool staticD
 		IO::writeValue(fout, float(_velocity.norm()));
 		IO::writeValue(fout, float(_velocity.norm()));
 
-		static constexpr uint indices[] = { 6, 1, 2, 0, 1, 3, 2 };
-		IO::write(fout, indices, sizeof(indices));
+		if (staticDraw) {
+			static constexpr uint indices[] = { 6, 1, 2, 0, 1, 3, 2 };
+			IO::write(fout, indices, sizeof(indices));
+		}
 	}
 }
 
