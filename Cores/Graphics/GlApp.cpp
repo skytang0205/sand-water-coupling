@@ -139,15 +139,13 @@ void GlApp::initCamera()
 			10.0f, // radius
 			0.0f, // phi
 			0.5f * float(std::numbers::pi), // theta
-			Vector3f::Zero() // target
-			);
+			Vector3f::Zero()); // target
 	}
 	else {
 		_camera = std::make_unique<OrthoCamera>(
 			Vector3f::Unit(2) * 15.0f, // pos
 			0.2f, // yScale
-			1 / 150.0f // zScale
-			);
+			1 / 150.0f); // zScale
 	}
 }
 
@@ -224,25 +222,21 @@ void GlApp::updateText()
 				_enableInfo ? "on" : "off",
 				_enableSrgb ? "on" : "off",
 				_enableMsaa ? "on" : "off",
-				_enableWireframe ? "on" : "off"
-				),
+				_enableWireframe ? "on" : "off"),
 			Vector2f(10.24f / _width, 7.68f / _height),
 			Vector2f(0.75f, 0.75f),
-			Vector4f(0, 0, 0, 1)
-			);
+			Vector4f(0, 0, 0, 1));
 		_text->set(
 			fmt::format("FPS: {:>3}", _framesPerSecond),
 			Vector2f(1.0f - 10.24f / _width, 7.68f / _height),
 			Vector2f(0.75f, 0.75f),
 			Vector4f(0, 0, 0, 1),
-			GlText::Alignment::Right
-			);
+			GlText::Alignment::Right);
 		_text->set(
 			fmt::format("Light direction: ({:.2f}, {:.2f})", _lightPhi, _lightTheta),
 			Vector2f(10.24f / _width, 1.0f - (24.0f + 7.68f) / _height),
 			Vector2f(0.75f, 0.75f),
-			Vector4f(0, 0, 0, 1)
-			);
+			Vector4f(0, 0, 0, 1));
 	}
 }
 

@@ -19,7 +19,6 @@ GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const
 	// Read data mode.
 	if (!node["data_mode"]) reportError("missing data mode");
 	const std::string dataMode = node["data_mode"].as<std::string>();
-	if (dataMode != "static" && dataMode != "dynamic") reportError("invalid data mode");
 
 	// Read primitive type.
 	if (!node["primitive_type"]) reportError("missing primitive type");
@@ -60,17 +59,33 @@ GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const
 	if (dataMode == "static") {
 		_vtxFrameOffset.push_back(0);
 		if (_indexed) _idxFrameOffset.push_back(0);
-		_frameWorlds.push_back(Matrix4f::Identity());
-		loadMesh(fmt::format("{}/0/{}.mesh", outputDir, name), dim, positions, normals, heats, indices);
+		loadMesh(
+			fmt::format("{}/0/{}.mesh", outputDir, name),
+			dim,
+			&positions,
+			&normals,
+			_enableColorMap ? &heats : nullptr,
+			_indexed ? &indices : nullptr
+			);
 	}
 	else if (dataMode == "dynamic") {
 		_vtxFrameOffset.push_back(0);
 		if (_indexed) _idxFrameOffset.push_back(0);
-		_frameWorlds.push_back(Matrix4f::Identity());
 		for (uint frame = 0; frame < endFrame; frame++) {
-			loadMesh(fmt::format("{}/{}/{}.mesh", outputDir, frame, name), dim, positions, normals, heats, indices);
+			loadMesh(
+				fmt::format("{}/{}/{}.mesh", outputDir, frame, name),
+				dim,
+				&positions,
+				&normals,
+				_enableColorMap ? &heats : nullptr,
+				_indexed ? &indices : nullptr
+				);
 		}
 	}
+	else if (dataMode == "semi-dynamic") {
+
+	}
+	else reportError("invalid data mode");
 	for (size_t frame = 1; frame < _vtxFrameOffset.size(); frame++) {
 		_vtxFrameOffset[frame] += _vtxFrameOffset[frame - 1];
 		if (_indexed) _idxFrameOffset[frame] += _idxFrameOffset[frame - 1];
@@ -133,7 +148,6 @@ void GlSimulated::beginDraw()
 		_count = _vtxFrameOffset[vtxFrame + 1] - _vtxFrameOffset[vtxFrame];
 	}
 	// Set uniforms.
-	_program->setUniform("uWorld", _frameWorlds[_currentFrame < _frameWorlds.size() ? _currentFrame : 0]);
 	_program->setUniform("uDiffuseAlbedo", _diffuseAlbedo);
 	_program->setUniform("uFresnelR0", _fresnelR0);
 	_program->setUniform("uRoughness", _roughness);
@@ -143,11 +157,10 @@ void GlSimulated::beginDraw()
 void GlSimulated::loadMesh(
 	const std::string &fileName,
 	const int dim,
-	std::vector<Vector3f> &positions,
-	std::vector<Vector3f> &normals,
-	std::vector<float> &heats,
-	std::vector<uint> &indices
-	)
+	std::vector<Vector3f> *const positions,
+	std::vector<Vector3f> *const normals,
+	std::vector<float> *const heats,
+	std::vector<uint> *const indices)
 {
 	std::ifstream fin(fileName, std::ios::binary);
 	if (!fin) {
@@ -157,35 +170,35 @@ void GlSimulated::loadMesh(
 	uint vtxCnt;
 	IO::readValue(fin, vtxCnt);
 	_vtxFrameOffset.push_back(vtxCnt);
-	// Read positions.
-	positions.resize(positions.size() + vtxCnt, Vector3f::Zero().eval());
-	if (dim > 2)
-		IO::readArray(fin, positions.data() + positions.size() - vtxCnt, vtxCnt);
-	else {
-		for (uint i = 0; i < vtxCnt; i++) {
-			IO::read(fin, positions.data() + positions.size() - vtxCnt + i, sizeof(Vector2f));
+	if (positions) {
+		positions->resize(positions->size() + vtxCnt, Vector3f::Zero().eval());
+		if (dim > 2)
+			IO::readArray(fin, positions->data() + positions->size() - vtxCnt, vtxCnt);
+		else {
+			for (uint i = 0; i < vtxCnt; i++) {
+				IO::read(fin, positions->data() + positions->size() - vtxCnt + i, sizeof(Vector2f));
+			}
 		}
 	}
-	// Read normals.
-	normals.resize(normals.size() + vtxCnt, Vector3f::Zero().eval());
-	if (dim > 2)
-		IO::readArray(fin, normals.data() + normals.size() - vtxCnt, vtxCnt);
-	else {
-		for (uint i = 0; i < vtxCnt; i++)
-			normals[normals.size() - vtxCnt + i].z() = 1.0f;
+	if (normals) {
+		normals->resize(normals->size() + vtxCnt, Vector3f::Zero().eval());
+		if (dim > 2)
+			IO::readArray(fin, normals->data() + normals->size() - vtxCnt, vtxCnt);
+		else {
+			for (uint i = 0; i < vtxCnt; i++)
+				normals->operator[](normals->size() - vtxCnt + i).z() = 1.0f;
+		}
 	}
-	// Read heats.
-	if (_enableColorMap) {
-		heats.resize(heats.size() + vtxCnt);
-		IO::readArray(fin, heats.data() + heats.size() - vtxCnt, vtxCnt);
+	if (heats) {
+		heats->resize(heats->size() + vtxCnt);
+		IO::readArray(fin, heats->data() + heats->size() - vtxCnt, vtxCnt);
 	}
-	// Read indices.
-	if (_indexed) {
+	if (indices) {
 		uint idxCnt;
 		IO::readValue(fin, idxCnt);
 		_idxFrameOffset.push_back(idxCnt);
-		indices.resize(indices.size() + idxCnt);
-		IO::readArray(fin, indices.data() + indices.size() - idxCnt, idxCnt);
+		indices->resize(indices->size() + idxCnt);
+		IO::readArray(fin, indices->data() + indices->size() - idxCnt, idxCnt);
 	}
 }
 

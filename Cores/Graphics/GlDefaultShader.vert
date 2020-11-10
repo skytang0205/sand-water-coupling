@@ -9,7 +9,6 @@ out vec3 vertPos;
 out vec3 vertNormal;
 out float vertHeat;
 
-uniform mat4 uWorld;
 uniform vec4 uDiffuseAlbedo;
 uniform vec3 uFresnelR0;
 uniform float uRoughness;
@@ -28,9 +27,8 @@ layout (std140, binding = 0) uniform PassConstants
 
 void main()
 {
-	vec4 pos = uWorld * vec4(aPos, 1.0);
-	vertPos = pos.xyz;
-	vertNormal = mat3(uWorld) * aNormal;
+	vertPos = aPos;
+	vertNormal = aNormal;
 	vertHeat = aHeat;
 	gl_Position = uProjView * vec4(vertPos, 1.0);
 }

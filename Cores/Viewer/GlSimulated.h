@@ -14,10 +14,10 @@ class GlSimulated : public GlRenderItem
 public:
 
 	static inline std::unordered_map<std::string, GLenum> strToMode = {
-			{ "point_list", GL_POINTS },
-			{ "line_list", GL_LINES },
-			{ "triangle_list", GL_TRIANGLES }
-		};
+		{ "point_list", GL_POINTS },
+		{ "line_list", GL_LINES },
+		{ "triangle_list", GL_TRIANGLES }
+	};
 
 protected:
 
@@ -33,7 +33,6 @@ protected:
 
 	std::vector<uint> _vtxFrameOffset;
 	std::vector<uint> _idxFrameOffset;
-	std::vector<Matrix4f> _frameWorlds;
 
 public:
 
@@ -57,11 +56,10 @@ protected:
 	void loadMesh(
 		const std::string &fileName,
 		const int dim,
-		std::vector<Vector3f> &positions,
-		std::vector<Vector3f> &normals,
-		std::vector<float> &heats,
-		std::vector<uint> &indices
-		);
+		std::vector<Vector3f> *const positions,
+		std::vector<Vector3f> *const normals,
+		std::vector<float> *const heats,
+		std::vector<uint> *const indices);
 
 	void reportError(const std::string &msg) const;
 };

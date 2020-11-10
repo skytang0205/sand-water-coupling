@@ -28,15 +28,15 @@ protected:
 	GLuint _vbo;
 
 	BitmapFont _bmConsolas = {
-			64,
-			51,
-			512,
-			512,
-			1,
-			128,
-			reinterpret_cast<const uchar *>(BitmapFont::kBitmapConsolas[0]),
-			BitmapFont::kBitmapConsolasChars
-		};
+		64,
+		51,
+		512,
+		512,
+		1,
+		128,
+		reinterpret_cast<const uchar *>(BitmapFont::kBitmapConsolas[0]),
+		BitmapFont::kBitmapConsolasChars
+	};
 
 public:
 
@@ -53,8 +53,7 @@ public:
 		const Vector2f &pos,
 		const Vector2f &scale,
 		const Vector4f &color,
-		const Alignment alignment = Alignment::Left
-		);
+		const Alignment alignment = Alignment::Left);
 	void resize(const int width, const int height) { _bmConsolas.normalize(width, height); }
 
 	virtual void beginDraw() override;

@@ -29,7 +29,6 @@ GlRenderTest::GlRenderTest(GlProgram *program) : GlRenderItem(program)
 
 void GlRenderTest::beginDraw()
 {
-	_program->setUniform("uWorld", Matrix4f::Identity().eval());
 	_program->setUniform("uDiffuseAlbedo", Vector4f(1, 0, 0, 1));
 	_program->setUniform("uFresnelR0", (0.02041f * Vector3f::Ones()).eval());
 	_program->setUniform("uRoughness", 0.75f);

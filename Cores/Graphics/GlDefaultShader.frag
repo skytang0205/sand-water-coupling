@@ -7,7 +7,6 @@ in float vertHeat;
 
 out vec4 fragColor;
 
-uniform mat4 uWorld;
 uniform vec4 uDiffuseAlbedo;
 uniform vec3 uFresnelR0;
 uniform float uRoughness;

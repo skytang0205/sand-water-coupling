@@ -105,8 +105,8 @@ void Simulator::advanceTimeBySteps(const real targetTime)
 		const auto endTime = steady_clock::now();
 		std::cout << fmt::format(
 			"    ... {:>7.2f}s used",
-			duration<double>(endTime - beginTime).count()
-			) << std::endl;
+			duration<double>(endTime - beginTime).count())
+			<< std::endl;
 	}
 }
 

@@ -45,8 +45,8 @@ public:
 		const float radius,
 		const float phi,
 		const float theta,
-		const Vector3f &target
-		) :
+		const Vector3f &target)
+		:
 		_savedRadius(radius),
 		_savedPhi(phi),
 		_savedTheta(theta),

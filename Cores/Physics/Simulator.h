@@ -27,8 +27,8 @@ public:
 		const uint endFrame,
 		const uint frameRate,
 		const double stepRate,
-		Simulation *const simulation
-		) :
+		Simulation *const simulation)
+		:
 		_outputDir(outputDir),
 		_beginFrame(beginFrame),
 		_endFrame(endFrame),

@@ -55,10 +55,10 @@ void GlText::set(const std::string &text, const Vector2f &pos, const Vector2f &s
 				x -= fc->xAdvance * scale.x();
 
 			_vertices[_instanceCount++] = {
-					Vector4f(x + fc->xOffset * scale.x(), y - fc->yOffset * scale.y(), fc->width * scale.x(), fc->height * scale.y()),
-					Vector4f(fc->x, fc->y, fc->texWidth, fc->texHeight),
-					color
-				};
+				Vector4f(x + fc->xOffset * scale.x(), y - fc->yOffset * scale.y(), fc->width * scale.x(), fc->height * scale.y()),
+				Vector4f(fc->x, fc->y, fc->texWidth, fc->texHeight),
+				color
+			};
 			if (_instanceCount >= _kTextBufferSize) {
 				std::cerr << "Error: [GlText] ran out of its text buffer." << std::endl;
 				std::exit(-1);

@@ -81,8 +81,7 @@ void GlViewer::updateText()
 		Vector2f(1.0f - 10.24f / _width, 1.0f - (24.0f + 7.68f) / _height),
 		Vector2f(0.75f, 0.75f),
 		Vector4f(0, 0, 0, 1),
-		GlText::Alignment::Right
-	);
+		GlText::Alignment::Right);
 }
 
 void GlViewer::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
