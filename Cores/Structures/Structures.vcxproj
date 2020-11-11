@@ -16,6 +16,11 @@
     <ClInclude Include="Field.h" />
     <ClInclude Include="ScalarGridField.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Field.cpp" />
+    <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="ScalarGridField.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

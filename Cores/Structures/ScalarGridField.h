@@ -9,7 +9,7 @@ namespace PhysX {
 template <int Dim, int DataLayout> class ScalarGridField;
 
 template <int Dim>
-class ScalarGridField<Dim, CellCentered> : public Grid<Dim>, ScalarField<Dim>
+class ScalarGridField<Dim, CellCentered> : public Grid<Dim>, public ScalarField<Dim>
 {
 	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
@@ -34,15 +34,25 @@ public:
 	ScalarGridField &operator=(const ScalarGridField &rhs) = default;
 	virtual ~ScalarGridField() = default;
 
-	virtual real operator()(const VectorDr &pos) const override
+	const real &operator[](const VectorDi &coord) const { return _data[coord]; }
+	real &operator[](const VectorDi &coord) { return _data[coord]; }
+
+	virtual real operator()(const VectorDr &pos) const override final
 	{
-		if constexpr (Dim == 2) {
-		}
-		else {
-		}
+		VectorDr frac;
+		VectorDi cell = this->getLowerCell(pos, frac);
+		return _data.lerp(cell, frac);
 	}
 
-	virtual VectorDr gradient(const VectorDr &pos) const override { return pos; }
+	virtual VectorDr gradient(const VectorDr &pos) const override final
+	{
+		const real dx = this->_spacing;
+		VectorDr vec;
+		for (int i = 0; i < Dim; i++) {
+			vec[i] = (operator()(pos + VectorDr::Unit(i) * dx) - operator()(pos - VectorDr::Unit(i) * dx)) / (2 * dx);
+		}
+		return vec;
+	}
 };
 
 }
