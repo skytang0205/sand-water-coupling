@@ -33,8 +33,21 @@ inline void testArgsParser(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace PhysX;
-	Array<1> data;
-/*	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(5.0, 5.0));
+	Array<3, int> data(Vector3i(2,3,4));
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < 4; k++)
+				data[Vector3i(i, j, k)] = i + j + k;
+		}
+	}
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < 4; k++)
+				std::cout << data[Vector3i(i, j, k)] << ' ';
+			std::cout << std::endl;
+		}
+	}
+	/*	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(5.0, 5.0));
 	auto simulator = new Simulator("output", 0, 100, 50, 1, simulation);
 	simulator->Simulate(); */
 	return 0;
