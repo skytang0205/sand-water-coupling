@@ -34,7 +34,6 @@ public:
 
 	GlViewer(const std::string &outputDir, const uint frameRate);
 
-	GlViewer() = delete;
 	GlViewer(const GlViewer &rhs) = delete;
 	GlViewer &operator=(const GlViewer &rhs) = delete;
 	virtual ~GlViewer() = default;

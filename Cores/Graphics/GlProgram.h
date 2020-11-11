@@ -18,10 +18,9 @@ public:
 
 	GlProgram(const GLchar *vsCode, const GLchar *fsCode, const GLint vsLength = -1, const GLint fsLength = -1);
 
-	GlProgram() = delete;
 	GlProgram(const GlProgram &rhs) = delete;
 	GlProgram &operator=(const GlProgram &rhs) = delete;
-	virtual ~GlProgram() { }
+	virtual ~GlProgram() = default;
 
 	void use() const { glUseProgram(_program); }
 

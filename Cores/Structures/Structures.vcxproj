@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Array.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Field.h" />
   </ItemGroup>

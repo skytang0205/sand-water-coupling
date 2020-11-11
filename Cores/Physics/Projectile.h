@@ -7,6 +7,7 @@ namespace PhysX {
 template <int Dim>
 class Projectile : public Simulation
 {
+	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
@@ -21,7 +22,6 @@ public:
 		_velocity(velocity)
 	{ }
 
-	Projectile() = delete;
 	Projectile(const Projectile &rhs) = delete;
 	Projectile &operator=(const Projectile &rhs) = delete;
 	virtual ~Projectile() = default;

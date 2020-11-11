@@ -28,9 +28,9 @@ public:
 
 	GlRenderItem(GlProgram *program) : _program(program) { glCreateVertexArrays(1, &_vao); }
 
-	GlRenderItem() = delete;
 	GlRenderItem(const GlRenderItem &rhs) = delete;
 	GlRenderItem &operator=(const GlRenderItem &rhs) = delete;
+
 	virtual ~GlRenderItem() { glDeleteVertexArrays(1, &_vao); }
 
 	virtual void beginDraw() { }

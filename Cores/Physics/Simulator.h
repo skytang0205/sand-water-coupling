@@ -37,7 +37,6 @@ public:
 		_simulation(simulation)
 	{ }
 
-	Simulator() = delete;
 	Simulator(const Simulator &rhs) = delete;
 	Simulator &operator=(const Simulator &rhs) = delete;
 	virtual ~Simulator() = default;

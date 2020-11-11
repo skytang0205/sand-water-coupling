@@ -37,9 +37,9 @@ public:
 		_count = 2 * dim;
 	}
 
-	GlAxes() = delete;
 	GlAxes(const GlAxes &rhs) = delete;
 	GlAxes &operator=(const GlAxes &rhs) = delete;
+
 	virtual ~GlAxes() { glDeleteBuffers(1, &_vbo); }
 };
 

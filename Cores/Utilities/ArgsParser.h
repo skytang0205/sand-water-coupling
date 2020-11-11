@@ -34,7 +34,6 @@ public:
 		_mandatory(mandatory)
 	{ }
 
-	ArgDataBase() = delete;
 	ArgDataBase(const ArgDataBase &rhs) = default;
 	ArgDataBase &operator=(const ArgDataBase &rhs) = default;
 	virtual ~ArgDataBase() = default;

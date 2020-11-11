@@ -56,7 +56,6 @@ public:
 		setSpherical(radius, phi, theta, target);
 	}
 
-	OrbitCamera() = delete;
 	OrbitCamera(const OrbitCamera &rhs) = default;
 	OrbitCamera &operator=(const OrbitCamera &rhs) = default;
 	virtual ~OrbitCamera() = default;

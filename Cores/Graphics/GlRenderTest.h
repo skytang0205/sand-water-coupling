@@ -15,9 +15,9 @@ public:
 
 	GlRenderTest(GlProgram *program);
 
-	GlRenderTest() = delete;
 	GlRenderTest(const GlRenderTest &rhs) = delete;
 	GlRenderTest &operator=(const GlRenderTest &rhs) = delete;
+
 	virtual ~GlRenderTest()
 	{
 		glDeleteBuffers(1, &_ebo);

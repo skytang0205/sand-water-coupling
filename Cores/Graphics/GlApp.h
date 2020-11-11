@@ -104,9 +104,9 @@ public:
 
 	GlApp(const int width, const int height, const std::string &caption);
 
-	GlApp() = delete;
 	GlApp(const GlApp &rhs) = delete;
 	GlApp &operator=(const GlApp &rhs) = delete;
+
 	virtual ~GlApp()
 	{
 		glDeleteBuffers(1, &_uboPassConstants);

@@ -7,6 +7,7 @@ namespace PhysX {
 template <int Dim>
 class ScalarField
 {
+	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 public:

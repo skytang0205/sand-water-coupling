@@ -42,9 +42,9 @@ public:
 
 	GlText(GlProgram *program);
 
-	GlText() = delete;
 	GlText(const GlText &rhs) = delete;
 	GlText &operator=(const GlText &rhs) = delete;
+
 	virtual ~GlText() { glDeleteBuffers(1, &_vbo); }
 
 	void reset() { _instanceCount = 0; }

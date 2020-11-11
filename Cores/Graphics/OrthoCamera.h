@@ -27,7 +27,6 @@ public:
 		_projDirty = true;
 	}
 
-	OrthoCamera() = delete;
 	OrthoCamera(const OrthoCamera &rhs) = default;
 	OrthoCamera &operator=(const OrthoCamera &rhs) = default;
 	virtual ~OrthoCamera() = default;

@@ -7,6 +7,7 @@ namespace PhysX {
 template <int Dim>
 class Grid
 {
+	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
@@ -23,7 +24,6 @@ public:
 		_origin(center - resolution.cast<real>() * spacing * real(0.5))
 	{ }
 
-	Grid() = delete;
 	Grid(const Grid &rhs) = default;
 	Grid &operator=(const Grid &rhs) = default;
 	virtual ~Grid() = default;

@@ -38,9 +38,9 @@ public:
 
 	GlSimulated(GlProgram *program, const std::string &outputDir, const uint endFrame, const int dim, const YAML::Node &node);
 
-	GlSimulated() = delete;
 	GlSimulated(const GlSimulated &rhs) = delete;
 	GlSimulated &operator=(const GlSimulated &rhs) = delete;
+
 	virtual ~GlSimulated()
 	{
 		glDeleteBuffers(1, &_ebo);
