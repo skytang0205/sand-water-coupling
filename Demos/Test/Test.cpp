@@ -1,5 +1,6 @@
 #include "Physics/Projectile.h"
 #include "Physics/Simulator.h"
+#include "Structures/Grid.h"
 #include "Utilities/ArgsParser.h"
 #include "Utilities/Types.h"
 
@@ -32,8 +33,9 @@ inline void testArgsParser(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace PhysX;
-	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(5.0, 5.0));
+	VectorGridField<3> test(0.5, Vector3i::Ones() * 50);
+/*	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(5.0, 5.0));
 	auto simulator = new Simulator("output", 0, 100, 50, 1, simulation);
-	simulator->Simulate();
+	simulator->Simulate(); */
 	return 0;
 }
