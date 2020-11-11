@@ -1,6 +1,6 @@
 #include "Physics/Projectile.h"
 #include "Physics/Simulator.h"
-#include "Structures/Array.h"
+#include "Structures/ScalarGridField.h"
 #include "Utilities/ArgsParser.h"
 #include "Utilities/Types.h"
 
@@ -33,20 +33,8 @@ inline void testArgsParser(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace PhysX;
-	Array<3, int> data(Vector3i(2,3,4));
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 3; j++) {
-			for (int k = 0; k < 4; k++)
-				data[Vector3i(i, j, k)] = i + j + k;
-		}
-	}
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 3; j++) {
-			for (int k = 0; k < 4; k++)
-				std::cout << data[Vector3i(i, j, k)] << ' ';
-			std::cout << std::endl;
-		}
-	}
+	ScalarGridField<2, CellCentered> field(0.5, Vector2i(3, 4));
+	std::cout << field(Vector2r(2, 3)) << std::endl;
 	/*	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(5.0, 5.0));
 	auto simulator = new Simulator("output", 0, 100, 50, 1, simulation);
 	simulator->Simulate(); */

@@ -4,13 +4,13 @@
 
 namespace PhysX {
 
-const double kGravity = 9.8;
-const double kGravitational = 6.67259e-11;
+inline constexpr double kGravity = 9.8;
+inline constexpr double kGravitational = 6.67259e-11;
 
-const double kVacuumPermittivity = 8.854187817e-12;
-const double kVacuumPermeability = std::numbers::pi * 4e-7;
-const double kLightSpeed = 299792458;
+inline constexpr double kVacuumPermittivity = 8.854187817e-12;
+inline constexpr double kVacuumPermeability = std::numbers::pi * 4e-7;
+inline constexpr double kLightSpeed = 299792458;
 
-const double kBoltzmann = 1.380649e-23;
+inline constexpr double kBoltzmann = 1.380649e-23;
 
 }

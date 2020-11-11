@@ -14,6 +14,7 @@
     <ClInclude Include="Array.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Field.h" />
+    <ClInclude Include="ScalarGridField.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

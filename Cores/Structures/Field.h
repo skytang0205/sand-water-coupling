@@ -17,8 +17,8 @@ public:
 	ScalarField &operator=(const ScalarField &rhs) = default;
 	virtual ~ScalarField() = default;
 
-	virtual real operator()(const VectorDr &pos) = 0;
-	virtual VectorDr gradient(const VectorDr &pos) = 0;
+	virtual real operator()(const VectorDr &pos) const = 0;
+	virtual VectorDr gradient(const VectorDr &pos) const = 0;
 };
 
 template <int Dim>
@@ -33,8 +33,8 @@ public:
 	VectorField &operator=(const VectorField &rhs) = default;
 	~VectorField() = default;
 
-	virtual VectorDr operator()(const VectorDr &pos) = 0;
-	virtual real divergence(const VectorDr &pos) = 0;
+	virtual VectorDr operator()(const VectorDr &pos) const = 0;
+	virtual real divergence(const VectorDr &pos) const = 0;
 };
 
 }
