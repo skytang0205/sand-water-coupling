@@ -12,14 +12,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="ScalarGridField.h" />
+    <ClInclude Include="SurfaceMesh.h" />
+    <ClInclude Include="VectorGridField.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Field.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="ScalarGridField.cpp" />
+    <ClCompile Include="SurfaceMesh.cpp" />
+    <ClCompile Include="VectorGridField.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

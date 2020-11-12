@@ -14,6 +14,10 @@ class ScalarGridField<Dim, CellCentered> : public Grid<Dim>, public ScalarField<
 	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
+	using Grid<Dim>::_spacing;
+	using Grid<Dim>::cellSize;
+	using Grid<Dim>::getCellLerp;
+
 protected:
 
 	Array<Dim> _data;
@@ -37,22 +41,10 @@ public:
 	const real &operator[](const VectorDi &coord) const { return _data[coord]; }
 	real &operator[](const VectorDi &coord) { return _data[coord]; }
 
-	virtual real operator()(const VectorDr &pos) const override final
-	{
-		VectorDr frac;
-		VectorDi cell = this->getLowerCell(pos, frac);
-		return _data.lerp(cell, frac);
-	}
+	virtual real operator()(const VectorDr &pos) const override final;
 
-	virtual VectorDr gradient(const VectorDr &pos) const override final
-	{
-		const real dx = this->_spacing;
-		VectorDr vec;
-		for (int i = 0; i < Dim; i++) {
-			vec[i] = (operator()(pos + VectorDr::Unit(i) * dx) - operator()(pos - VectorDr::Unit(i) * dx)) / (2 * dx);
-		}
-		return vec;
-	}
+	VectorDr gradientAtCellCenter(const VectorDi &cell) const;
+	virtual VectorDr gradient(const VectorDr &pos) const override final;
 };
 
 }

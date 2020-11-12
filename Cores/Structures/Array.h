@@ -39,26 +39,6 @@ public:
 	const Type &operator[](const VectorDi &coord) const { return _data[index(coord)]; }
 	Type &operator[](const VectorDi &coord) { return _data[index(coord)]; }
 
-	Type lerp(const VectorDi &coord, const VectorDr &frac) const
-	{
-		if constexpr (Dim == 2) {
-			return operator[](coord) * (1 - frac.x()) * (1 - frac.y())
-				+ operator[](coord + Vector2i(0, 1)) * (1 - frac.x()) * frac.y()
-				+ operator[](coord + Vector2i(1, 0)) * frac.x() * (1 - frac.y())
-				+ operator[](coord + Vector2i(1, 1)) * frac.x() * frac.y();
-		}
-		else {
-			return operator[](coord) * (1 - frac.x()) * (1 - frac.y()) * (1 - frac.z())
-				+ operator[](coord + Vector3i(0, 0, 1)) * (1 - frac.x()) * (1 - frac.y()) * frac.z()
-				+ operator[](coord + Vector3i(0, 1, 0)) * (1 - frac.x()) * frac.y() * (1 - frac.z())
-				+ operator[](coord + Vector3i(0, 1, 1)) * (1 - frac.x()) * frac.y() * frac.z()
-				+ operator[](coord + Vector3i(1, 0, 0)) * frac.x() * (1 - frac.y()) * (1 - frac.z())
-				+ operator[](coord + Vector3i(1, 0, 1)) * frac.x() * (1 - frac.y()) * frac.z()
-				+ operator[](coord + Vector3i(1, 1, 0)) * frac.x() * frac.y() * (1 - frac.z())
-				+ operator[](coord + Vector3i(1, 1, 1)) * frac.x() * frac.y() * frac.z();
-		}
-	}
-
 protected:
 
 	size_t index(const VectorDi &coord) const
