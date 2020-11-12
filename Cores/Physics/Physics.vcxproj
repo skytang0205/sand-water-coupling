@@ -11,11 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GirdBasedAdvection.h" />
+    <ClInclude Include="GridBasedFluid.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GirdBasedAdvection.cpp" />
+    <ClCompile Include="GridBasedFluid.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
