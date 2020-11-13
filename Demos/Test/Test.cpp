@@ -1,6 +1,5 @@
-#include "Physics/Projectile.h"
+#include "Physics/GridBasedFluid.h"
 #include "Physics/Simulator.h"
-#include "Structures/VectorGridField.h"
 #include "Utilities/ArgsParser.h"
 #include "Utilities/Types.h"
 
@@ -33,9 +32,9 @@ inline void testArgsParser(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace PhysX;
-	VectorGridField<2, FaceCentered> field(0.5, Vector2i(3, 4), Vector2r::Zero(), Vector2r(2, 3));
-	/*	auto simulation = new Projectile<2>(Vector2d::Zero(), Vector2d(5.0, 5.0));
-	auto simulator = new Simulator("output", 0, 100, 50, 1, simulation);
-	simulator->Simulate(); */
+	Grid<2> grid(0.1, Vector2i(100, 100));
+	auto fluid = std::make_unique<GridBasedFluid<2>>(grid);
+	auto simulator = std::make_unique<Simulator>("output", 0, 50, 50, 1, fluid.get());
+	simulator->Simulate();
 	return 0;
 }

@@ -23,6 +23,11 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Structures\Structures.vcxproj">
+      <Project>{11fdb336-d077-4fab-bedf-3444181a927d}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

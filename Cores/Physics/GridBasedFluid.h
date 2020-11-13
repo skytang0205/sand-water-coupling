@@ -1,23 +1,29 @@
 #pragma once
 
+#include "Physics/GirdBasedAdvection.h"
 #include "Physics/Simulation.h"
-#include "Structures/VectorGridField.h"
+#include "Structures/GridBasedVectorField.h"
+
+#include <memory>
 
 namespace PhysX {
 
 template <int Dim>
 class GridBasedFluid : public Simulation
 {
-	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
 
-	VectorGridField<Dim, FaceCentered> _velocity;
+	const Grid<Dim> _grid;
+
+	FaceCenteredVectorField<Dim> _velocity;
+
+	std::unique_ptr<GridBasedAdvection<Dim>> _advection;
 
 public:
 
-	GridBasedFluid() { }
+	GridBasedFluid(const Grid<Dim> &grid);
 
 	GridBasedFluid(const GridBasedFluid &rhs) = delete;
 	GridBasedFluid &operator=(const GridBasedFluid &rhs) = delete;

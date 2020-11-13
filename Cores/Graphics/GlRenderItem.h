@@ -20,13 +20,13 @@ protected:
 	bool _indexed = false;
 	bool _visible = true;
 
-	GlProgram *_program;
+	GlProgram *const _program;
 
 	GLuint _vao;
 
 public:
 
-	GlRenderItem(GlProgram *program) : _program(program) { glCreateVertexArrays(1, &_vao); }
+	GlRenderItem(GlProgram *const program) : _program(program) { glCreateVertexArrays(1, &_vao); }
 
 	GlRenderItem(const GlRenderItem &rhs) = delete;
 	GlRenderItem &operator=(const GlRenderItem &rhs) = delete;

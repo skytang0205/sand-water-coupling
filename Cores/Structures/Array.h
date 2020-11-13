@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utilities/IO.h"
 #include "Utilities/Types.h"
 
 #include <vector>
@@ -9,7 +10,6 @@ namespace PhysX {
 template <int Dim, typename Type = real>
 class Array final
 {
-	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
@@ -24,8 +24,6 @@ public:
 		_data(size.cast<size_t>().prod(), value)
 	{ }
 
-	Array(const Array &rhs) = default;
-	Array &operator=(const Array &rhs) = default;
 	virtual ~Array() = default;
 
 	VectorDi size() const { return _size; }
@@ -38,6 +36,9 @@ public:
 
 	const Type &operator[](const VectorDi &coord) const { return _data[index(coord)]; }
 	Type &operator[](const VectorDi &coord) { return _data[index(coord)]; }
+
+	void read(std::istream &in) { IO::readArray(in, _data.data(), _data.size()); }
+	void write(std::ostream &out) const { IO::writeArray(out, _data.data(), _data.size()); }
 
 protected:
 

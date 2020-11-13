@@ -40,7 +40,7 @@ protected:
 
 public:
 
-	GlText(GlProgram *program);
+	GlText(GlProgram *const program);
 
 	GlText(const GlText &rhs) = delete;
 	GlText &operator=(const GlText &rhs) = delete;

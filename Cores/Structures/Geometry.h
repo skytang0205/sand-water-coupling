@@ -9,14 +9,11 @@ namespace PhysX {
 template <int Dim>
 class Geometry
 {
-	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 public:
 
 	Geometry() = default;
-	Geometry(const Geometry &rhs) = default;
-	Geometry &operator=(const Geometry &rhs) = default;
 	virtual ~Geometry() = default;
 
 	virtual VectorDr closestPoint(const VectorDr &pos) const = 0;
@@ -29,14 +26,11 @@ public:
 template <int Dim>
 class ImplicitGeometry : public Geometry<Dim>
 {
-	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 public:
 
 	ImplicitGeometry() = default;
-	ImplicitGeometry(const ImplicitGeometry &rhs) = default;
-	ImplicitGeometry &operator=(const ImplicitGeometry &rhs) = default;
 	virtual ~ImplicitGeometry() = default;
 
 	virtual VectorDr closestPoint(const VectorDr &pos) const { return pos - signedDistance(pos) * closestNormal(pos); }

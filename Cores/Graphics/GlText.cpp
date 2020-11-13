@@ -6,7 +6,7 @@
 
 namespace PhysX {
 
-GlText::GlText(GlProgram *program) :
+GlText::GlText(GlProgram *const program) :
 	GlRenderItem(program)
 {
 	glCreateTextures(GL_TEXTURE_2D, 1, &_texture);

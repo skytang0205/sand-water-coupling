@@ -20,8 +20,6 @@ protected:
 public:
 
 	Camera() = default;
-	Camera(const Camera &rhs) = default;
-	Camera &operator=(const Camera &rhs) = default;
 	virtual ~Camera() = default;
 
 	virtual void update() = 0;

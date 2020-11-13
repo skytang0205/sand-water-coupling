@@ -12,7 +12,7 @@ protected:
 
 public:
 
-	GlAxes(GlProgram *program, const int dim, const float length) : GlRenderItem(program)
+	GlAxes(GlProgram *const program, const int dim, const float length) : GlRenderItem(program)
 	{
 		float vertices[] = {
 			0.0f,	0.0f,	0.0f,	1.0f, 0.0f, 0.0f, 1.0f,

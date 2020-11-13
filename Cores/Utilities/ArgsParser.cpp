@@ -33,7 +33,7 @@ std::string ArgsParser::generateUsage() const
 	return usage;
 }
 
-void ArgsParser::parse(const int argc, char *const argv[])
+void ArgsParser::parse(const int argc, const char *const argv[])
 {
 	if (argc == 0) reportError("empty command line");
 

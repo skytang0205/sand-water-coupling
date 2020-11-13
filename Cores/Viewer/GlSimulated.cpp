@@ -9,7 +9,7 @@
 #include <cstdlib>
 
 namespace PhysX {
-GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const uint endFrame, const int dim, const YAML::Node &node) :
+GlSimulated::GlSimulated(GlProgram *const program, const std::string &outputDir, const uint endFrame, const int dim, const YAML::Node &node) :
 	GlRenderItem(program)
 {
 	// Read name.
@@ -107,8 +107,9 @@ GlSimulated::GlSimulated(GlProgram *program, const std::string &outputDir, const
 	// Normalized heats.
 	if (_enableColorMap && !normalizedHeat) {
 		const auto minmax = std::minmax_element(heats.begin(), heats.end());
-		const float minimum = *minmax.first;
-		const float maximum = *minmax.second;
+		float minimum = *minmax.first;
+		float maximum = *minmax.second;
+		if (minimum == maximum) minimum -= 1, maximum += 1;
 		for (auto &x : heats) x = (x - minimum) / (maximum - minimum);
 	}
 

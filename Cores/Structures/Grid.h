@@ -3,6 +3,7 @@
 #include "Utilities/Types.h"
 
 #include <array>
+#include <functional>
 
 namespace PhysX {
 
@@ -13,7 +14,6 @@ inline constexpr int VertexCentered = 2;
 template <int Dim>
 class Grid
 {
-	static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
@@ -30,9 +30,9 @@ public:
 		_origin(center - resolution.cast<real>() * spacing * real(0.5))
 	{ }
 
-	Grid(const Grid &rhs) = default;
-	Grid &operator=(const Grid &rhs) = default;
 	virtual ~Grid() = default;
+
+	real spacing() const { return _spacing; }
 
 	VectorDr cellOrigin() const { return _origin + VectorDr::Ones() * real(0.5) * _spacing; }
 	VectorDr faceOrigin(const int axis) const { return _origin + (VectorDr::Ones() - VectorDr::Unit(axis)) * real(0.5) * _spacing; }
@@ -40,17 +40,26 @@ public:
 	VectorDi cellSize() const { return _resolution; }
 	VectorDi faceSize(const int axis) const { return _resolution + VectorDi::Unit(axis); }
 
-	VectorDr cellCenter(const VectorDi &coord) const { return cellOrigin() + coord.cast<real>() * _spacing; }
-	VectorDr faceCenter(const int axis, const VectorDi &coord) const { return faceOrigin(axis) + coord.cast<real>() * _spacing; }
+	size_t cellCnt() const { return cellSize().cast<size_t>().prod(); }
+	size_t faceCnt(const int axis) const { return faceSize(axis).cast<size_t>().prod(); }
+
+	VectorDr cellCenter(const VectorDi &cell) const { return cellOrigin() + cell.cast<real>() * _spacing; }
+	VectorDr faceCenter(const int axis, const VectorDi &face) const { return faceOrigin(axis) + face.cast<real>() * _spacing; }
+
+	void getCellLerp(const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const { getLerp(cellOrigin(), cellSize(), pos, coords, weights); }
+	void getFaceLerp(const int axis, const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const { getLerp(faceOrigin(axis), faceSize(axis), pos, coords, weights); }
+
+	void forEachCell(const std::function<void(const VectorDi &)> &func) const { forEach(cellSize(), func); }
+	void parallelForEachCell(const std::function<void(const VectorDi &)> &func) const { parallelForEach(cellSize(), func); };
+	void forEachFace(const std::function<void(const int, const VectorDi &)> &func) const { for (int axis = 0; axis < Dim; axis++) forEach(faceSize(axis), std::bind(func, axis, std::placeholders::_1)); }
+	void parallelForEachFace(const std::function<void(const int, const VectorDi &)> &func) const { for (int axis = 0; axis < Dim; axis++) parallelForEach(faceSize(axis), std::bind(func, axis, std::placeholders::_1)); }
 
 protected:
 
-	void getCellLerp(const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const { getLerp(cellOrigin(), pos, coords, weights); }
-	void getFaceLerp(const int axis, const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const { getLerp(faceOrigin(axis), pos, coords, weights); }
+	void getLerp(const VectorDr &dataOrigin, const VectorDi &dataSize, const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const;
 
-private:
-
-	void getLerp(const VectorDr &dataOrigin, const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const;
+	void forEach(const VectorDi &dataSize, const std::function<void(const VectorDi &)> &func) const;
+	void parallelForEach(const VectorDi &dataSize, const std::function<void(const VectorDi &)> &func) const;
 };
 
 }

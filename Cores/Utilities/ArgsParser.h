@@ -34,8 +34,6 @@ public:
 		_mandatory(mandatory)
 	{ }
 
-	ArgDataBase(const ArgDataBase &rhs) = default;
-	ArgDataBase &operator=(const ArgDataBase &rhs) = default;
 	virtual ~ArgDataBase() = default;
 
 	const std::type_info &type() const { return _type; }
@@ -71,9 +69,6 @@ public:
 		_defaultValue(defaultValue)
 	{ }
 
-	ArgData() = delete;
-	ArgData(const ArgData &rhs) = default;
-	ArgData &operator=(const ArgData &rhs) = default;
 	virtual ~ArgData() = default;
 
 	virtual std::string getShortDesc() const override { return _mandatory ? fmt::format("--{}", _name) : fmt::format("--{}={}", _name, _defaultValue); }
@@ -104,7 +99,7 @@ public:
 
 	std::string generateUsage() const;
 
-	void parse(const int argc, char *const argv[]);
+	void parse(const int argc, const char *const argv[]);
 	void parse(const char *cmdLine);
 
 	std::any getValueByName(const std::string &name) const { return findArgByName(name)->getValue(); }

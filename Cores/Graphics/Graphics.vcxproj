@@ -100,7 +100,6 @@
     <ClCompile Include="GlProgram.cpp" />
     <ClCompile Include="GlRenderItem.cpp" />
     <ClCompile Include="GlText.cpp" />
-    <ClCompile Include="GlRenderTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeometryGenerator.h" />
@@ -113,7 +112,6 @@
     <ClInclude Include="GlRenderItem.h" />
     <ClInclude Include="BitmapFont.h" />
     <ClInclude Include="GlText.h" />
-    <ClInclude Include="GlRenderTest.h" />
     <ClInclude Include="StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +122,11 @@
     <None Include="GlDefaultShader.vert" />
     <None Include="GlTextShader.frag" />
     <None Include="GlTextShader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities\Utilities.vcxproj">
+      <Project>{35ea6b7d-75ec-44b7-a6ae-7f6a9b018155}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

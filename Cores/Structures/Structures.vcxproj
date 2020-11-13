@@ -15,15 +15,20 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Field.h" />
-    <ClInclude Include="ScalarGridField.h" />
+    <ClInclude Include="GridBasedScalarField.h" />
     <ClInclude Include="SurfaceMesh.h" />
-    <ClInclude Include="VectorGridField.h" />
+    <ClInclude Include="GridBasedVectorField.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp" />
-    <ClCompile Include="ScalarGridField.cpp" />
+    <ClCompile Include="GridBasedScalarField.cpp" />
     <ClCompile Include="SurfaceMesh.cpp" />
-    <ClCompile Include="VectorGridField.cpp" />
+    <ClCompile Include="GridBasedVectorField.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities\Utilities.vcxproj">
+      <Project>{35ea6b7d-75ec-44b7-a6ae-7f6a9b018155}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

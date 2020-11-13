@@ -27,8 +27,6 @@ protected:
 public:
 
 	StepTimer() = default;
-	StepTimer(const StepTimer &rhs) = default;
-	StepTimer &operator=(const StepTimer &rhs) = default;
 	virtual ~StepTimer() = default;
 
 	auto totalTime() const { return (_stopped ? _stopTime : _currTime) - _baseTime - _pausedTime; }

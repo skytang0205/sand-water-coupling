@@ -36,7 +36,7 @@ protected:
 
 public:
 
-	GlSimulated(GlProgram *program, const std::string &outputDir, const uint endFrame, const int dim, const YAML::Node &node);
+	GlSimulated(GlProgram *const program, const std::string &outputDir, const uint endFrame, const int dim, const YAML::Node &node);
 
 	GlSimulated(const GlSimulated &rhs) = delete;
 	GlSimulated &operator=(const GlSimulated &rhs) = delete;
