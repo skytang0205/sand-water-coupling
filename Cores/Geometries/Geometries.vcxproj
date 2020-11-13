@@ -11,28 +11,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GirdBasedAdvection.h" />
-    <ClInclude Include="GridBasedFluid.h" />
-    <ClInclude Include="Projectile.h" />
-    <ClInclude Include="Simulation.h" />
-    <ClInclude Include="Simulator.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="Surface.h" />
+    <ClInclude Include="SurfaceMesh.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GirdBasedAdvection.cpp" />
-    <ClCompile Include="GridBasedFluid.cpp" />
-    <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="SurfaceMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Geometries\Geometries.vcxproj">
-      <Project>{c94749bc-3d90-4972-9e0d-d8c5d6d0df60}</Project>
+    <ProjectReference Include="..\Structures\Structures.vcxproj">
+      <Project>{11fdb336-d077-4fab-bedf-3444181a927d}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</ProjectGuid>
-    <RootNamespace>Physics</RootNamespace>
+    <ProjectGuid>{c94749bc-3d90-4972-9e0d-d8c5d6d0df60}</ProjectGuid>
+    <RootNamespace>Geometries</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

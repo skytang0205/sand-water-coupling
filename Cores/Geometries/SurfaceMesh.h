@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Structures/Geometry.h"
+#include "Geometries/Surface.h"
 
 #include <vector>
 
 namespace PhysX {
 
 template <int Dim>
-class SurfaceMesh final : public Geometry<Dim>
+class SurfaceMesh final : public Surface<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 

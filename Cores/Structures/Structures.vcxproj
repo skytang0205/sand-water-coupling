@@ -12,17 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
-    <ClInclude Include="Geometry.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="GridBasedScalarField.h" />
-    <ClInclude Include="SurfaceMesh.h" />
     <ClInclude Include="GridBasedVectorField.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="GridBasedScalarField.cpp" />
-    <ClCompile Include="SurfaceMesh.cpp" />
     <ClCompile Include="GridBasedVectorField.cpp" />
   </ItemGroup>
   <ItemGroup>

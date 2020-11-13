@@ -7,14 +7,14 @@
 namespace PhysX {
 
 template <int Dim>
-class Geometry
+class Surface
 {
 	DECLARE_DIM_TYPES(Dim)
 
 public:
 
-	Geometry() = default;
-	virtual ~Geometry() = default;
+	Surface() = default;
+	virtual ~Surface() = default;
 
 	virtual VectorDr closestPoint(const VectorDr &pos) const = 0;
 	virtual VectorDr closestNormal(const VectorDr &pos) const = 0;
@@ -24,14 +24,14 @@ public:
 };
 
 template <int Dim>
-class ImplicitGeometry : public Geometry<Dim>
+class ImplicitSurface : public Surface<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
 public:
 
-	ImplicitGeometry() = default;
-	virtual ~ImplicitGeometry() = default;
+	ImplicitSurface() = default;
+	virtual ~ImplicitSurface() = default;
 
 	virtual VectorDr closestPoint(const VectorDr &pos) const { return pos - signedDistance(pos) * closestNormal(pos); }
 	virtual VectorDr closestNormal(const VectorDr &pos) const = 0;

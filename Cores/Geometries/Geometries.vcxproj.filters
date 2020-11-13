@@ -15,30 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Grid.h">
+    <ClInclude Include="Surface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Field.h">
+    <ClInclude Include="SurfaceMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Array.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GridBasedScalarField.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GridBasedVectorField.h">
+    <ClInclude Include="Collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Grid.cpp">
+    <ClCompile Include="SurfaceMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GridBasedScalarField.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GridBasedVectorField.cpp">
+    <ClCompile Include="Collider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
