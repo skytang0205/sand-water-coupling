@@ -5,7 +5,7 @@ namespace PhysX {
 template <int Dim>
 void Grid<Dim>::getLerp(const VectorDr &dataOrigin, const VectorDi &dataSize, const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const
 {
-	VectorDi lower = ((pos - dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(dataSize - VectorDi::Ones());
+	VectorDi lower = ((pos - dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(dataSize - VectorDi::Ones() * 2);
 	VectorDr frac = ((pos - dataOrigin - lower.cast<real>() * _spacing) / _spacing).cwiseMax(0).cwiseMin(1);
 	if constexpr (Dim == 2) {
 		coords = { lower, lower + Vector2i(0, 1), lower + Vector2i(1, 0), lower + Vector2i(1, 1) };

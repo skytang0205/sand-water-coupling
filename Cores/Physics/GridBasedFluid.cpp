@@ -11,7 +11,8 @@ GridBasedFluid<Dim>::GridBasedFluid(const Grid<Dim> &grid) :
 	_velocity(&_grid)
 {
 	_grid.parallelForEachFace([&](const int axis, const VectorDi &face) {
-			_velocity[axis][face] = axis == 0 ? 0.2 : 0;
+			const VectorDr pos = _grid.faceCenter(axis, face);
+			if constexpr (Dim == 2) _velocity[axis][face] = axis == 0 ? -pos.y() : pos.x();
 		});
 
 	_advection = std::move(std::make_unique<SemiLagrangianAdvection<Dim>>());

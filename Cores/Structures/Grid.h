@@ -7,10 +7,6 @@
 
 namespace PhysX {
 
-inline constexpr int CellCentered = 0;
-inline constexpr int FaceCentered = 1;
-inline constexpr int VertexCentered = 2;
-
 template <int Dim>
 class Grid
 {
