@@ -1,4 +1,4 @@
-#include "Physics/GridBasedFluid.h"
+#include "Physics/EulerianFluid.h"
 #include "Physics/Simulator.h"
 #include "Utilities/ArgsParser.h"
 #include "Utilities/Types.h"
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 {
 	using namespace PhysX;
 	StaggeredGrid<2> grid(0.1, Vector2i(100, 100));
-	auto fluid = std::make_unique<GridBasedFluid<2>>(grid);
+	auto fluid = std::make_unique<EulerianFluid<2>>(grid);
 	auto simulator = std::make_unique<Simulator>("output", 0, 50, 50, 1, fluid.get());
 	simulator->Simulate();
 	return 0;

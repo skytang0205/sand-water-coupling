@@ -17,12 +17,14 @@
     <ClInclude Include="GridBasedScalarField.h" />
     <ClInclude Include="GridBasedVectorField.h" />
     <ClInclude Include="StaggeredGrid.h" />
+    <ClInclude Include="StaggeredGridBasedVectorField.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="GridBasedScalarField.cpp" />
     <ClCompile Include="GridBasedVectorField.cpp" />
     <ClCompile Include="StaggeredGrid.cpp" />
+    <ClCompile Include="StaggeredGridBasedVectorField.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.vcxproj">

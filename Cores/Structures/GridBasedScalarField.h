@@ -22,9 +22,9 @@ public:
 
 	virtual ~GridBasedScalarField() = default;
 
-	virtual real operator()(const VectorDr &pos) const override final;
+	virtual real operator()(const VectorDr &pos) const override;
 	VectorDr gradientAtDataPoint(const VectorDi &coord) const;
-	virtual VectorDr gradient(const VectorDr &pos) const override final;
+	virtual VectorDr gradient(const VectorDr &pos) const override;
 };
 
 }

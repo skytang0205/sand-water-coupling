@@ -1,4 +1,4 @@
-#include "GridBasedFluid.h"
+#include "EulerianFluid.h"
 
 #include "Utilities/IO.h"
 #include "Utilities/Yaml.h"
@@ -6,7 +6,7 @@
 namespace PhysX {
 
 template <int Dim>
-GridBasedFluid<Dim>::GridBasedFluid(const StaggeredGrid<Dim> &grid) :
+EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_grid(grid),
 	_velocity(&_grid)
 {
@@ -15,11 +15,11 @@ GridBasedFluid<Dim>::GridBasedFluid(const StaggeredGrid<Dim> &grid) :
 			if constexpr (Dim == 2) _velocity[axis][face] = axis == 0 ? -pos.y() : pos.x();
 		});
 
-	_advection = std::move(std::make_unique<SemiLagrangianAdvection<Dim>>());
+	_advector = std::move(std::make_unique<SemiLagrangianAdvector<Dim>>());
 }
 
 template<int Dim>
-void GridBasedFluid<Dim>::writeDescription(std::ofstream &fout) const
+void EulerianFluid<Dim>::writeDescription(std::ofstream &fout) const
 {
 	YAML::Node root;
 	root["dimension"] = Dim;
@@ -37,7 +37,7 @@ void GridBasedFluid<Dim>::writeDescription(std::ofstream &fout) const
 }
 
 template<int Dim>
-void GridBasedFluid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
+void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
 	{ // Write fluid.
 		std::ofstream fout(frameDir + "/fluid.mesh", std::ios::binary);
@@ -71,26 +71,26 @@ void GridBasedFluid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 }
 
 template<int Dim>
-void GridBasedFluid<Dim>::saveFrame(const std::string &frameDir) const
+void EulerianFluid<Dim>::saveFrame(const std::string &frameDir) const
 {
 	std::ofstream fout(frameDir + "/velocity.sav", std::ios::binary);
 	_velocity.write(fout);
 }
 
 template<int Dim>
-void GridBasedFluid<Dim>::loadFrame(const std::string &frameDir)
+void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 {
 	std::ifstream fin(frameDir + "/velocity.sav", std::ios::binary);
 	_velocity.read(fin);
 }
 
 template <int Dim>
-void GridBasedFluid<Dim>::advance(const real dt)
+void EulerianFluid<Dim>::advance(const real dt)
 {
-	_advection->advect(_velocity, _velocity, dt);
+	_advector->advect(_velocity, _velocity, dt);
 }
 
-template class GridBasedFluid<2>;
-template class GridBasedFluid<3>;
+template class EulerianFluid<2>;
+template class EulerianFluid<3>;
 
 }

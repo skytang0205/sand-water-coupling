@@ -1,29 +1,33 @@
 #pragma once
 
+#include "Physics/EulerianAdvector.h"
 #include "Physics/Simulation.h"
+#include "Structures/StaggeredGridBasedVectorField.h"
+
+#include <memory>
 
 namespace PhysX {
 
 template <int Dim>
-class Projectile : public Simulation
+class EulerianFluid : public Simulation
 {
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
 
-	VectorDr _position;
-	VectorDr _velocity;
+	const StaggeredGrid<Dim> _grid;
+
+	StaggeredGridBasedVectorField<Dim> _velocity;
+
+	std::unique_ptr<EulerianAdvector<Dim>> _advector;
 
 public:
 
-	Projectile(const VectorDr &position, const VectorDr &velocity) :
-		_position(position),
-		_velocity(velocity)
-	{ }
+	EulerianFluid(const StaggeredGrid<Dim> &grid);
 
-	Projectile(const Projectile &rhs) = delete;
-	Projectile &operator=(const Projectile &rhs) = delete;
-	virtual ~Projectile() = default;
+	EulerianFluid(const EulerianFluid &rhs) = delete;
+	EulerianFluid &operator=(const EulerianFluid &rhs) = delete;
+	virtual ~EulerianFluid() = default;
 
 	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return real(1) / frameRate / stepRate; }
 

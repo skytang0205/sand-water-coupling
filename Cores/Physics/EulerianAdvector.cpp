@@ -1,9 +1,9 @@
-#include "GirdBasedAdvection.h"
+#include "EulerianAdvector.h"
 
 namespace PhysX {
 
 template<int Dim>
-void SemiLagrangianAdvection<Dim>::advect(GridBasedStaggeredVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt)
+void SemiLagrangianAdvector<Dim>::advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt)
 {
 	auto newField = field;
 	newField.parallelForEach([&](const int axis, const VectorDi &face) {
@@ -14,10 +14,10 @@ void SemiLagrangianAdvection<Dim>::advect(GridBasedStaggeredVectorField<Dim> &fi
 	field = newField;
 }
 
-template class GridBasedAdvection<2>;
-template class GridBasedAdvection<3>;
+template class EulerianAdvector<2>;
+template class EulerianAdvector<3>;
 
-template class SemiLagrangianAdvection<2>;
-template class SemiLagrangianAdvection<3>;
+template class SemiLagrangianAdvector<2>;
+template class SemiLagrangianAdvector<3>;
 
 }

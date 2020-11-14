@@ -33,8 +33,6 @@ public:
 		_data.resize(_grid->dataCount(), value);
 	}
 
-	const Grid<Dim> *grid() const { return _grid; }
-
 	VectorDi size() const { return _grid->dataSize(); }
 	size_t count() const { return _data.size(); }
 	VectorDr position(const VectorDi &coord) const { return _grid->dataPosition(coord); }

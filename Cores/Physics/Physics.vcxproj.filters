@@ -21,13 +21,10 @@
     <ClInclude Include="Simulator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Projectile.h">
+    <ClInclude Include="EulerianAdvector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GridBasedFluid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GirdBasedAdvection.h">
+    <ClInclude Include="EulerianFluid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,13 +32,10 @@
     <ClCompile Include="Simulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Projectile.cpp">
+    <ClCompile Include="EulerianAdvector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GridBasedFluid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GirdBasedAdvection.cpp">
+    <ClCompile Include="EulerianFluid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
