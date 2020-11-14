@@ -2,25 +2,6 @@
 
 namespace PhysX {
 
-template <>
-StaggeredGridBasedVectorField<2>::StaggeredGridBasedVectorField(const StaggeredGrid<2> *grid, const VectorDr &value) :
-	_grid(grid),
-	_components {
-		GridBasedScalarField<2>(_grid->faceGrid(0), value[0]),
-		GridBasedScalarField<2>(_grid->faceGrid(1), value[1])
-}
-{ }
-
-template <>
-StaggeredGridBasedVectorField<3>::StaggeredGridBasedVectorField(const StaggeredGrid<3> *grid, const VectorDr &value) :
-	_grid(grid),
-	_components {
-		GridBasedScalarField<3>(_grid->faceGrid(0), value[0]),
-		GridBasedScalarField<3>(_grid->faceGrid(1), value[1]),
-		GridBasedScalarField<3>(_grid->faceGrid(2), value[2])
-}
-{ }
-
 template <int Dim>
 Vector<real, Dim> StaggeredGridBasedVectorField<Dim>::operator()(const VectorDr &pos) const
 {

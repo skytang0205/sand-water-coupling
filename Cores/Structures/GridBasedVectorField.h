@@ -20,6 +20,7 @@ public:
 
 	GridBasedVectorField(const Grid<Dim> *const grid, const VectorDr &value = VectorDr::Zero()) : GridBasedData<Dim, VectorDr>(grid, value) { }
 
+	GridBasedVectorField() = default;
 	virtual ~GridBasedVectorField() = default;
 
 	virtual VectorDr operator()(const VectorDr &pos) const override;

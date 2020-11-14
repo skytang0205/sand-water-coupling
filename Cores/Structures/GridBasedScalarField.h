@@ -20,6 +20,7 @@ public:
 
 	GridBasedScalarField(const Grid<Dim> *const grid, const real value = 0) : GridBasedData<Dim>(grid, value) { }
 
+	GridBasedScalarField() = default;
 	virtual ~GridBasedScalarField() = default;
 
 	virtual real operator()(const VectorDr &pos) const override;

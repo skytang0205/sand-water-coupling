@@ -9,10 +9,10 @@ Vector<real, Dim> GridBasedVectorField<Dim>::operator()(const VectorDr &pos) con
 	std::array<real, 1 << Dim> weights;
 	_grid->getLerpCoordsAndWeights(pos, coords, weights);
 
-	VectorDr vec = VectorDr::Zero();
+	VectorDr val = VectorDr::Zero();
 	for (int i = 0; i < (1 << Dim); i++)
-		vec += operator[](coords[i]) * weights[i];
-	return vec;
+		val += operator[](coords[i]) * weights[i];
+	return val;
 }
 
 template <int Dim>

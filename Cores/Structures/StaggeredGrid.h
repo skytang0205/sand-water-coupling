@@ -23,6 +23,8 @@ public:
 
 	StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center = VectorDr::Zero());
 
+	virtual ~StaggeredGrid() = default;
+
 	real spacing() const { return _spacing; }
 	VectorDi resolution() const { return _resolution; }
 	VectorDr origin() const { return _origin; }

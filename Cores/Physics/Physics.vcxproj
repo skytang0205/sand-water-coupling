@@ -13,12 +13,14 @@
   <ItemGroup>
     <ClInclude Include="EulerianAdvector.h" />
     <ClInclude Include="EulerianFluid.h" />
+    <ClInclude Include="EulerianProjector.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EulerianAdvector.cpp" />
     <ClCompile Include="EulerianFluid.cpp" />
+    <ClCompile Include="EulerianProjector.cpp" />
     <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
   <ItemGroup>

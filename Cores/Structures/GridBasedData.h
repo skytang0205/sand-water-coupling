@@ -2,7 +2,6 @@
 
 #include "Structures/Grid.h"
 #include "Utilities/IO.h"
-#include "Utilities/Types.h"
 
 #include <vector>
 
@@ -15,16 +14,14 @@ class GridBasedData
 
 protected:
 
-	const Grid<Dim> *_grid;
+	const Grid<Dim> *_grid = nullptr;
 	std::vector<Type> _data;
 
 public:
 
-	GridBasedData(const Grid<Dim> *const grid, const Type &value = Type()) :
-		_grid(grid),
-		_data(_grid->dataCount(), value)
-	{ }
+	GridBasedData(const Grid<Dim> *const grid, const Type &value = Type()) { resize(grid, value); }
 
+	GridBasedData() = default;
 	virtual ~GridBasedData() = default;
 
 	void resize(const Grid<Dim> *const grid, const Type &value = Type())

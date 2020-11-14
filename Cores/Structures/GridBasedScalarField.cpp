@@ -18,12 +18,12 @@ real GridBasedScalarField<Dim>::operator()(const VectorDr &pos) const
 template <int Dim>
 Vector<real, Dim> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi &coord) const
 {
-	VectorDr vec;
+	VectorDr val;
 	for (int i = 0; i < Dim; i++) {
-		vec[i] = operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)
+		val[i] = operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)
 			- operator[](coord[i] > 0 ? coord - VectorDi::Unit(i) : coord);
 	}
-	return vec / (2 * _grid->spacing());
+	return val / (2 * _grid->spacing());
 }
 
 template <int Dim>
@@ -33,10 +33,10 @@ Vector<real, Dim> GridBasedScalarField<Dim>::gradient(const VectorDr &pos) const
 	std::array<real, 1 << Dim> weights;
 	_grid->getLerpCoordsAndWeights(pos, coords, weights);
 
-	VectorDr vec = VectorDr::Zero();
+	VectorDr val = VectorDr::Zero();
 	for (int i = 0; i < (1 << Dim); i++)
-		vec += gradientAtDataPoint(coords[i]) * weights[i];
-	return vec;
+		val += gradientAtDataPoint(coords[i]) * weights[i];
+	return val;
 }
 
 template class GridBasedScalarField<2>;

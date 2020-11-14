@@ -13,14 +13,22 @@ class StaggeredGridBasedVectorField final : public VectorField<Dim>
 
 protected:
 
-	const StaggeredGrid<Dim> *_grid;
+	const StaggeredGrid<Dim> *_grid = nullptr;
 	std::array<GridBasedScalarField<Dim>, Dim> _components;
 
 public:
 
-	StaggeredGridBasedVectorField(const StaggeredGrid<Dim> *grid, const VectorDr &value = VectorDr::Zero());
+	StaggeredGridBasedVectorField(const StaggeredGrid<Dim> *const grid, const VectorDr &value = VectorDr::Zero()) { resize(grid, value); }
 
+	StaggeredGridBasedVectorField() = default;
 	virtual ~StaggeredGridBasedVectorField() = default;
+
+	void resize(const StaggeredGrid<Dim> *const grid, const VectorDr &value = VectorDr::Zero())
+	{
+		_grid = grid;
+		for (int axis = 0; axis < Dim; axis++)
+			_components[axis].resize(_grid->faceGrid(axis), value[axis]);
+	}
 
 	const GridBasedScalarField<Dim> &operator[](const int axis) const { return _components[axis]; }
 	GridBasedScalarField<Dim> &operator[](const int axis) { return _components[axis]; }

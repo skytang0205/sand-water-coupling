@@ -17,6 +17,7 @@
     <ClInclude Include="GridBasedScalarField.h" />
     <ClInclude Include="GridBasedVectorField.h" />
     <ClInclude Include="StaggeredGrid.h" />
+    <ClInclude Include="StaggeredGridBasedData.h" />
     <ClInclude Include="StaggeredGridBasedVectorField.h" />
   </ItemGroup>
   <ItemGroup>
