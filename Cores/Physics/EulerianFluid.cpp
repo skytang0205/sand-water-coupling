@@ -18,7 +18,7 @@ EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_advector = std::move(std::make_unique<SemiLagrangianAdvector<Dim>>());
 }
 
-template<int Dim>
+template <int Dim>
 void EulerianFluid<Dim>::writeDescription(std::ofstream &fout) const
 {
 	YAML::Node root;
@@ -36,7 +36,7 @@ void EulerianFluid<Dim>::writeDescription(std::ofstream &fout) const
 	fout << root << std::endl;
 }
 
-template<int Dim>
+template <int Dim>
 void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
 	{ // Write fluid.
@@ -70,14 +70,14 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 	}
 }
 
-template<int Dim>
+template <int Dim>
 void EulerianFluid<Dim>::saveFrame(const std::string &frameDir) const
 {
 	std::ofstream fout(frameDir + "/velocity.sav", std::ios::binary);
 	_velocity.write(fout);
 }
 
-template<int Dim>
+template <int Dim>
 void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 {
 	std::ifstream fin(frameDir + "/velocity.sav", std::ios::binary);
@@ -85,9 +85,59 @@ void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 }
 
 template <int Dim>
+void EulerianFluid<Dim>::initialize()
+{ }
+
+template <int Dim>
 void EulerianFluid<Dim>::advance(const real dt)
 {
+	advectFields(dt);
+	applyBodyForces(dt);
+	projectVelocity(dt);
+}
+
+template <int Dim>
+void EulerianFluid<Dim>::advectFields(const real dt)
+{
 	_advector->advect(_velocity, _velocity, dt);
+	enforceBoundaryConditions();
+}
+
+template <int Dim>
+void EulerianFluid<Dim>::applyBodyForces(const real dt)
+{
+}
+
+template <int Dim>
+void EulerianFluid<Dim>::projectVelocity(const real dt)
+{
+	_projector->project(_velocity, _fluidFraction);
+}
+
+template <int Dim>
+void EulerianFluid<Dim>::updateFluidFraction()
+{
+	_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
+			if (_collider) {
+				const VectorDi cell0 = face - VectorDi::Unit(axis);
+				const VectorDi cell1 = face;
+				_fluidFraction[axis][face] = _collider->surface()->fractionInside(_grid.cellCenter(cell0), _grid.cellCenter(cell1));
+			}
+			else _fluidFraction[axis][face] = _fluidFraction.isBoundary(axis, face) ? real(0.5) : 1;
+		});
+}
+
+template <int Dim>
+void EulerianFluid<Dim>::extrapolateVeclocity()
+{ }
+
+template <int Dim>
+void EulerianFluid<Dim>::enforceBoundaryConditions()
+{
+	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
+			if (_collider);
+			else if (_velocity.isBoundary(axis, face)) _velocity[axis][face] = 0;
+		});
 }
 
 template class EulerianFluid<2>;

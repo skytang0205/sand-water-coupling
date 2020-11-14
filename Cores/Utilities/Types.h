@@ -37,6 +37,7 @@ using	Vector4r			=	Vector4##t;							\
 using	VectorXr			=	VectorX##t;							\
 using	Matrix2r			=	Matrix2##t;							\
 using	Matrix3r			=	Matrix3##t;							\
+using	Matrix4r			=	Matrix4##t;							\
 using	SparseMatrixr		=	SparseMatrix##t;
 
 #ifdef USE_FLOAT

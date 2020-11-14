@@ -35,6 +35,12 @@ public:
 	size_t dataCount() const { return _dataSize.cast<size_t>().prod(); }
 	VectorDr dataPosition(const VectorDi &coord) const { return _dataOrigin + coord.cast<real>() * _spacing; }
 
+	size_t index(const VectorDi &coord) const
+	{
+		if constexpr (Dim == 2) return coord.x() + size_t(_dataSize.x()) * coord.y();
+		else return coord.x() + _dataSize.x() * (coord.y() + size_t(_dataSize.y()) * coord.z());
+	}
+
 	void getLerpCoordsAndWeights(const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const;
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const;

@@ -1,7 +1,11 @@
 #pragma once
 
+#include "Geometries/Collider.h"
+#include "Geometries/GridBasedImplicitSurface.h"
 #include "Physics/EulerianAdvector.h"
+#include "Physics/EulerianProjector.h"
 #include "Physics/Simulation.h"
+#include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
 
 #include <memory>
@@ -18,8 +22,11 @@ protected:
 	const StaggeredGrid<Dim> _grid;
 
 	StaggeredGridBasedVectorField<Dim> _velocity;
+	StaggeredGridBasedData<Dim> _fluidFraction;
 
+	std::unique_ptr<Collider<Dim>> _collider;
 	std::unique_ptr<EulerianAdvector<Dim>> _advector;
+	std::unique_ptr<EulerianProjector<Dim>> _projector;
 
 public:
 
@@ -36,7 +43,18 @@ public:
 	virtual void saveFrame(const std::string &frameDir) const;
 	virtual void loadFrame(const std::string &framdDir);
 
+	virtual void initialize();
 	virtual void advance(const real dt);
+
+protected:
+
+	virtual void advectFields(const real dt);
+	virtual void applyBodyForces(const real dt);
+	virtual void projectVelocity(const real dt);
+
+	virtual void updateFluidFraction();
+	virtual void extrapolateVeclocity();
+	virtual void enforceBoundaryConditions();
 };
 
 }

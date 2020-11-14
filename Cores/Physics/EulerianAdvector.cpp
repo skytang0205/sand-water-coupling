@@ -2,7 +2,7 @@
 
 namespace PhysX {
 
-template<int Dim>
+template <int Dim>
 void SemiLagrangianAdvector<Dim>::advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt)
 {
 	auto newField = field;

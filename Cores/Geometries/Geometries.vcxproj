@@ -12,11 +12,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="GridBasedImplicitSurface.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="SurfaceMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="GridBasedImplicitSurface.cpp" />
     <ClCompile Include="SurfaceMesh.cpp" />
   </ItemGroup>
   <ItemGroup>

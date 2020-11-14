@@ -34,22 +34,14 @@ public:
 	size_t count() const { return _data.size(); }
 	VectorDr position(const VectorDi &coord) const { return _grid->dataPosition(coord); }
 
-	const Type &operator[](const VectorDi &coord) const { return _data[index(coord)]; }
-	Type &operator[](const VectorDi &coord) { return _data[index(coord)]; }
+	const Type &operator[](const VectorDi &coord) const { return _data[_grid->index(coord)]; }
+	Type &operator[](const VectorDi &coord) { return _data[_grid->index(coord)]; }
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const { _grid->forEach(func); }
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const { _grid->parallelForEach(func); }
 
 	void read(std::istream &in) { IO::readArray(in, _data.data(), _data.size()); }
 	void write(std::ostream &out) const { IO::writeArray(out, _data.data(), _data.size()); }
-
-private:
-
-	size_t index(const VectorDi &coord) const
-	{
-		if constexpr (Dim == 2) return coord.x() + size_t(size().x()) * coord.y();
-		else return coord.x() + size().x() * (coord.y() + size_t(size().y()) * coord.z());
-	}
 };
 
 }

@@ -30,6 +30,8 @@ public:
 			_components[axis].resize(_grid->faceGrid(axis), value[axis]);
 	}
 
+	bool isBoundary(const int axis, const VectorDi &face) { return _grid->isBoundaryFace(axis, face); }
+
 	const GridBasedScalarField<Dim> &operator[](const int axis) const { return _components[axis]; }
 	GridBasedScalarField<Dim> &operator[](const int axis) { return _components[axis]; }
 

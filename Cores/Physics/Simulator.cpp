@@ -15,6 +15,7 @@ void Simulator::Simulate()
 	const auto initialTime = steady_clock::now();
 
 	if (_beginFrame == 0) {
+		_simulation->initialize();
 		createOutputDirectory();
 		writeAndSaveToFrameDirectory(0, true);
 

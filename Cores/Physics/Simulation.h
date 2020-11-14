@@ -28,6 +28,7 @@ public:
 	virtual void saveFrame(const std::string &frameDir) const = 0;
 	virtual void loadFrame(const std::string &frameDir) = 0;
 
+	virtual void initialize() { }
 	virtual void advance(const real dt) = 0;
 };
 

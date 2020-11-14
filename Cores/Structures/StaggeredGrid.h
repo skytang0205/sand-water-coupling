@@ -45,6 +45,8 @@ public:
 	VectorDr cellCenter(const VectorDi &cell) const { return _cellGrid.dataPosition(cell); }
 	VectorDr faceCenter(const int axis, const VectorDi &face) const { return _faceGrids[axis].dataPosition(face); }
 
+	bool isBoundaryFace(const int axis, const VectorDi &face) const { return face[axis] == 0 || face[axis] == _resolution[axis]; }
+
 	void forEachNode(const std::function<void(const VectorDi &)> &func) const { _nodeGrid.forEach(func); }
 	void forEachCell(const std::function<void(const VectorDi &)> &func) const { _cellGrid.forEach(func); }
 	void forEachFace(const std::function<void(const int, const VectorDi &)> &func) const { for (int axis = 0; axis < Dim; axis++) _faceGrids[axis].forEach(std::bind(func, axis, std::placeholders::_1)); }
