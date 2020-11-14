@@ -15,15 +15,15 @@ class GridBasedFluid : public Simulation
 
 protected:
 
-	const Grid<Dim> _grid;
+	const StaggeredGrid<Dim> _grid;
 
-	FaceCenteredVectorField<Dim> _velocity;
+	GridBasedStaggeredVectorField<Dim> _velocity;
 
 	std::unique_ptr<GridBasedAdvection<Dim>> _advection;
 
 public:
 
-	GridBasedFluid(const Grid<Dim> &grid);
+	GridBasedFluid(const StaggeredGrid<Dim> &grid);
 
 	GridBasedFluid(const GridBasedFluid &rhs) = delete;
 	GridBasedFluid &operator=(const GridBasedFluid &rhs) = delete;

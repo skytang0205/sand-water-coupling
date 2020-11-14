@@ -15,7 +15,7 @@ public:
 	GridBasedAdvection() = default;
 	virtual ~GridBasedAdvection() = default;
 
-	virtual void advect(FaceCenteredVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) = 0;
+	virtual void advect(GridBasedStaggeredVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) = 0;
 };
 
 template <int Dim>
@@ -28,7 +28,7 @@ public:
 	SemiLagrangianAdvection() = default;
 	virtual ~SemiLagrangianAdvection() = default;
 
-	void advect(FaceCenteredVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt);
+	void advect(GridBasedStaggeredVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt);
 };
 
 }

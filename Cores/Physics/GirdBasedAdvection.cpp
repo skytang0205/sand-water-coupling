@@ -3,13 +3,13 @@
 namespace PhysX {
 
 template<int Dim>
-void SemiLagrangianAdvection<Dim>::advect(FaceCenteredVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt)
+void SemiLagrangianAdvection<Dim>::advect(GridBasedStaggeredVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt)
 {
 	auto newField = field;
-	newField.grid().parallelForEachFace([&](const int axis, const VectorDi &face) {
-			const VectorDr startPos = newField.grid().faceCenter(axis, face);
+	newField.parallelForEach([&](const int axis, const VectorDi &face) {
+			const VectorDr startPos = newField[axis].position(face);
 			const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
-			newField[axis][face] = field(axis, startPos - flow(midPos) * dt);
+			newField[axis][face] = field[axis](startPos - flow(midPos) * dt);
 		});
 	field = newField;
 }

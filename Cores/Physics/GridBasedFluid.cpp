@@ -6,12 +6,12 @@
 namespace PhysX {
 
 template <int Dim>
-GridBasedFluid<Dim>::GridBasedFluid(const Grid<Dim> &grid) :
+GridBasedFluid<Dim>::GridBasedFluid(const StaggeredGrid<Dim> &grid) :
 	_grid(grid),
 	_velocity(&_grid)
 {
-	_grid.parallelForEachFace([&](const int axis, const VectorDi &face) {
-			const VectorDr pos = _grid.faceCenter(axis, face);
+	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
+			const VectorDr pos = _velocity[axis].position(face);
 			if constexpr (Dim == 2) _velocity[axis][face] = axis == 0 ? -pos.y() : pos.x();
 		});
 
@@ -41,7 +41,7 @@ void GridBasedFluid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 {
 	{ // Write fluid.
 		std::ofstream fout(frameDir + "/fluid.mesh", std::ios::binary);
-		IO::writeValue(fout, uint(4 * _grid.cellCnt()));
+		IO::writeValue(fout, uint(4 * _grid.cellCount()));
 		const VectorDr a = VectorDr::Unit(0) * _grid.spacing() / 2;
 		const VectorDr b = VectorDr::Unit(1) * _grid.spacing() / 2;
 		_grid.forEachCell([&](const VectorDi &cell) {
@@ -61,8 +61,8 @@ void GridBasedFluid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 			});
 		if (staticDraw) {
 			static constexpr uint indices[] = { 1, 2, 0, 1, 3, 2 };
-			IO::writeValue(fout, uint(6 * _grid.cellCnt()));
-			for (int i = 0; i < _grid.cellCnt(); i++) {
+			IO::writeValue(fout, uint(6 * _grid.cellCount()));
+			for (int i = 0; i < _grid.cellCount(); i++) {
 				for (int j = 0; j < 6; j++)
 					IO::writeValue(fout, uint(i * 4 + indices[j]));
 			}

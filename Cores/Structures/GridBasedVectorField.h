@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Structures/Array.h"
 #include "Structures/Field.h"
-#include "Structures/Grid.h"
+#include "Structures/GridBasedScalarField.h"
+#include "Structures/StaggeredGrid.h"
 
 namespace PhysX {
 
@@ -11,17 +11,10 @@ class GridBasedVectorField : public VectorField<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
-protected:
-
-	const Grid<Dim> *_grid;
-
 public:
 
-	GridBasedVectorField(const Grid<Dim> *const grid) : _grid(grid) { }
-
+	GridBasedVectorField() = default;
 	virtual ~GridBasedVectorField() = default;
-
-	const Grid<Dim> &grid() const { return *_grid; }
 
 	virtual VectorDr operator()(const VectorDr &pos) const = 0;
 	virtual real divergence(const VectorDr &pos) const = 0;
@@ -31,38 +24,34 @@ public:
 };
 
 template <int Dim>
-class FaceCenteredVectorField final : public GridBasedVectorField<Dim>
+class GridBasedStaggeredVectorField final : public GridBasedVectorField<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
-	using GridBasedVectorField<Dim>::_grid;
-
 protected:
 
-	std::array<Array<Dim>, Dim> _data;
+	const StaggeredGrid<Dim> *_staggeredGrid;
+	std::array<GridBasedScalarField<Dim>, Dim> _components;
 
 public:
 
-	FaceCenteredVectorField(const Grid<Dim> *const grid, const VectorDr &value = VectorDr::Zero()) : GridBasedVectorField<Dim>(grid)
-	{
-		for (int axis = 0; axis < Dim; axis++) {
-			_data[axis].resize(_grid->faceSize(axis), value[axis]);
-		}
-	}
+	GridBasedStaggeredVectorField(const StaggeredGrid<Dim> *staggeredGrid, const VectorDr &value = VectorDr::Zero());
 
-	virtual ~FaceCenteredVectorField() = default;
+	virtual ~GridBasedStaggeredVectorField() = default;
 
-	const Array<Dim> &operator[](const int axis) const { return _data[axis]; }
-	Array<Dim> &operator[](const int axis) { return _data[axis]; }
+	const GridBasedScalarField<Dim> &operator[](const int axis) const { return _components[axis]; }
+	GridBasedScalarField<Dim> &operator[](const int axis) { return _components[axis]; }
 
-	real operator()(const int axis, const VectorDr &pos) const;
 	virtual VectorDr operator()(const VectorDr &pos) const override final;
 
 	real divergenceAtCellCenter(const VectorDi &cell) const;
 	virtual real divergence(const VectorDr &pos) const override final;
 
-	virtual void read(std::istream &in) { for (int axis = 0; axis < Dim; axis++) _data[axis].read(in); }
-	virtual void write(std::ostream &out) const { for (int axis = 0; axis < Dim; axis++) _data[axis].write(out); }
+	void forEach(const std::function<void(const int, const VectorDi &)> &func) const { _staggeredGrid->forEachFace(func); }
+	void parallelForEach(const std::function<void(const int, const VectorDi &)> &func) const { _staggeredGrid->parallelForEachFace(func); }
+
+	virtual void read(std::istream &in) override { for (int axis = 0; axis < Dim; axis++) _components[axis].read(in); }
+	virtual void write(std::ostream &out) const override { for (int axis = 0; axis < Dim; axis++) _components[axis].write(out); }
 };
 
 }
