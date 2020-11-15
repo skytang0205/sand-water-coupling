@@ -7,10 +7,10 @@ void SemiLagrangianAdvector<Dim>::advect(StaggeredGridBasedVectorField<Dim> &fie
 {
 	auto newField = field;
 	newField.parallelForEach([&](const int axis, const VectorDi &face) {
-			const VectorDr startPos = newField[axis].position(face);
-			const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
-			newField[axis][face] = field[axis](startPos - flow(midPos) * dt);
-		});
+		const VectorDr startPos = newField[axis].position(face);
+		const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
+		newField[axis][face] = field[axis](startPos - flow(midPos) * dt);
+	});
 	field = newField;
 }
 

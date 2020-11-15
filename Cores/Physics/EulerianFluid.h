@@ -24,7 +24,8 @@ protected:
 	StaggeredGridBasedVectorField<Dim> _velocity;
 	StaggeredGridBasedData<Dim> _fluidFraction;
 
-	std::unique_ptr<Collider<Dim>> _collider;
+	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
+
 	std::unique_ptr<EulerianAdvector<Dim>> _advector;
 	std::unique_ptr<EulerianProjector<Dim>> _projector;
 
@@ -53,7 +54,7 @@ protected:
 	virtual void projectVelocity();
 
 	virtual void updateFluidFraction();
-	virtual void extrapolateVeclocity();
+	virtual void extrapolateVeclocity(const real bandWidth = -1);
 	virtual void enforceBoundaryConditions();
 };
 

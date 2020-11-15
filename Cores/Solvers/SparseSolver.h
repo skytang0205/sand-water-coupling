@@ -10,6 +10,11 @@ namespace PhysX {
 
 class SparseSolver
 {
+protected:
+
+	static constexpr int _kDefaultMaxIterations = 999;
+	static constexpr real _kDefaultTolerance = real(1e-6);
+
 public:
 
 	SparseSolver() = default;
@@ -19,8 +24,8 @@ public:
 		const SparseMatrixr &A,
 		Eigen::Ref<VectorXr, Eigen::Aligned> x,
 		const Eigen::Ref<const VectorXr, Eigen::Aligned> &b,
-		const int max_iterations = 999,
-		const real tolerance = real(1e-8)) const = 0;
+		const int maxIterations = _kDefaultMaxIterations,
+		const real tolerance = _kDefaultTolerance) const = 0;
 };
 
 class CgSolver final : public SparseSolver
@@ -34,8 +39,8 @@ public:
 		const SparseMatrixr &A,
 		Eigen::Ref<VectorXr, Eigen::Aligned> x,
 		const Eigen::Ref<const VectorXr, Eigen::Aligned> &b,
-		const int max_iterations = 999,
-		const real tolerance = real(1e-8)) const override;
+		const int maxIterations = _kDefaultMaxIterations,
+		const real tolerance = _kDefaultTolerance) const override;
 };
 
 class IcPCgSolver final : public SparseSolver
@@ -49,8 +54,8 @@ public:
 		const SparseMatrixr &A,
 		Eigen::Ref<VectorXr, Eigen::Aligned> x,
 		const Eigen::Ref<const VectorXr, Eigen::Aligned> &b,
-		const int max_iterations = 999,
-		const real tolerance = real(1e-8)) const override;
+		const int maxIterations = _kDefaultMaxIterations,
+		const real tolerance = _kDefaultTolerance) const override;
 };
 
 }

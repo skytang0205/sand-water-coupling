@@ -46,20 +46,20 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 		const VectorDr a = VectorDr::Unit(0) * _grid.spacing() / 2;
 		const VectorDr b = VectorDr::Unit(1) * _grid.spacing() / 2;
 		_grid.forEachCell([&](const VectorDi &cell) {
-				const VectorDr pos = _grid.cellCenter(cell);
-				IO::writeValue(fout, (pos - a - b).cast<float>().eval());
-				IO::writeValue(fout, (pos + a - b).cast<float>().eval());
-				IO::writeValue(fout, (pos - a + b).cast<float>().eval());
-				IO::writeValue(fout, (pos + a + b).cast<float>().eval());
-			});
+			const VectorDr pos = _grid.cellCenter(cell);
+			IO::writeValue(fout, (pos - a - b).cast<float>().eval());
+			IO::writeValue(fout, (pos + a - b).cast<float>().eval());
+			IO::writeValue(fout, (pos - a + b).cast<float>().eval());
+			IO::writeValue(fout, (pos + a + b).cast<float>().eval());
+		});
 		_grid.forEachCell([&](const VectorDi &cell) {
-				const VectorDr pos = _grid.cellCenter(cell);
-				const float vel = float(_velocity(pos).norm());
-				IO::writeValue(fout, vel);
-				IO::writeValue(fout, vel);
-				IO::writeValue(fout, vel);
-				IO::writeValue(fout, vel);
-			});
+			const VectorDr pos = _grid.cellCenter(cell);
+			const float vel = float(_velocity(pos).norm());
+			IO::writeValue(fout, vel);
+			IO::writeValue(fout, vel);
+			IO::writeValue(fout, vel);
+			IO::writeValue(fout, vel);
+		});
 		if (staticDraw) {
 			static constexpr uint indices[] = { 1, 2, 0, 1, 3, 2 };
 			IO::writeValue(fout, uint(6 * _grid.cellCount()));
@@ -123,26 +123,46 @@ template <int Dim>
 void EulerianFluid<Dim>::updateFluidFraction()
 {
 	_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
-			if (_collider) {
+		_fluidFraction[axis][face] = 1;
+		if (!_fluidFraction.isBoundary(axis, face)) {
+			for (const auto &_collider : _colliders) {
 				const VectorDi cell0 = face - VectorDi::Unit(axis);
 				const VectorDi cell1 = face;
-				_fluidFraction[axis][face] = _collider->surface()->fractionInside(_grid.cellCenter(cell0), _grid.cellCenter(cell1));
+				_fluidFraction[axis][face] -= _collider->surface()->fractionInside(_grid.cellCenter(cell0), _grid.cellCenter(cell1));
 			}
-			else _fluidFraction[axis][face] = _fluidFraction.isBoundary(axis, face) ? real(0.5) : 1;
-		});
+		}
+	});
 }
 
 template <int Dim>
-void EulerianFluid<Dim>::extrapolateVeclocity()
-{ }
+void EulerianFluid<Dim>::extrapolateVeclocity(const real bandWidth)
+{
+}
 
 template <int Dim>
 void EulerianFluid<Dim>::enforceBoundaryConditions()
 {
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-			if (_collider);
-			else if (_velocity.isBoundary(axis, face)) _velocity[axis][face] = 0.5;
-		});
+		for (const auto &_collider : _colliders) {
+			const VectorDr pos = _velocity[axis].position(face);
+			if (_collider->surface()->inside(pos)) {
+				const VectorDr colliderVel = _collider->velocityAt(pos);
+				const VectorDr vel = _velocity(pos);
+				const VectorDr n = _collider->surface()->closestNormal(pos);
+				if (n.any()) {
+					const VectorDr velR = vel - colliderVel;
+					VectorDr velT = velR - velR.dot(n) * n;
+					if (const real mu = _collider->frictionCoefficient(); mu && velT.any()) {
+						const real velN = std::max(-velR.dot(n), real(0));
+						velT *= std::max(1 - mu * velN / velT.norm(), real(0));
+					}
+					_velocity[axis][face] = (velT + colliderVel)[axis];
+				}
+				else _velocity[axis][face] = colliderVel[axis];
+				break;
+			}
+		}
+	});
 }
 
 template class EulerianFluid<2>;

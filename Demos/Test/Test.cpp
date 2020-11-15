@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 	using namespace PhysX;
 	StaggeredGrid<2> grid(0.02, Vector2i(100, 100));
 	auto fluid = std::make_unique<EulerianFluid<2>>(grid);
-	auto simulator = std::make_unique<Simulator>("output", 0, 2, 50, 1, fluid.get());
+	auto simulator = std::make_unique<Simulator>("output", 0, 100, 50, 1, fluid.get());
 	simulator->Simulate();
 	return 0;
 }
