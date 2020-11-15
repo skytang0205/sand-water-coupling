@@ -11,31 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EulerianAdvector.h" />
-    <ClInclude Include="EulerianFluid.h" />
-    <ClInclude Include="EulerianProjector.h" />
-    <ClInclude Include="Simulation.h" />
-    <ClInclude Include="Simulator.h" />
+    <ClInclude Include="SparseSolver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EulerianAdvector.cpp" />
-    <ClCompile Include="EulerianFluid.cpp" />
-    <ClCompile Include="EulerianProjector.cpp" />
-    <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="SparseSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Geometries\Geometries.vcxproj">
-      <Project>{c94749bc-3d90-4972-9e0d-d8c5d6d0df60}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Solvers\Solvers.vcxproj">
-      <Project>{0e8fcbbd-e115-45ca-9c7a-5d23bee91033}</Project>
+    <ProjectReference Include="..\Utilities\Utilities.vcxproj">
+      <Project>{35ea6b7d-75ec-44b7-a6ae-7f6a9b018155}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</ProjectGuid>
-    <RootNamespace>Physics</RootNamespace>
+    <ProjectGuid>{0e8fcbbd-e115-45ca-9c7a-5d23bee91033}</ProjectGuid>
+    <RootNamespace>Solvers</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

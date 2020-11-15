@@ -3,6 +3,7 @@
 #include "Structures/Grid.h"
 #include "Utilities/IO.h"
 
+#include <algorithm>
 #include <vector>
 
 namespace PhysX {
@@ -30,12 +31,22 @@ public:
 		_data.resize(_grid->dataCount(), value);
 	}
 
+	bool isValid(const VectorDi &coord) const { return _grid->isValid(coord); }
+
+	Type *data() { return _data.data(); }
+
+	real spacing() const { return _grid->spacing(); }
 	VectorDi size() const { return _grid->dataSize(); }
 	size_t count() const { return _data.size(); }
 	VectorDr position(const VectorDi &coord) const { return _grid->dataPosition(coord); }
 
+	size_t index(const VectorDi &coord) const { return _grid->index(coord); }
+
 	const Type &operator[](const VectorDi &coord) const { return _data[_grid->index(coord)]; }
 	Type &operator[](const VectorDi &coord) { return _data[_grid->index(coord)]; }
+
+	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
+	void setZero() { setConstant(Type(0)); }
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const { _grid->forEach(func); }
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const { _grid->parallelForEach(func); }

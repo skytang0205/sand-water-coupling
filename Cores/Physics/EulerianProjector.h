@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Geometries/Collider.h"
+#include "Solvers/SparseSolver.h"
 #include "Structures/GridBasedScalarField.h"
 #include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
@@ -14,11 +15,17 @@ class EulerianProjector
 
 protected:
 
-	GridBasedScalarField<Dim> _reducedPressure; // reducedPressure = dt / dx / rho * pressure
+	GridBasedScalarField<Dim> _reducedPressure; // reducedPressure = -dt / dx / rho * pressure
+	GridBasedScalarField<Dim> _velocityDiv; // velocityDiv = Div(velocity) * dx
+
+	std::vector<Tripletr> _coefficients;
+	SparseMatrixr _matLaplacian;
+
+	std::unique_ptr<SparseSolver> _solver;
 
 public:
 
-	EulerianProjector(const Grid<Dim> *const grid) : _reducedPressure(grid) { }
+	EulerianProjector(const Grid<Dim> *const grid);
 
 	EulerianProjector(const EulerianProjector &rhs) = delete;
 	EulerianProjector &operator=(const EulerianProjector &rhs) = delete;
@@ -29,6 +36,7 @@ public:
 protected:
 
 	void buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights);
+	void solveLinearSystem();
 	void applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights) const;
 };
 

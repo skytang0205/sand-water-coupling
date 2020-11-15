@@ -26,6 +26,9 @@ public:
 	virtual real operator()(const VectorDr &pos) const override;
 	VectorDr gradientAtDataPoint(const VectorDi &coord) const;
 	virtual VectorDr gradient(const VectorDr &pos) const override;
+
+	real derivativeAtFaceCenter(const int axis, const VectorDi &face) const { return (operator[](face) - operator[](face - VectorDi::Unit(axis))) / _grid->spacing(); }
+
 };
 
 }

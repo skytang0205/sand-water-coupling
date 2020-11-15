@@ -28,6 +28,8 @@ public:
 
 	virtual ~Grid() = default;
 
+	bool isValid(const VectorDi &coord) const { return (coord.array() >= 0).all() && (coord.array() < _dataSize.array()).all(); }
+
 	real spacing() const { return _spacing; }
 	VectorDi dataSize() const { return _dataSize; }
 	VectorDr dataOrigin() const { return _dataOrigin; }

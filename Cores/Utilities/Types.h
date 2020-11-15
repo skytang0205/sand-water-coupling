@@ -17,6 +17,7 @@ using	VectorX##t			=	Eigen::VectorX##t;
 using	Matrix2##t			=	Eigen::Matrix2##t;					\
 using	Matrix3##t			=	Eigen::Matrix3##t;					\
 using	Matrix4##t			=	Eigen::Matrix4##t;					\
+using	Triplet##t			=	Eigen::Triplet<type>;				\
 using	SparseMatrix##t		=	Eigen::SparseMatrix<type>;
 
 DECLARE_EIGEN_VECTOR_TYPES(int, i)
@@ -38,6 +39,7 @@ using	VectorXr			=	VectorX##t;							\
 using	Matrix2r			=	Matrix2##t;							\
 using	Matrix3r			=	Matrix3##t;							\
 using	Matrix4r			=	Matrix4##t;							\
+using	Tripletr			=	Triplet##t;							\
 using	SparseMatrixr		=	SparseMatrix##t;
 
 #ifdef USE_FLOAT

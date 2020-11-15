@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Structures", "Cores\Structu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Geometries", "Cores\Geometries\Geometries.vcxproj", "{C94749BC-3D90-4972-9E0D-D8C5D6D0DF60}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Solvers", "Cores\Solvers\Solvers.vcxproj", "{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -62,6 +64,10 @@ Global
 		{C94749BC-3D90-4972-9E0D-D8C5D6D0DF60}.Debug|x64.Build.0 = Debug|x64
 		{C94749BC-3D90-4972-9E0D-D8C5D6D0DF60}.Release|x64.ActiveCfg = Release|x64
 		{C94749BC-3D90-4972-9E0D-D8C5D6D0DF60}.Release|x64.Build.0 = Release|x64
+		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}.Debug|x64.ActiveCfg = Debug|x64
+		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}.Debug|x64.Build.0 = Debug|x64
+		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}.Release|x64.ActiveCfg = Release|x64
+		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{EACF5052-AB16-4FAC-BF50-60E7775ECAC2} = {DE281693-1993-479C-A672-10D61E74B412}
 		{11FDB336-D077-4FAB-BEDF-3444181A927D} = {DE281693-1993-479C-A672-10D61E74B412}
 		{C94749BC-3D90-4972-9E0D-D8C5D6D0DF60} = {DE281693-1993-479C-A672-10D61E74B412}
+		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033} = {DE281693-1993-479C-A672-10D61E74B412}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FF25F6D-05AD-416D-82C1-A2E523A66E8D}

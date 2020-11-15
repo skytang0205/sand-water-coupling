@@ -8,14 +8,15 @@ namespace PhysX {
 template <int Dim>
 EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_grid(grid),
-	_velocity(&_grid)
+	_velocity(&_grid),
+	_fluidFraction(&_grid),
+	_advector(std::make_unique<SemiLagrangianAdvector<Dim>>()),
+	_projector(std::make_unique<EulerianProjector<Dim>>(_grid.cellGrid()))
 {
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 			const VectorDr pos = _velocity[axis].position(face);
 			if constexpr (Dim == 2) _velocity[axis][face] = axis == 0 ? -pos.y() : pos.x();
 		});
-
-	_advector = std::move(std::make_unique<SemiLagrangianAdvector<Dim>>());
 }
 
 template <int Dim>
@@ -86,21 +87,25 @@ void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 
 template <int Dim>
 void EulerianFluid<Dim>::initialize()
-{ }
+{
+	enforceBoundaryConditions();
+	updateFluidFraction();
+	projectVelocity();
+}
 
 template <int Dim>
 void EulerianFluid<Dim>::advance(const real dt)
 {
 	advectFields(dt);
-	applyBodyForces(dt);
-	projectVelocity(dt);
+	enforceBoundaryConditions();
+	updateFluidFraction();
+	projectVelocity();
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_velocity, _velocity, dt);
-	enforceBoundaryConditions();
 }
 
 template <int Dim>
@@ -109,7 +114,7 @@ void EulerianFluid<Dim>::applyBodyForces(const real dt)
 }
 
 template <int Dim>
-void EulerianFluid<Dim>::projectVelocity(const real dt)
+void EulerianFluid<Dim>::projectVelocity()
 {
 	_projector->project(_velocity, _fluidFraction);
 }
@@ -136,7 +141,7 @@ void EulerianFluid<Dim>::enforceBoundaryConditions()
 {
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (_collider);
-			else if (_velocity.isBoundary(axis, face)) _velocity[axis][face] = 0;
+			else if (_velocity.isBoundary(axis, face)) _velocity[axis][face] = 0.5;
 		});
 }
 

@@ -50,7 +50,7 @@ protected:
 
 	virtual void advectFields(const real dt);
 	virtual void applyBodyForces(const real dt);
-	virtual void projectVelocity(const real dt);
+	virtual void projectVelocity();
 
 	virtual void updateFluidFraction();
 	virtual void extrapolateVeclocity();
