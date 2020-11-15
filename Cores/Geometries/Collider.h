@@ -35,17 +35,17 @@ public:
 };
 
 template <int Dim>
-class StaticCollider final : public Collider<Dim>
+class StaticCollider : public Collider<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
 
-	std::unique_ptr<Surface<Dim>> _surface;
+	const std::unique_ptr<Surface<Dim>> _surface;
 
 public:
 
-	StaticCollider(const real restitutionCoefficient = 1, const real frictionCoefficient = 0, std::unique_ptr<Surface<Dim>> surface) :
+	StaticCollider(std::unique_ptr<Surface<Dim>> surface, const real restitutionCoefficient = 1, const real frictionCoefficient = 0) :
 		Collider<Dim>(restitutionCoefficient, frictionCoefficient),
 		_surface(std::move(surface))
 	{ }
@@ -54,7 +54,13 @@ public:
 	StaticCollider &operator=(const StaticCollider &rhs) = delete;
 	virtual ~StaticCollider() = default;
 
-	virtual Surface<Dim> *surface() const override { return _surface.get(); }
+	virtual VectorDr velocityAt(const VectorDr &pos) const override { return VectorDr::Zero(); }
+	virtual Surface<Dim> *surface() const override final { return _surface.get(); }
+};
+
+template <int Dim>
+class DynamicCollider : public Collider<Dim>
+{
 };
 
 }
