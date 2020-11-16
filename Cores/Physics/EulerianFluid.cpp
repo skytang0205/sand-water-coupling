@@ -13,15 +13,7 @@ EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_fluidFraction(&_grid),
 	_advector(std::make_unique<SemiLagrangianAdvector<Dim>>()),
 	_projector(std::make_unique<EulerianProjector<Dim>>(_grid.cellGrid()))
-{
-	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-			const VectorDr pos = _velocity[axis].position(face);
-			if constexpr (Dim == 2) _velocity[axis][face] = (axis == 0 ? -pos.y() : pos.x()) * _grid.spacing() * 50;
-		});
-	_colliders.push_back(
-		std::make_unique<StaticCollider<Dim>>(
-			std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), real(0.5))));
-}
+{ }
 
 template <int Dim>
 void EulerianFluid<Dim>::writeDescription(std::ofstream &fout) const
@@ -191,9 +183,8 @@ template <int Dim>
 void EulerianFluid<Dim>::enforceBoundaryConditions()
 {
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (_velocity.isBoundary(axis, face)) {
-			_velocity[axis][face] = _grid.spacing() * (axis == 0 ? face.y() : face.x());
-		}
+		if (_velocity.isBoundary(axis, face) && _domainBoundaryHandler)
+			_velocity[axis][face] = _domainBoundaryHandler(axis, face);
 		for (const auto &collider : _colliders) {
 			const VectorDr pos = _velocity[axis].position(face);
 			if (collider->surface()->inside(pos)) {

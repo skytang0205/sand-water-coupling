@@ -8,6 +8,7 @@
 #include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
 
+#include <functional>
 #include <memory>
 
 namespace PhysX {
@@ -17,6 +18,10 @@ class EulerianFluid : public Simulation
 {
 	DECLARE_DIM_TYPES(Dim)
 
+public:
+
+	friend class EulerianFluidBuilder;
+
 protected:
 
 	const StaggeredGrid<Dim> _grid;
@@ -24,6 +29,7 @@ protected:
 	StaggeredGridBasedVectorField<Dim> _velocity;
 	StaggeredGridBasedData<Dim> _fluidFraction;
 
+	std::function<real(const int, const VectorDi &)> _domainBoundaryHandler;
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 
 	std::unique_ptr<EulerianAdvector<Dim>> _advector;

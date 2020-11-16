@@ -30,6 +30,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Geometries", "Cores\Geometr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Solvers", "Cores\Solvers\Solvers.vcxproj", "{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EulerianFluidTest", "Demos\EulerianFluidTest\EulerianFluidTest.vcxproj", "{8CC693A5-0BBC-4364-961B-26E77E60ACE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -68,6 +70,10 @@ Global
 		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}.Debug|x64.Build.0 = Debug|x64
 		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}.Release|x64.ActiveCfg = Release|x64
 		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033}.Release|x64.Build.0 = Release|x64
+		{8CC693A5-0BBC-4364-961B-26E77E60ACE4}.Debug|x64.ActiveCfg = Debug|x64
+		{8CC693A5-0BBC-4364-961B-26E77E60ACE4}.Debug|x64.Build.0 = Debug|x64
+		{8CC693A5-0BBC-4364-961B-26E77E60ACE4}.Release|x64.ActiveCfg = Release|x64
+		{8CC693A5-0BBC-4364-961B-26E77E60ACE4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{11FDB336-D077-4FAB-BEDF-3444181A927D} = {DE281693-1993-479C-A672-10D61E74B412}
 		{C94749BC-3D90-4972-9E0D-D8C5D6D0DF60} = {DE281693-1993-479C-A672-10D61E74B412}
 		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033} = {DE281693-1993-479C-A672-10D61E74B412}
+		{8CC693A5-0BBC-4364-961B-26E77E60ACE4} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FF25F6D-05AD-416D-82C1-A2E523A66E8D}

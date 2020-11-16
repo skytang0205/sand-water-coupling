@@ -1,12 +1,8 @@
-#include "Physics/EulerianFluid.h"
-#include "Physics/Simulator.h"
 #include "Utilities/ArgsParser.h"
-#include "Utilities/Types.h"
 
 #include <fmt/core.h>
 
 #include <iostream>
-#include <chrono>
 
 inline void testArgsParser(int argc, char *argv[])
 {
@@ -28,20 +24,8 @@ inline void testArgsParser(int argc, char *argv[])
 	std::cout << fmt::format("{}\n{}\n{}\n{}\n{}\n{}\n", output, first, last, rate, step, config);
 }
 
-inline void testEulerianFluid()
-{
-	using namespace PhysX;
-	const real length = 2.0;
-	const int resolution = 200;
-	StaggeredGrid<2> grid(length / resolution, Vector2i(1, 1) * resolution);
-	auto fluid = std::make_unique<EulerianFluid<2>>(grid);
-	auto simulator = std::make_unique<Simulator>("output", 0, 100, 50, 1, fluid.get());
-	simulator->Simulate();
-
-}
-
 int main(int argc, char *argv[])
 {
-	testEulerianFluid();
+	testArgsParser(argc, argv);
 	return 0;
 }
