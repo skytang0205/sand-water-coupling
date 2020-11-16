@@ -34,6 +34,7 @@ public:
 	bool isValid(const VectorDi &coord) const { return _grid->isValid(coord); }
 
 	Type *data() { return _data.data(); }
+	const Type *data() const { return _data.data(); }
 
 	real spacing() const { return _grid->spacing(); }
 	VectorDi size() const { return _grid->dataSize(); }
@@ -42,11 +43,20 @@ public:
 
 	size_t index(const VectorDi &coord) const { return _grid->index(coord); }
 
-	const Type &operator[](const VectorDi &coord) const { return _data[_grid->index(coord)]; }
 	Type &operator[](const VectorDi &coord) { return _data[_grid->index(coord)]; }
+	const Type &operator[](const VectorDi &coord) const { return _data[_grid->index(coord)]; }
 
 	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
 	void setZero() { setConstant(Type(0)); }
+
+	Type min() const { return *std::min_element(_data.begin(), _data.end()); }
+	Type max() const { return *std::max_element(_data.begin(), _data.end()); }
+
+	Type absoluteMax() const
+	{
+		auto minmax = std::minmax_element(_data.begin(), _data.end());
+		return std::max(-*minmax.first, *minmax.second);
+	}
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const { _grid->forEach(func); }
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const { _grid->parallelForEach(func); }

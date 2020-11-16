@@ -30,6 +30,9 @@
     <ClInclude Include="EulerianProjector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LevelSetLiquid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Simulator.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EulerianProjector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelSetLiquid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

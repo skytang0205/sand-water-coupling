@@ -27,7 +27,8 @@ public:
 	Collider &operator=(const Collider &rhs) = delete;
 	virtual ~Collider() = default;
 
-	virtual Surface<Dim> *surface() const = 0;
+	virtual Surface<Dim> *surface() = 0;
+	virtual const Surface<Dim> *surface() const = 0;
 
 	virtual VectorDr velocityAt(const VectorDr &pos) const = 0;
 	real restitutionCoefficient() const { return _restitutionCoefficient; }
@@ -55,7 +56,8 @@ public:
 	virtual ~StaticCollider() = default;
 
 	virtual VectorDr velocityAt(const VectorDr &pos) const override { return VectorDr::Zero(); }
-	virtual Surface<Dim> *surface() const override final { return _surface.get(); }
+	virtual Surface<Dim> *surface() override final { return _surface.get(); }
+	virtual const Surface<Dim> *surface() const override final { return _surface.get(); }
 };
 
 template <int Dim>

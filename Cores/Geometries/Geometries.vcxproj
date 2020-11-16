@@ -14,12 +14,14 @@
     <ClInclude Include="Collider.h" />
     <ClInclude Include="GridBasedImplicitSurface.h" />
     <ClInclude Include="ImplicitSurface.h" />
+    <ClInclude Include="LevelSetReinitializer.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="SurfaceMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="GridBasedImplicitSurface.cpp" />
+    <ClCompile Include="LevelSetReinitializer.cpp" />
     <ClCompile Include="SurfaceMesh.cpp" />
   </ItemGroup>
   <ItemGroup>

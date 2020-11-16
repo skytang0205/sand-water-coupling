@@ -43,21 +43,21 @@ public:
 	EulerianFluid &operator=(const EulerianFluid &rhs) = delete;
 	virtual ~EulerianFluid() = default;
 
-	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return real(1) / frameRate / stepRate; }
+	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return std::min(real(1) / frameRate, stepRate * _grid.spacing() / _velocity.absoluteMax()); }
 
-	virtual void writeDescription(std::ofstream &fout) const;
-	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const;
-	virtual void saveFrame(const std::string &frameDir) const;
-	virtual void loadFrame(const std::string &framdDir);
+	virtual void writeDescription(std::ofstream &fout) const override;
+	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const override;
+	virtual void saveFrame(const std::string &frameDir) const override;
+	virtual void loadFrame(const std::string &framdDir) override;
 
-	virtual void initialize();
-	virtual void advance(const real dt);
+	virtual void initialize() override;
+	virtual void advance(const real dt) override;
 
 protected:
 
 	void advectFields(const real dt);
 	void updateColliders(const real dt);
-	void applyBodyForces(const real dt);
+	void applyBodyForces(const real dt) { }
 	void projectVelocity();
 
 	void updateFluidFraction();

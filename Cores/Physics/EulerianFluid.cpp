@@ -79,6 +79,7 @@ void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 {
 	std::ifstream fin(frameDir + "/velocity.sav", std::ios::binary);
 	_velocity.read(fin);
+	updateFluidFraction();
 }
 
 template <int Dim>
@@ -112,16 +113,11 @@ void EulerianFluid<Dim>::updateColliders(const real dt)
 	bool dirty = false;
 	for (const auto &collider : _colliders) {
 		auto dynamicCollider = dynamic_cast<DynamicCollider<Dim> *>(collider.get());
-		if (!dynamicCollider) {
+		if (dynamicCollider) {
 			dirty = true;
 		}
 	}
 	if (dirty) updateFluidFraction();
-}
-
-template <int Dim>
-void EulerianFluid<Dim>::applyBodyForces(const real dt)
-{
 }
 
 template <int Dim>
