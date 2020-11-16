@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Geometries/Surface.h"
+#include "Geometries/ImplicitSurface.h"
 
 namespace PhysX {
 

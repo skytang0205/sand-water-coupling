@@ -27,6 +27,9 @@
     <ClInclude Include="GridBasedImplicitSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImplicitSurface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SurfaceMesh.cpp">

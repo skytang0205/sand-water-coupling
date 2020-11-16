@@ -26,15 +26,22 @@ inline void testArgsParser(int argc, char *argv[])
 	auto config = std::any_cast<std::string>(argsParser.getValueByName("config"));
 
 	std::cout << fmt::format("{}\n{}\n{}\n{}\n{}\n{}\n", output, first, last, rate, step, config);
+}
+
+inline void testEulerianFluid()
+{
+	using namespace PhysX;
+	const real length = 2.0;
+	const int resolution = 200;
+	StaggeredGrid<2> grid(length / resolution, Vector2i(1, 1) * resolution);
+	auto fluid = std::make_unique<EulerianFluid<2>>(grid);
+	auto simulator = std::make_unique<Simulator>("output", 0, 100, 50, 1, fluid.get());
+	simulator->Simulate();
 
 }
 
 int main(int argc, char *argv[])
 {
-	using namespace PhysX;
-	StaggeredGrid<2> grid(0.02, Vector2i(100, 100));
-	auto fluid = std::make_unique<EulerianFluid<2>>(grid);
-	auto simulator = std::make_unique<Simulator>("output", 0, 100, 50, 1, fluid.get());
-	simulator->Simulate();
+	testEulerianFluid();
 	return 0;
 }

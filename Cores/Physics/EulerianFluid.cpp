@@ -1,5 +1,6 @@
 #include "EulerianFluid.h"
 
+#include "Geometries/ImplicitSurface.h"
 #include "Utilities/IO.h"
 #include "Utilities/Yaml.h"
 
@@ -15,8 +16,11 @@ EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 {
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 			const VectorDr pos = _velocity[axis].position(face);
-			if constexpr (Dim == 2) _velocity[axis][face] = axis == 0 ? -pos.y() : pos.x();
+			if constexpr (Dim == 2) _velocity[axis][face] = (axis == 0 ? -pos.y() : pos.x()) * _grid.spacing() * 50;
 		});
+	_colliders.push_back(
+		std::make_unique<StaticCollider<Dim>>(
+			std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), real(0.5))));
 }
 
 template <int Dim>
@@ -54,7 +58,7 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 		});
 		_grid.forEachCell([&](const VectorDi &cell) {
 			const VectorDr pos = _grid.cellCenter(cell);
-			const float vel = float(_velocity(pos).norm());
+			const float vel = pos.norm() < 0.5 ? 0 : float(_velocity(pos).norm());
 			IO::writeValue(fout, vel);
 			IO::writeValue(fout, vel);
 			IO::writeValue(fout, vel);
@@ -88,19 +92,19 @@ void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 template <int Dim>
 void EulerianFluid<Dim>::initialize()
 {
-	// TODO: check pipeline
 	updateFluidFraction();
+	extrapolateVelocity();
 	enforceBoundaryConditions();
 	projectVelocity();
+	extrapolateVelocity();
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::advance(const real dt)
 {
-	// TODO: check pipeline
 	updateColliders(dt);
+
 	advectFields(dt);
-	updateFluidFraction();
 	projectVelocity();
 }
 
@@ -108,7 +112,6 @@ template <int Dim>
 void EulerianFluid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_velocity, _velocity, dt);
-	enforceBoundaryConditions();
 }
 
 template <int Dim>
@@ -132,8 +135,9 @@ void EulerianFluid<Dim>::applyBodyForces(const real dt)
 template <int Dim>
 void EulerianFluid<Dim>::projectVelocity()
 {
-	_projector->project(_velocity, _fluidFraction);
 	enforceBoundaryConditions();
+	_projector->project(_velocity, _fluidFraction);
+	extrapolateVelocity();
 }
 
 template <int Dim>
@@ -152,10 +156,8 @@ void EulerianFluid<Dim>::updateFluidFraction()
 }
 
 template <int Dim>
-void EulerianFluid<Dim>::extrapolateVelocity()
+void EulerianFluid<Dim>::extrapolateVelocity(const int maxIterations)
 {
-	static constexpr int kMaxIterations = 1;
-
 	auto newVelocity = _velocity;
 	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(&_grid);
 	auto newVisited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(&_grid);
@@ -163,7 +165,7 @@ void EulerianFluid<Dim>::extrapolateVelocity()
 		if (!((*visited)[axis][face] = _fluidFraction[axis][face] > 0))
 			newVelocity[axis][face] = 0;
 	});
-	for (int iter = 0; iter < kMaxIterations; iter++) {
+	for (int iter = 0; iter < maxIterations; iter++) {
 		newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (!(*visited)[axis][face]) {
 				int cnt = 0;
@@ -188,14 +190,9 @@ void EulerianFluid<Dim>::extrapolateVelocity()
 template <int Dim>
 void EulerianFluid<Dim>::enforceBoundaryConditions()
 {
-	extrapolateVelocity();
-
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (_velocity.isBoundary(axis, face)) {
-			int pos = int(_time * 50) % 100;;
-			if (axis == 0 && face[0] == 0) _velocity[axis][face] = 10 * (face[1] == pos);
-			if (axis == 0 && face[0] > 0) _velocity[axis][face] = real(10) / _grid.resolution().y();
-			if (axis == 1) _velocity[axis][face] = 0;
+			_velocity[axis][face] = _grid.spacing() * (axis == 0 ? face.y() : face.x());
 		}
 		for (const auto &collider : _colliders) {
 			const VectorDr pos = _velocity[axis].position(face);

@@ -55,7 +55,7 @@ protected:
 	void projectVelocity();
 
 	void updateFluidFraction();
-	void extrapolateVelocity();
+	void extrapolateVelocity(const int maxIterations = 3);
 	void enforceBoundaryConditions();
 };
 

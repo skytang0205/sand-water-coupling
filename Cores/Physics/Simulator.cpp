@@ -15,7 +15,14 @@ void Simulator::Simulate()
 	const auto initialTime = steady_clock::now();
 
 	if (_beginFrame == 0) {
+		std::cout << "[Initialize] ";
 		_simulation->initialize();
+		const auto endTime = steady_clock::now();
+		std::cout << fmt::format(
+			"    ... {:>7.2f}s used",
+			duration<double>(endTime - initialTime).count())
+			<< std::endl;
+
 		createOutputDirectory();
 		writeAndSaveToFrameDirectory(0, true);
 
@@ -100,7 +107,7 @@ void Simulator::advanceTimeBySteps(const real targetTime)
 			dt = (targetTime - time) / 2;
 		}
 
-		std::cout << fmt::format("[{:.0f} SPF] ", targetTime / dt);
+		std::cout << fmt::format("[{:>6.0f} SPF] ", targetTime / dt);
 		_simulation->advance(dt);
 		time += dt;
 		const auto endTime = steady_clock::now();

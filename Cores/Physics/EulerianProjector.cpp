@@ -36,13 +36,13 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 				if (_reducedPressure.isValid(nbCell)) {
 					term *= weights[axis][face];
 					diagCoeff += term;
-					_coefficients.push_back(Tripletr(idx, nbIdx, -term));
+					if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
 				}
 				div += i * term * velocity[axis][face];
 			}
 		}
 		_velocityDiv[cell] = div;
-		_coefficients.push_back(Tripletr(idx, idx, diagCoeff));
+		if (diagCoeff) _coefficients.push_back(Tripletr(idx, idx, diagCoeff));
 	});
 	_matLaplacian.setFromTriplets(_coefficients.begin(), _coefficients.end());
 }
