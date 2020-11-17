@@ -144,7 +144,7 @@ void EulerianFluid<Dim>::updateFluidFraction()
 }
 
 template <int Dim>
-void EulerianFluid<Dim>::extrapolateVelocity(const int maxIterations)
+void EulerianFluid<Dim>::extrapolateVelocity()
 {
 	auto newVelocity = _velocity;
 	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(&_grid);
@@ -153,7 +153,7 @@ void EulerianFluid<Dim>::extrapolateVelocity(const int maxIterations)
 		if (!((*visited)[axis][face] = _fluidFraction[axis][face] > 0))
 			newVelocity[axis][face] = 0;
 	});
-	for (int iter = 0; iter < maxIterations; iter++) {
+	for (int iter = 0; iter < _kExtrapMaxIters; iter++) {
 		newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (!(*visited)[axis][face]) {
 				int cnt = 0;
@@ -165,10 +165,10 @@ void EulerianFluid<Dim>::extrapolateVelocity(const int maxIterations)
 				}
 				if (cnt > 0) {
 					newVelocity[axis][face] = sum / cnt;
-					(*newVisited)[axis][face] = 1;
+					(*newVisited)[axis][face] = true;
 				}
 			}
-			else (*newVisited)[axis][face] = 1;
+			else (*newVisited)[axis][face] = true;
 		});
 		visited.swap(newVisited);
 	}

@@ -24,6 +24,8 @@ public:
 
 protected:
 
+	static constexpr int _kExtrapMaxIters = 3;
+
 	const StaggeredGrid<Dim> _grid;
 
 	StaggeredGridBasedVectorField<Dim> _velocity;
@@ -61,7 +63,7 @@ protected:
 	void projectVelocity();
 
 	void updateFluidFraction();
-	void extrapolateVelocity(const int maxIterations = 3);
+	void extrapolateVelocity();
 	void enforceBoundaryConditions();
 };
 
