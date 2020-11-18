@@ -71,14 +71,14 @@ template <int Dim>
 void EulerianFluid<Dim>::saveFrame(const std::string &frameDir) const
 {
 	std::ofstream fout(frameDir + "/velocity.sav", std::ios::binary);
-	_velocity.write(fout);
+	_velocity.save(fout);
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 {
 	std::ifstream fin(frameDir + "/velocity.sav", std::ios::binary);
-	_velocity.read(fin);
+	_velocity.load(fin);
 	updateFluidFraction();
 }
 

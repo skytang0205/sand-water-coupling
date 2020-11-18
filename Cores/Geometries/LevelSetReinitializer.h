@@ -39,7 +39,7 @@ protected:
 	GridBasedData<Dim> _tent; // tentative signed distance
 	GridBasedData<Dim, uchar> _visited;
 
-	std::vector<int> _intfCellIndices;
+	std::vector<int> _intfIndices;
 	std::priority_queue<std::pair<real, int>> _heap;
 
 public:
@@ -53,8 +53,8 @@ protected:
 	void initInterface(const GridBasedScalarField<Dim> &phi);
 	void performFastMarching();
 
-	void updateNeighborCells(const VectorDi &cell);
-	real solveEikonalEquation(const VectorDi &cell) const;
+	void updateNeighbors(const VectorDi &coord);
+	real solveEikonalEquation(const VectorDi &coord) const;
 
 	static real solveQuadratic(const real p0, const real dx) { return p0 + dx; }
 	static real solveQuadratic(real p0, real p1, const real dx);

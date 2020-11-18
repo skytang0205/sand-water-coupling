@@ -3,6 +3,18 @@
 namespace PhysX {
 
 template <int Dim>
+void SemiLagrangianAdvector<Dim>::advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt)
+{
+	auto newField = field;
+	newField.parallelForEach([&](const VectorDi &coord) {
+		const VectorDr startPos = newField.position(coord);
+		const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
+		newField[coord] = field(startPos - flow(midPos) * dt);
+	});
+	field = newField;
+}
+
+template <int Dim>
 void SemiLagrangianAdvector<Dim>::advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt)
 {
 	auto newField = field;

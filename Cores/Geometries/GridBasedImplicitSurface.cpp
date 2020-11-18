@@ -5,8 +5,8 @@ namespace PhysX {
 template <int Dim>
 void GridBasedImplicitSurface<Dim>::setFromSurface(const Surface<Dim> &surface)
 {
-	_signedDistanceField.parallelForEach([&](const VectorDi &cell) {
-		_signedDistanceField[cell] = surface.signedDistance(_signedDistanceField.position(cell));
+	_signedDistanceField.parallelForEach([&](const VectorDi &coord) {
+		_signedDistanceField[coord] = surface.signedDistance(_signedDistanceField.position(coord));
 	});
 }
 

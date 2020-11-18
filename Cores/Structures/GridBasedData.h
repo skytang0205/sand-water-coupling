@@ -64,8 +64,8 @@ public:
 	void forEach(const std::function<void(const VectorDi &)> &func) const { _grid->forEach(func); }
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const { _grid->parallelForEach(func); }
 
-	void read(std::istream &in) { IO::readArray(in, _data.data(), _data.size()); }
-	void write(std::ostream &out) const { IO::writeArray(out, _data.data(), _data.size()); }
+	void load(std::istream &in) { IO::readArray(in, _data.data(), _data.size()); }
+	void save(std::ostream &out) const { IO::writeArray(out, _data.data(), _data.size()); }
 };
 
 }

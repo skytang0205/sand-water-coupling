@@ -23,8 +23,8 @@ void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim>&
 	_visited.setZero();
 	initInterface(phi);
 	performFastMarching();
-	phi.parallelForEach([&](const VectorDi &cell) {
-		phi[cell] = (phi[cell] > 0 ? 1 : -1) * _tent[cell];
+	phi.parallelForEach([&](const VectorDi &coord) {
+		phi[coord] = (phi[coord] > 0 ? 1 : -1) * _tent[coord];
 	});
 }
 
@@ -35,20 +35,20 @@ void FastMarchingReinitializer<Dim>::initInterface(const GridBasedScalarField<Di
 		return (phi0 <= 0 && phi1 > 0) || (phi0 > 0 && phi1 <= 0);
 	};
 
-	_intfCellIndices.clear();
-	phi.forEach([&](const VectorDi &cell) {
+	_intfIndices.clear();
+	phi.forEach([&](const VectorDi &coord) {
 		VectorDr tempPhi = VectorDr::Ones() * std::numeric_limits<real>::infinity();
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
-			const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
-			if (phi.isValid(nbCell) && isInterface(phi[cell], phi[nbCell])) {
+			const VectorDi nbCoord = Grid<Dim>::neighbor(coord, i);
+			if (phi.isValid(nbCoord) && isInterface(phi[coord], phi[nbCoord])) {
 				const int axis = i >> 1;
-				tempPhi[axis] = std::min(tempPhi[axis], phi[cell] / (phi[cell] - phi[nbCell]));
+				tempPhi[axis] = std::min(tempPhi[axis], phi[coord] / (phi[coord] - phi[nbCoord]));
 			}
 		}
 		if (tempPhi.array().isFinite().any()) {
-			_tent[cell] = real(1) / tempPhi.cwiseInverse().norm();
-			_visited[cell] = true;
-			_intfCellIndices.push_back(int(phi.index(cell)));
+			_tent[coord] = real(1) / tempPhi.cwiseInverse().norm();
+			_visited[coord] = true;
+			_intfIndices.push_back(int(phi.index(coord)));
 		}
 	});
 }
@@ -56,41 +56,41 @@ void FastMarchingReinitializer<Dim>::initInterface(const GridBasedScalarField<Di
 template <int Dim>
 void FastMarchingReinitializer<Dim>::performFastMarching()
 {
-	for (const auto cellIdx : _intfCellIndices)
-		updateNeighborCells(_tent.coordinate(cellIdx));
+	for (const auto index : _intfIndices)
+		updateNeighbors(_tent.coordinate(index));
 	while (!_heap.empty()) {
 		const real val = _heap.top().first;
-		const VectorDi cell = _tent.coordinate(_heap.top().second);
+		const VectorDi coord = _tent.coordinate(_heap.top().second);
 		_heap.pop();
-		if (_tent[cell] != val) continue;
-		_visited[cell] = true;
-		updateNeighborCells(cell);
+		if (_tent[coord] != val) continue;
+		_visited[coord] = true;
+		updateNeighbors(coord);
 	}
 }
 
 template <int Dim>
-void FastMarchingReinitializer<Dim>::updateNeighborCells(const VectorDi &cell)
+void FastMarchingReinitializer<Dim>::updateNeighbors(const VectorDi &coord)
 {
 	for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
-		const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
-		if (!_tent.isValid(nbCell)) continue;
-		if (const real temp = solveEikonalEquation(nbCell); temp < _tent[nbCell]) {
-			_tent[nbCell] = temp;
-			_heap.push(std::make_pair(temp, int(_tent.index(nbCell))));
+		const VectorDi nbCoord = Grid<Dim>::neighbor(coord, i);
+		if (!_tent.isValid(nbCoord)) continue;
+		if (const real temp = solveEikonalEquation(nbCoord); temp < _tent[nbCoord]) {
+			_tent[nbCoord] = temp;
+			_heap.push(std::make_pair(temp, int(_tent.index(nbCoord))));
 		}
 	}
 }
 
 template <int Dim>
-real FastMarchingReinitializer<Dim>::solveEikonalEquation(const VectorDi &cell) const
+real FastMarchingReinitializer<Dim>::solveEikonalEquation(const VectorDi &coord) const
 {
 	VectorDr tempPhi = VectorDr::Ones() * std::numeric_limits<real>::infinity();
 	VectorDi mark = VectorDi::Zero();
 	for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
-		const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
-		if (_tent.isValid(nbCell) && _visited[nbCell]) {
+		const VectorDi nbCoord = Grid<Dim>::neighbor(coord, i);
+		if (_tent.isValid(nbCoord) && _visited[nbCoord]) {
 			const int axis = i >> 1;
-			tempPhi[axis] = std::min(tempPhi[axis], _tent[nbCell]);
+			tempPhi[axis] = std::min(tempPhi[axis], _tent[nbCoord]);
 		}
 	}
 	real newPhi;

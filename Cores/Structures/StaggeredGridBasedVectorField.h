@@ -62,8 +62,8 @@ public:
 	void forEach(const std::function<void(const int, const VectorDi &)> &func) const { _grid->forEachFace(func); }
 	void parallelForEach(const std::function<void(const int, const VectorDi &)> &func) const { _grid->parallelForEachFace(func); }
 
-	void read(std::istream &in) { for (int axis = 0; axis < Dim; axis++) _components[axis].read(in); }
-	void write(std::ostream &out) const { for (int axis = 0; axis < Dim; axis++) _components[axis].write(out); }
+	void load(std::istream &in) { for (int axis = 0; axis < Dim; axis++) _components[axis].load(in); }
+	void save(std::ostream &out) const { for (int axis = 0; axis < Dim; axis++) _components[axis].save(out); }
 };
 
 }
