@@ -43,6 +43,15 @@ public:
 		else return coord.x() + _dataSize.x() * (coord.y() + size_t(_dataSize.y()) * coord.z());
 	}
 
+	VectorDi coordinate(const size_t index) const
+	{
+		if constexpr (Dim == 2) return VectorDi(index % _dataSize.x(), index / _dataSize.x());
+		else return VectorDi(
+			int(index % _dataSize.x()),
+			int(index / _dataSize.x() % _dataSize.y()),
+			int(index / _dataSize.x() / _dataSize.y()));
+	}
+
 	void getLerpCoordsAndWeights(const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const;
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const;

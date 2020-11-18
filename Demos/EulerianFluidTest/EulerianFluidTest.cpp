@@ -30,5 +30,6 @@ int main(int argc, char *argv[])
 	auto fluid = PhysX::EulerianFluidBuilder::build<2>(scale);
 	auto simulator = std::make_unique<PhysX::Simulator>(output, begin, end, rate, cfl, fluid.get());
 	simulator->Simulate();
+
 	return 0;
 }

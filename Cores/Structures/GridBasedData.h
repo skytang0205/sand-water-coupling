@@ -42,7 +42,10 @@ public:
 	VectorDr position(const VectorDi &coord) const { return _grid->dataPosition(coord); }
 
 	size_t index(const VectorDi &coord) const { return _grid->index(coord); }
+	VectorDi coordinate(const size_t index) const { return _grid->coordinate(index); }
 
+	Type &operator[](const size_t index) { return _data[index]; }
+	const Type &operator[](const size_t index) const { return _data[index]; }
 	Type &operator[](const VectorDi &coord) { return _data[_grid->index(coord)]; }
 	const Type &operator[](const VectorDi &coord) const { return _data[_grid->index(coord)]; }
 

@@ -34,8 +34,6 @@ public:
 	}
 
 	virtual real signedDistance(const VectorDr &pos) const { return _signedDistanceField(pos); }
-
-	real fractionInside(const VectorDi &cell0, const VectorDi &cell1) const { return Surface<Dim>::fractionInside(_signedDistanceField[cell0], _signedDistanceField[cell1]); }
 };
 
 }
