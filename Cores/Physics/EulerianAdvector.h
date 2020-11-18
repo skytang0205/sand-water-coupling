@@ -34,8 +34,8 @@ public:
 	SemiLagrangianAdvector &operator=(const SemiLagrangianAdvector &rhs) = delete;
 	virtual ~SemiLagrangianAdvector() = default;
 
-	void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt);
-	void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt);
+	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
+	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
 };
 
 }

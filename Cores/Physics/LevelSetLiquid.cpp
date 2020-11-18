@@ -46,8 +46,7 @@ void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 			IO::writeValue(fout, (pos + a + b).cast<float>().eval());
 		});
 		_grid.forEachCell([&](const VectorDi &cell) {
-			const VectorDr pos = _grid.cellCenter(cell);
-			const float phi = float(_levelSet.signedDistance(pos));
+			const float phi = _levelSet.signedDistanceField()[cell];
 			IO::writeValue(fout, phi);
 			IO::writeValue(fout, phi);
 			IO::writeValue(fout, phi);
