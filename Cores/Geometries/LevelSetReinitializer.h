@@ -35,12 +35,13 @@ class FastMarchingReinitializer final : public LevelSetReinitializer<Dim>
 protected:
 
 	using LevelSetReinitializer<Dim>::_reinitMaxIters;
+	using PRI = std::pair<real, int>;
 
 	GridBasedData<Dim> _tent; // tentative signed distance
 	GridBasedData<Dim, uchar> _visited;
 
 	std::vector<int> _intfIndices;
-	std::priority_queue<std::pair<real, int>> _heap;
+	std::priority_queue<PRI, std::vector<PRI>, std::greater<PRI>> _heap;
 
 public:
 

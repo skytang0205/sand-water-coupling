@@ -1,5 +1,6 @@
 #include "LevelSetLiquid.h"
 
+#include "Utilities/Constants.h"
 #include "Utilities/IO.h"
 #include "Utilities/Yaml.h"
 
@@ -9,7 +10,7 @@ template <int Dim>
 LevelSetLiquid<Dim>::LevelSetLiquid(const StaggeredGrid<Dim> &grid) :
 	EulerianFluid<Dim>(grid),
 	_levelSet(_grid.cellGrid()),
-	_levelSetReinitializer(std::make_unique<FastMarchingReinitializer<Dim>>(_grid.cellGrid(), -1))
+	_levelSetReinitializer(std::make_unique<FastMarchingReinitializer<Dim>>(_grid.cellGrid(), _kLsReinitMaxIters))
 { }
 
 template <int Dim>
@@ -46,7 +47,7 @@ void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 			IO::writeValue(fout, (pos + a + b).cast<float>().eval());
 		});
 		_grid.forEachCell([&](const VectorDi &cell) {
-			const float phi = _levelSet.signedDistanceField()[cell];
+			const float phi = float(_levelSet.signedDistanceField()[cell]);
 			IO::writeValue(fout, phi);
 			IO::writeValue(fout, phi);
 			IO::writeValue(fout, phi);
@@ -80,12 +81,77 @@ void LevelSetLiquid<Dim>::loadFrame(const std::string &frameDir)
 template <int Dim>
 void LevelSetLiquid<Dim>::initialize()
 {
+	reinitializeLevelSet();
+	EulerianFluid<Dim>::initialize();
 }
 
 template <int Dim>
-void LevelSetLiquid<Dim>::advance(const real dt)
+void LevelSetLiquid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_levelSet.signedDistanceField(), _velocity, dt);
+	_levelSetReinitializer->reinitialize(_levelSet);
+
+	_advector->advect(_velocity, _velocity, dt);
+
+	extrapolateVelocity();
+}
+
+template <int Dim>
+void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
+{
+	if (_enableGravity) {
+		_velocity[1].parallelForEach([&](const VectorDi &face) {
+			_velocity[1][face] -= kGravity * dt;
+		});
+	}
+}
+
+template <int Dim>
+void LevelSetLiquid<Dim>::projectVelocity()
+{
+	_projector->project(_velocity, _fluidFraction, _levelSet.signedDistanceField());
+	extrapolateVelocity();
+}
+
+template <int Dim>
+void LevelSetLiquid<Dim>::extrapolateVelocity()
+{
+	const auto &phi = _levelSet.signedDistanceField();
+	const auto isProjected = [&](const int axis, const VectorDi &face)->bool {
+		const VectorDi cell0 = face - VectorDi::Unit(axis);
+		const VectorDi cell1 = face;
+		return (phi.isValid(cell0) && Surface<Dim>::inside(phi[cell0]))
+			|| (phi.isValid(cell1) && Surface<Dim>::inside(phi[cell1]));
+	};
+
+	auto newVelocity = _velocity;
+	newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		if (isProjected(axis, face)) return;
+		int cnt = 0;
+		real sum = 0;
+		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
+			const VectorDi &nbFace = Grid<Dim>::neighbor(face, i);
+			if (newVelocity[axis].isValid(nbFace) && isProjected(axis, nbFace))
+				sum += newVelocity[axis][nbFace], cnt++;
+		}
+		if (cnt > 0) newVelocity[axis][face] = sum / cnt;
+	});
+
+	const real bandWidth = _kExtrapMaxIters * _grid.spacing();
+	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		const VectorDr pos = _velocity[axis].position(face);
+		if (_levelSet.signedDistance(pos) > 0) {
+			_velocity[axis][face] =
+				_levelSet.signedDistance(pos) < bandWidth ? newVelocity[axis](_levelSet.closestPosition(pos)) : real(0);
+		}
+	});
+
+	enforceBoundaryConditions();
+}
+
+template <int Dim>
+void LevelSetLiquid<Dim>::reinitializeLevelSet()
+{
 	_levelSetReinitializer->reinitialize(_levelSet);
 }
 

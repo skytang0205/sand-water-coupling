@@ -58,7 +58,7 @@ public:
 	Type absoluteMax() const
 	{
 		auto minmax = std::minmax_element(_data.begin(), _data.end());
-		return std::max(-*minmax.first, *minmax.second);
+		return std::max(std::abs(*minmax.first), std::abs(*minmax.second));
 	}
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const { _grid->forEach(func); }

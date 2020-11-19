@@ -26,20 +26,12 @@ protected:
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
-		auto fluid = std::make_unique<EulerianFluid<Dim>>(grid);
+		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
-		fluid->_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-			const VectorDr pos = fluid->_velocity[axis].position(face);
-			if constexpr (Dim == 2) fluid->_velocity[axis][face] = (axis == 0 ? -pos.y() : pos.x()) * grid.spacing() * 50;
-		});
-		fluid->_colliders.push_back(
-			std::make_unique<StaticCollider<Dim>>(
-				std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), real(0.5))));
-		fluid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real {
-			return grid.spacing() * (axis == 0 ? face.y() : face.x());
-		};
-
-		return fluid;
+		ImplicitSphere<Dim> sphere(VectorDr::Zero() - VectorDr::Unit(1) * length / 4, length / 4);
+		liquid->_levelSet.setFromSurface(sphere);
+		liquid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real { return 0; };
+		return liquid;
 	}
 
 	static void reportError(const std::string &msg);

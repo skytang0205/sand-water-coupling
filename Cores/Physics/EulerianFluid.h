@@ -57,14 +57,14 @@ public:
 
 protected:
 
-	void advectFields(const real dt);
-	void updateColliders(const real dt);
-	void applyBodyForces(const real dt) { }
-	void projectVelocity();
+	virtual void advectFields(const real dt);
+	virtual void updateColliders(const real dt);
+	virtual void applyBodyForces(const real dt) { }
+	virtual void projectVelocity();
 
-	void updateFluidFraction();
-	void extrapolateVelocity();
-	void enforceBoundaryConditions();
+	virtual void updateFluidFraction();
+	virtual void extrapolateVelocity();
+	virtual void enforceBoundaryConditions();
 };
 
 }

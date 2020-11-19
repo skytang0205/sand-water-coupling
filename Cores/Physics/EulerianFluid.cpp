@@ -87,9 +87,7 @@ void EulerianFluid<Dim>::initialize()
 {
 	updateFluidFraction();
 	extrapolateVelocity();
-	enforceBoundaryConditions();
 	projectVelocity();
-	extrapolateVelocity();
 }
 
 template <int Dim>
@@ -98,6 +96,7 @@ void EulerianFluid<Dim>::advance(const real dt)
 	updateColliders(dt);
 
 	advectFields(dt);
+	applyBodyForces(dt);
 	projectVelocity();
 }
 
@@ -105,6 +104,7 @@ template <int Dim>
 void EulerianFluid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_velocity, _velocity, dt);
+	extrapolateVelocity();
 }
 
 template <int Dim>
@@ -123,7 +123,6 @@ void EulerianFluid<Dim>::updateColliders(const real dt)
 template <int Dim>
 void EulerianFluid<Dim>::projectVelocity()
 {
-	enforceBoundaryConditions();
 	_projector->project(_velocity, _fluidFraction);
 	extrapolateVelocity();
 }
@@ -131,20 +130,13 @@ void EulerianFluid<Dim>::projectVelocity()
 template <int Dim>
 void EulerianFluid<Dim>::updateFluidFraction()
 {
-	const auto fraction = [](const real phi0, const real phi1)->real {
-		if (phi0 <= 0 && phi1 <= 0) return 1;
-		else if (phi0 <= 0 && phi1 > 0) return phi0 / (phi0 - phi1);
-		else if (phi0 > 0 && phi1 <= 0) return phi1 / (phi1 - phi0);
-		else return 0;
-	};
-
 	_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
 		_fluidFraction[axis][face] = 1;
 		if (!_fluidFraction.isBoundary(axis, face)) {
 			for (const auto &collider : _colliders) {
 				const VectorDi cell0 = face - VectorDi::Unit(axis);
 				const VectorDi cell1 = face;
-				_fluidFraction[axis][face] -= fraction(
+				_fluidFraction[axis][face] -= Surface<Dim>::fraction(
 					collider->surface()->signedDistance(_grid.cellCenter(cell0)),
 					collider->surface()->signedDistance(_grid.cellCenter(cell1)));
 			}
@@ -182,6 +174,8 @@ void EulerianFluid<Dim>::extrapolateVelocity()
 		visited.swap(newVisited);
 	}
 	_velocity = newVelocity;
+
+	enforceBoundaryConditions();
 }
 
 template <int Dim>

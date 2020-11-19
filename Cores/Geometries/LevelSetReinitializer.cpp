@@ -24,25 +24,21 @@ void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim>&
 	initInterface(phi);
 	performFastMarching();
 	phi.parallelForEach([&](const VectorDi &coord) {
-		phi[coord] = (phi[coord] > 0 ? 1 : -1) * _tent[coord];
+		phi[coord] = Surface<Dim>::sgn(phi[coord]) * _tent[coord];
 	});
 }
 
 template <int Dim>
 void FastMarchingReinitializer<Dim>::initInterface(const GridBasedScalarField<Dim> &phi)
 {
-	const auto isInterface = [](const real phi0, const real phi1)->bool {
-		return (phi0 <= 0 && phi1 > 0) || (phi0 > 0 && phi1 <= 0);
-	};
-
 	_intfIndices.clear();
 	phi.forEach([&](const VectorDi &coord) {
 		VectorDr tempPhi = VectorDr::Ones() * std::numeric_limits<real>::infinity();
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 			const VectorDi nbCoord = Grid<Dim>::neighbor(coord, i);
-			if (phi.isValid(nbCoord) && isInterface(phi[coord], phi[nbCoord])) {
+			if (phi.isValid(nbCoord) && Surface<Dim>::isInterface(phi[coord], phi[nbCoord])) {
 				const int axis = i >> 1;
-				tempPhi[axis] = std::min(tempPhi[axis], phi[coord] / (phi[coord] - phi[nbCoord]));
+				tempPhi[axis] = std::min(tempPhi[axis], Surface<Dim>::theta(phi[coord], phi[nbCoord]) * phi.spacing());
 			}
 		}
 		if (tempPhi.array().isFinite().any()) {
@@ -76,7 +72,7 @@ void FastMarchingReinitializer<Dim>::updateNeighbors(const VectorDi &coord)
 		if (!_tent.isValid(nbCoord)) continue;
 		if (const real temp = solveEikonalEquation(nbCoord); temp < _tent[nbCoord]) {
 			_tent[nbCoord] = temp;
-			_heap.push(std::make_pair(temp, int(_tent.index(nbCoord))));
+			_heap.push(PRI(temp, int(_tent.index(nbCoord))));
 		}
 	}
 }
@@ -107,7 +103,7 @@ template <int Dim>
 real PhysX::FastMarchingReinitializer<Dim>::solveQuadratic(real p0, real p1, const real dx)
 {
 	if (p0 > p1) std::swap(p0, p1);
-	if (std::isinf(p1) && p1 - p0 > dx) return solveQuadratic(p0, dx);
+	if (std::isinf(p1) || p1 - p0 > dx) return solveQuadratic(p0, dx);
 	else return ((p0 + p1) + std::sqrt(2 * dx * dx - (p0 - p1) * (p0 - p1))) * real(0.5);
 }
 
@@ -116,7 +112,7 @@ real PhysX::FastMarchingReinitializer<Dim>::solveQuadratic(real p0, real p1, rea
 {
 	if (p0 > p1) std::swap(p0, p1);
 	if (p1 > p2) std::swap(p1, p2);
-	if (std::isinf(p2) && (p2 - p0) * (p2 - p0) + (p2 - p1) * (p2 - p1) > dx * dx) return solveQuadratic(p0, p1, dx);
+	if (std::isinf(p2) || (p2 - p0) * (p2 - p0) + (p2 - p1) * (p2 - p1) > dx * dx) return solveQuadratic(p0, p1, dx);
 	else return (p0 + p1 + p2 + std::sqrt((p0 + p1 + p2) * (p0 + p1 + p2) - 3 * (p0 * p0 + p1 * p1 + p2 * p2 - dx * dx))) / 3;
 }
 
