@@ -24,7 +24,7 @@ void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim>&
 	initInterface(phi);
 	performFastMarching();
 	phi.parallelForEach([&](const VectorDi &coord) {
-		phi[coord] = Surface<Dim>::sgn(phi[coord]) * _tent[coord];
+		phi[coord] = Surface<Dim>::sign(phi[coord]) * _tent[coord];
 	});
 }
 

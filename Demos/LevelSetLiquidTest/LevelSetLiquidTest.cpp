@@ -31,5 +31,11 @@ int main(int argc, char *argv[])
 	auto simulator = std::make_unique<PhysX::Simulator>(output, begin, end, rate, cfl, liquid.get());
 	simulator->Simulate();
 
+	auto box = PhysX::ImplicitBox<2>(PhysX::Vector2r(1, 2), PhysX::Vector2r(4, 3));
+	std::cout << box.closestPosition(PhysX::Vector2r(0, 0)).transpose() << std::endl;
+	std::cout << box.closestPosition(PhysX::Vector2r(5, 5)).transpose() << std::endl;
+	std::cout << box.closestPosition(PhysX::Vector2r(-2, 10)).transpose() << std::endl;
+	std::cout << box.closestPosition(PhysX::Vector2r(-6, -6)).transpose() << std::endl;
+
 	return 0;
 }

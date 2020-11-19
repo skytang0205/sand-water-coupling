@@ -28,7 +28,7 @@ protected:
 		StaggeredGrid<Dim> grid(length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
-		ImplicitSphere<Dim> sphere(VectorDr::Zero() - VectorDr::Unit(1) * length / 4, length / 4);
+		ImplicitSphere<Dim> sphere(VectorDr::Zero() - VectorDr::Unit(1) * length / 2, length / 2);
 		liquid->_levelSet.setFromSurface(sphere);
 		liquid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real { return 0; };
 		return liquid;

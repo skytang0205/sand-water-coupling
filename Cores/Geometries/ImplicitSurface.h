@@ -45,4 +45,45 @@ public:
 	virtual real signedDistance(const VectorDr &pos) const override { return (pos - _center).norm() - _radius; }
 };
 
+template <int Dim>
+class ImplicitBox final : public ImplicitSurface<Dim>
+{
+	DECLARE_DIM_TYPES(Dim)
+
+protected:
+
+	const VectorDr _center;
+	const VectorDr _halfLengths;
+
+public:
+
+	ImplicitBox(const VectorDr &center, const VectorDr &halfLengths) : _center(center), _halfLengths(halfLengths) { }
+	virtual ~ImplicitBox() = default;
+
+	virtual VectorDr closestPosition(const VectorDr &pos) const override
+	{
+		const VectorDr phi = (pos - _center).cwiseAbs() - _halfLengths;
+		VectorDr sign = (pos - _center).cwiseSign();
+		if ((phi.array() <= 0).all()) sign = sign.cwiseProduct(phi.cwiseEqual(phi.maxCoeff()));
+		else sign = sign.cwiseProduct(phi.cwiseMax(0).cwiseSign());
+		return _center + sign.cwiseProduct(_halfLengths);
+	}
+
+	virtual VectorDr closestNormal(const VectorDr &pos) const override
+	{
+		const VectorDr phi = (pos - _center).cwiseAbs() - _halfLengths;
+		VectorDr sign = (pos - _center).cwiseSign();
+		if ((phi.array() <= 0).all()) sign = sign.cwiseProduct(phi.cwiseEqual(phi.maxCoeff()));
+		else sign = sign.cwiseProduct(phi.cwiseMax(0).cwiseSign());
+		return sign.cwiseProduct(phi).normalized();
+	}
+
+	virtual real signedDistance(const VectorDr &pos) const override
+	{
+		const VectorDr phi = (pos - _center).cwiseAbs() - _halfLengths;
+		if ((phi.array() <= 0).all()) return phi.maxCoeff();
+		else return phi.cwiseMax(0).norm();
+	}
+};
+
 }

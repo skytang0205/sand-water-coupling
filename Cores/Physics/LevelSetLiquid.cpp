@@ -67,6 +67,7 @@ void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 template <int Dim>
 void LevelSetLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
+	EulerianFluid<Dim>::saveFrame(frameDir);
 	std::ofstream fout(frameDir + "/phi.sav", std::ios::binary);
 	_levelSet.signedDistanceField().save(fout);
 }
@@ -74,6 +75,7 @@ void LevelSetLiquid<Dim>::saveFrame(const std::string &frameDir) const
 template <int Dim>
 void LevelSetLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
+	EulerianFluid<Dim>::loadFrame(frameDir);
 	std::ifstream fin(frameDir + "/phi.sav", std::ios::binary);
 	_levelSet.signedDistanceField().load(fin);
 }
