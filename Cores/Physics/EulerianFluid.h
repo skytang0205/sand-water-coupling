@@ -47,7 +47,8 @@ public:
 
 	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return std::min(real(1) / frameRate, stepRate * _grid.spacing() / _velocity.absoluteMax()); }
 
-	virtual void writeDescription(std::ofstream &fout) const override;
+	virtual int dimension() const override { return Dim; }
+	virtual void writeDescription(YAML::Node &root) const override;
 	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const override;
 	virtual void saveFrame(const std::string &frameDir) const override;
 	virtual void loadFrame(const std::string &framdDir) override;
@@ -59,7 +60,7 @@ protected:
 
 	virtual void advectFields(const real dt);
 	virtual void updateColliders(const real dt);
-	virtual void applyBodyForces(const real dt) { }
+	virtual void applyBodyForces(const real dt);
 	virtual void projectVelocity();
 
 	virtual void updateFluidFraction();

@@ -41,6 +41,9 @@ public:
 	real divergenceAtCellCenter(const VectorDi &cell) const;
 	virtual real divergence(const VectorDr &pos) const override;
 
+	void setConstant(const VectorDr &value) { for (int axis = 0; axis < Dim; axis++) _components[axis].setConstant(value[axis]); }
+	void setZero() { setConstant(VectorDr::Zero()); }
+
 	real min() const
 	{
 		if constexpr (Dim == 2) return std::min(_components[0].min(), _components[1].min());

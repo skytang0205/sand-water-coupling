@@ -36,6 +36,9 @@ public:
 	GridBasedData<Dim> &operator[](const int axis) { return _components[axis]; }
 	const GridBasedData<Dim> &operator[](const int axis) const { return _components[axis]; }
 
+	void setConstant(const Type &value) { for (int axis = 0; axis < Dim; axis++) _components[axis].setConstant(value); }
+	void setZero() { setConstant(Type(0)); }
+
 	Type min() const
 	{
 		if constexpr (Dim == 2) return std::min(_components[0].min(), _components[1].min());

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utilities/Types.h"
+#include "Utilities/Yaml.h"
 
 #include <fstream>
 #include <string>
@@ -23,7 +24,8 @@ public:
 	void setTime(const real time) { _time = time; }
 	virtual real getTimeStep(const uint frameRate, const real stepRate) const = 0;
 
-	virtual void writeDescription(std::ofstream &output) const = 0;
+	virtual int dimension() const = 0;
+	virtual void writeDescription(YAML::Node &root) const = 0;
 	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const = 0;
 	virtual void saveFrame(const std::string &frameDir) const = 0;
 	virtual void loadFrame(const std::string &frameDir) = 0;

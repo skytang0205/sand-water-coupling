@@ -14,12 +14,10 @@ LevelSetLiquid<Dim>::LevelSetLiquid(const StaggeredGrid<Dim> &grid) :
 { }
 
 template <int Dim>
-void LevelSetLiquid<Dim>::writeDescription(std::ofstream &fout) const
+void LevelSetLiquid<Dim>::writeDescription(YAML::Node &root) const
 {
-	YAML::Node root;
-	root["dimension"] = Dim;
-	// Description of fluid.
-	{
+	EulerianFluid<Dim>::writeDescription(root);
+	{ // Description of phi.
 		YAML::Node node;
 		node["name"] = "phi";
 		node["data_mode"] = "semi-dynamic";
@@ -28,13 +26,13 @@ void LevelSetLiquid<Dim>::writeDescription(std::ofstream &fout) const
 		node["color_map"]["enabled"] = true;
 		root["objects"].push_back(node);
 	}
-	fout << root << std::endl;
 }
 
 template <int Dim>
 void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
-	{ // Write fluid.
+	EulerianFluid<Dim>::writeFrame(frameDir, staticDraw);
+	{ // Write phi.
 		std::ofstream fout(frameDir + "/phi.mesh", std::ios::binary);
 		IO::writeValue(fout, uint(4 * _grid.cellCount()));
 		const VectorDr a = VectorDr::Unit(0) * _grid.spacing() / 2;
@@ -93,9 +91,7 @@ void LevelSetLiquid<Dim>::advectFields(const real dt)
 	_advector->advect(_levelSet.signedDistanceField(), _velocity, dt);
 	reinitializeLevelSet();
 
-	_advector->advect(_velocity, _velocity, dt);
-
-	extrapolateVelocity();
+	EulerianFluid<Dim>::advectFields(dt);
 }
 
 template <int Dim>
@@ -106,6 +102,8 @@ void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
 			_velocity[1][face] -= kGravity * dt;
 		});
 	}
+
+	EulerianFluid<Dim>::applyBodyForces(dt);
 }
 
 template <int Dim>
@@ -154,10 +152,6 @@ void LevelSetLiquid<Dim>::extrapolateVelocity()
 template <int Dim>
 void LevelSetLiquid<Dim>::reinitializeLevelSet()
 {
-	for (const auto &collider : _colliders) {
-		_levelSet.exceptSurface(*collider->surface());
-	}
-
 	_levelSetReinitializer->reinitialize(_levelSet);
 }
 

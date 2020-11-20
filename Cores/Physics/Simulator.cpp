@@ -1,5 +1,7 @@
 #include "Simulator.h"
 
+#include "Utilities/Yaml.h"
+
 #include <fmt/core.h>
 
 #include <chrono>
@@ -15,19 +17,27 @@ void Simulator::Simulate()
 	const auto initialTime = steady_clock::now();
 
 	if (_beginFrame == 0) {
-		std::cout << "[Initialize] ";
-		_simulation->initialize();
-		const auto endTime = steady_clock::now();
-		std::cout << fmt::format(
-			"    ... {:>7.2f}s used",
-			duration<double>(endTime - initialTime).count())
-			<< std::endl;
+		{ // Initialize simulation.
+			std::cout << "[Initialize] ";
+			_simulation->initialize();
+			const auto endTime = steady_clock::now();
+			std::cout << fmt::format(
+				"    ... {:>7.2f}s used",
+				duration<double>(endTime - initialTime).count())
+				<< std::endl;
+		}
 
 		createOutputDirectory();
 		writeAndSaveToFrameDirectory(0, true);
 
-		std::ofstream fout(_outputDir + "/description.yaml");
-		_simulation->writeDescription(fout);
+		{ // Write description.
+			YAML::Node root;
+			root["dimension"] = _simulation->dimension();
+			_simulation->writeDescription(root);
+			std::ofstream fout(_outputDir + "/description.yaml");
+			fout << root;
+		}
+
 		_beginFrame = 1;
 	}
 	else {
