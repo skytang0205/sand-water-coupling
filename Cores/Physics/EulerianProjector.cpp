@@ -44,22 +44,22 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 		const int idx = int(_reducedPressure.index(cell));
 		real diagCoeff = 0;
 		real div = 0;
-		for (int axis = 0; axis < Dim; axis++) {
-			for (int i = -1; i <= 1; i += 2) {
-				const VectorDi nbCell = cell + VectorDi::Unit(axis) * i;
-				const VectorDi face = i < 0 ? cell : nbCell;
-				const int nbIdx = int(_reducedPressure.index(nbCell));
-				real term = 1;
-				if (_reducedPressure.isValid(nbCell)) {
-					term *= weights[axis][face];
-					diagCoeff += term;
-					if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
-				}
-				div += i * term * velocity[axis][face];
+		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
+			const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
+			const int axis = i >> 1;
+			const VectorDi face = i & 1 ? cell : nbCell;
+			const int nbIdx = int(_reducedPressure.index(nbCell));
+			real term = 1;
+			if (_reducedPressure.isValid(nbCell)) {
+				term *= weights[axis][face];
+				diagCoeff += term;
+				if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
 			}
+			div += (i & 1 ? -1 : 1) * term * velocity[axis][face];
 		}
+		if (!diagCoeff) diagCoeff = 1;
 		_velocityDiv[cell] = div;
-		if (diagCoeff) _coefficients.push_back(Tripletr(idx, idx, diagCoeff));
+		_coefficients.push_back(Tripletr(idx, idx, diagCoeff));
 	});
 	_matLaplacian.setFromTriplets(_coefficients.begin(), _coefficients.end());
 }
@@ -83,31 +83,30 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 		const int idx = int(_reducedPressure.index(cell));
 		real diagCoeff = 0;
 		real div = 0;
-		if (Surface<Dim>::inside(phi[cell])) {
-			for (int axis = 0; axis < Dim; axis++) {
-				for (int i = -1; i <= 1; i += 2) {
-					const VectorDi nbCell = cell + VectorDi::Unit(axis) * i;
-					const VectorDi face = i < 0 ? cell : nbCell;
-					const int nbIdx = int(_reducedPressure.index(nbCell));
-					real term = 1;
-					if (_reducedPressure.isValid(nbCell)) {
-						term *= weights[axis][face];
-						if (Surface<Dim>::inside(phi[nbCell])) {
-							diagCoeff += term;
-							if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
-						}
-						else {
-							const real fraction = std::max(Surface<Dim>::theta(phi[cell], phi[nbCell]), real(0.01));
-							diagCoeff += term / fraction;
-						}
+		if (Surface<Dim>::isInside(phi[cell])) {
+			for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
+				const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
+				const int axis = i >> 1;
+				const VectorDi face = i & 1 ? cell : nbCell;
+				const int nbIdx = int(_reducedPressure.index(nbCell));
+				real term = 1;
+				if (_reducedPressure.isValid(nbCell)) {
+					term *= weights[axis][face];
+					if (Surface<Dim>::isInside(phi[nbCell])) {
+						diagCoeff += term;
+						if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
 					}
-					div += i * term * velocity[axis][face];
+					else {
+						const real fraction = std::max(Surface<Dim>::theta(phi[cell], phi[nbCell]), real(0.01));
+						diagCoeff += term / fraction;
+					}
 				}
+				div += (i & 1 ? -1 : 1) * term * velocity[axis][face];
 			}
 		}
-		else diagCoeff = 1;
+		if (!diagCoeff) diagCoeff = 1;
 		_velocityDiv[cell] = div;
-		if (diagCoeff) _coefficients.push_back(Tripletr(idx, idx, diagCoeff));
+		_coefficients.push_back(Tripletr(idx, idx, diagCoeff));
 	});
 	_matLaplacian.setFromTriplets(_coefficients.begin(), _coefficients.end());
 }
@@ -119,7 +118,7 @@ void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField
 		if (!velocity.isBoundary(axis, face) && weights[axis][face] > 0) {
 			const VectorDi cell0 = face - VectorDi::Unit(axis);
 			const VectorDi cell1 = face;
-			if (Surface<Dim>::inside(phi[cell0]) || Surface<Dim>::inside(phi[cell1])) {
+			if (Surface<Dim>::isInside(phi[cell0]) || Surface<Dim>::isInside(phi[cell1])) {
 				const real fraction = std::max(Surface<Dim>::fraction(phi[cell0], phi[cell1]), real(0.01));
 				velocity[axis][face] += (_reducedPressure[face] - _reducedPressure[face - VectorDi::Unit(axis)]) / fraction;
 			}

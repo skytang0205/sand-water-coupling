@@ -186,7 +186,7 @@ void EulerianFluid<Dim>::enforceBoundaryConditions()
 			_velocity[axis][face] = _domainBoundaryHandler(axis, face);
 		for (const auto &collider : _colliders) {
 			const VectorDr pos = _velocity[axis].position(face);
-			if (collider->surface()->inside(pos)) {
+			if (collider->surface()->isInside(pos)) {
 				const VectorDr colliderVel = collider->velocityAt(pos);
 				const VectorDr vel = _velocity(pos);
 				const VectorDr n = collider->surface()->closestNormal(pos);

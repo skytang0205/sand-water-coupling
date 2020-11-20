@@ -13,7 +13,7 @@ class ImplicitSurface : public Surface<Dim>
 
 public:
 
-	using Surface<Dim>::inside;
+	using Surface<Dim>::isInside;
 
 	ImplicitSurface() = default;
 	virtual ~ImplicitSurface() = default;
@@ -22,7 +22,7 @@ public:
 	virtual VectorDr closestNormal(const VectorDr &pos) const = 0;
 	virtual real distance(const VectorDr &pos) const { return std::abs(signedDistance(pos)); }
 	virtual real signedDistance(const VectorDr &pos) const = 0;
-	virtual bool inside(const VectorDr &pos) const { return inside(signedDistance(pos)); }
+	virtual bool isInside(const VectorDr &pos) const { return isInside(signedDistance(pos)); }
 };
 
 template <int Dim>
@@ -60,22 +60,17 @@ public:
 	ImplicitBox(const VectorDr &center, const VectorDr &halfLengths) : _center(center), _halfLengths(halfLengths) { }
 	virtual ~ImplicitBox() = default;
 
-	virtual VectorDr closestPosition(const VectorDr &pos) const override
-	{
-		const VectorDr phi = (pos - _center).cwiseAbs() - _halfLengths;
-		VectorDr sign = (pos - _center).cwiseSign();
-		if ((phi.array() <= 0).all()) sign = sign.cwiseProduct(phi.cwiseEqual(phi.maxCoeff()));
-		else sign = sign.cwiseProduct(phi.cwiseMax(0).cwiseSign());
-		return _center + sign.cwiseProduct(_halfLengths);
-	}
-
 	virtual VectorDr closestNormal(const VectorDr &pos) const override
 	{
 		const VectorDr phi = (pos - _center).cwiseAbs() - _halfLengths;
-		VectorDr sign = (pos - _center).cwiseSign();
-		if ((phi.array() <= 0).all()) sign = sign.cwiseProduct(phi.cwiseEqual(phi.maxCoeff()));
-		else sign = sign.cwiseProduct(phi.cwiseMax(0).cwiseSign());
-		return sign.cwiseProduct(phi).normalized();
+		VectorDr normal;
+		if ((phi.array() <= 0).all()) {
+			int axis;
+			phi.maxCoeff(&axis);
+			normal = VectorDr::Unit(axis);
+		}
+		else normal = phi.cwiseMax(0);
+		return normal.cwiseProduct((pos - _center).cwiseSign()).normalized();
 	}
 
 	virtual real signedDistance(const VectorDr &pos) const override
@@ -84,6 +79,25 @@ public:
 		if ((phi.array() <= 0).all()) return phi.maxCoeff();
 		else return phi.cwiseMax(0).norm();
 	}
+};
+
+template <int Dim>
+class ImplicitPlane final : public ImplicitSurface<Dim>
+{
+	DECLARE_DIM_TYPES(Dim)
+
+protected:
+
+	const VectorDr _position;
+	const VectorDr _normal;
+
+public:
+
+	ImplicitPlane(const VectorDr &position, const VectorDr &direction) : _position(position), _normal(direction.normalized()) { }
+	virtual ~ImplicitPlane() = default;
+
+	virtual VectorDr closestNormal(const VectorDr &pos) const override { return _normal; }
+	virtual real signedDistance(const VectorDr &pos) const override { return (pos - _position).dot(_normal); }
 };
 
 }

@@ -16,12 +16,15 @@ protected:
 
 public:
 
-	GridBasedImplicitSurface(const Grid<Dim> *const grid) : _signedDistanceField(grid) { }
-	GridBasedImplicitSurface(const Grid<Dim> *const grid, const Surface<Dim> &surface) : _signedDistanceField(grid) { setFromSurface(surface); }
+	GridBasedImplicitSurface(const Grid<Dim> *const grid) : _signedDistanceField(grid, std::numeric_limits<real>::infinity()) { }
+	GridBasedImplicitSurface(const Grid<Dim> *const grid, const Surface<Dim> &surface) : _signedDistanceField(grid, std::numeric_limits<real>::infinity()) { unionSurface(surface); }
 
 	virtual ~GridBasedImplicitSurface() = default;
 
-	void setFromSurface(const Surface<Dim> &surface);
+	void clear() { _signedDistanceField.setConstant(std::numeric_limits<real>::infinity()); }
+	void unionSurface(const Surface<Dim> &surface);
+	void intersectSurface(const Surface<Dim> &surface);
+	void exceptSurface(const Surface<Dim> &surface);
 
 	GridBasedScalarField<Dim> &signedDistanceField() { return _signedDistanceField; }
 	const GridBasedScalarField<Dim> &signedDistanceField() const { return _signedDistanceField; }

@@ -23,6 +23,7 @@ protected:
 	using EulerianFluid<Dim>::_grid;
 	using EulerianFluid<Dim>::_velocity;
 	using EulerianFluid<Dim>::_fluidFraction;
+	using EulerianFluid<Dim>::_colliders;
 	using EulerianFluid<Dim>::_advector;
 	using EulerianFluid<Dim>::_projector;
 

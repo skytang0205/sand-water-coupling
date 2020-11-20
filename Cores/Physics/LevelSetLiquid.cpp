@@ -91,7 +91,7 @@ template <int Dim>
 void LevelSetLiquid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_levelSet.signedDistanceField(), _velocity, dt);
-	_levelSetReinitializer->reinitialize(_levelSet);
+	reinitializeLevelSet();
 
 	_advector->advect(_velocity, _velocity, dt);
 
@@ -119,21 +119,21 @@ template <int Dim>
 void LevelSetLiquid<Dim>::extrapolateVelocity()
 {
 	const auto &phi = _levelSet.signedDistanceField();
-	const auto isProjected = [&](const int axis, const VectorDi &face)->bool {
+	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
 		const VectorDi cell0 = face - VectorDi::Unit(axis);
 		const VectorDi cell1 = face;
-		return (phi.isValid(cell0) && Surface<Dim>::inside(phi[cell0]))
-			|| (phi.isValid(cell1) && Surface<Dim>::inside(phi[cell1]));
+		return (phi.isValid(cell0) && Surface<Dim>::isInside(phi[cell0]))
+			|| (phi.isValid(cell1) && Surface<Dim>::isInside(phi[cell1]));
 	};
 
 	auto newVelocity = _velocity;
 	newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (isProjected(axis, face)) return;
+		if (isLiquidFace(axis, face)) return;
 		int cnt = 0;
 		real sum = 0;
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 			const VectorDi &nbFace = Grid<Dim>::neighbor(face, i);
-			if (newVelocity[axis].isValid(nbFace) && isProjected(axis, nbFace))
+			if (newVelocity[axis].isValid(nbFace) && isLiquidFace(axis, nbFace))
 				sum += newVelocity[axis][nbFace], cnt++;
 		}
 		if (cnt > 0) newVelocity[axis][face] = sum / cnt;
@@ -154,6 +154,10 @@ void LevelSetLiquid<Dim>::extrapolateVelocity()
 template <int Dim>
 void LevelSetLiquid<Dim>::reinitializeLevelSet()
 {
+	for (const auto &collider : _colliders) {
+		_levelSet.exceptSurface(*collider->surface());
+	}
+
 	_levelSetReinitializer->reinitialize(_levelSet);
 }
 

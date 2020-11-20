@@ -7,9 +7,8 @@ void SemiLagrangianAdvector<Dim>::advect(GridBasedScalarField<Dim> &field, const
 {
 	auto newField = field;
 	newField.parallelForEach([&](const VectorDi &coord) {
-		const VectorDr startPos = newField.position(coord);
-		const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
-		newField[coord] = field(startPos - flow(midPos) * dt);
+		const VectorDr pos = newField.position(coord);
+		newField[coord] = field(backtrace(pos, flow, dt));
 	});
 	field = newField;
 }
@@ -19,11 +18,18 @@ void SemiLagrangianAdvector<Dim>::advect(StaggeredGridBasedVectorField<Dim> &fie
 {
 	auto newField = field;
 	newField.parallelForEach([&](const int axis, const VectorDi &face) {
-		const VectorDr startPos = newField[axis].position(face);
-		const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
-		newField[axis][face] = field[axis](startPos - flow(midPos) * dt);
+		const VectorDr pos = newField[axis].position(face);
+		newField[axis][face] = field[axis](backtrace(pos, flow, dt));
 	});
 	field = newField;
+}
+
+template <int Dim>
+Vector<real, Dim> SemiLagrangianAdvector<Dim>::backtrace(const VectorDr &startPos, const VectorField<Dim> &flow, const real dt) const
+{
+	const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
+	VectorDr stopPos = startPos - flow(midPos) * dt;
+	return stopPos;
 }
 
 template class EulerianAdvector<2>;

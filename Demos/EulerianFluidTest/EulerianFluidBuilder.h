@@ -12,8 +12,11 @@ public:
 	static std::unique_ptr<EulerianFluid<Dim>> build(const int scale, const int option = 0)
 	{
 		switch (option) {
-		case 0: return buildCase0<Dim>(scale);
-		default: reportError("invalid option");
+		case 0:
+			return buildCase0<Dim>(scale);
+		default:
+			reportError("invalid option");
+			return nullptr;
 		}
 	}
 
