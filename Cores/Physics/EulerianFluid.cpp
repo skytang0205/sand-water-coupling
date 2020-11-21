@@ -60,14 +60,14 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 	{ // Write neumann.
 		std::ofstream fout(frameDir + "/neumann.mesh", std::ios::binary);
 		uint cnt = 0;
-		for (int axis = 0; axis < Dim; axis++) cnt += uint(_bcNeumann[axis].size());
+		_fluidFraction.forEach([&](const int axis, const VectorDi &face) {
+			if (!_fluidFraction.isBoundary(axis, face) && _fluidFraction[axis][face] < 1) cnt++;
+		});
 		IO::writeValue(fout, cnt);
-		for (int axis = 0; axis < Dim; axis++) {
-			for (const auto &bc : _bcNeumann[axis]) {
-				const VectorDi face = _velocity[axis].coordinate(bc.first);
+		_fluidFraction.forEach([&](const int axis, const VectorDi &face) {
+			if (!_fluidFraction.isBoundary(axis, face) && _fluidFraction[axis][face] < 1)
 				IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
-			}
-		}
+		});
 	}
 }
 
@@ -156,32 +156,6 @@ void EulerianFluid<Dim>::updateFluidFraction()
 			}
 		});
 	}
-
-	updateBoundaryConditions();
-}
-
-template <int Dim>
-void EulerianFluid<Dim>::updateBoundaryConditions()
-{
-	for (int axis = 0; axis < Dim; axis++)
-		_bcNeumann[axis].clear();
-
-	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		const int idx = int(_velocity[axis].index(face));
-		if (!_velocity.isBoundary(axis, face)) {
-			const VectorDr pos = _velocity[axis].position(face);
-			for (const auto &collider : _colliders) {
-				if (collider->surface()->isInside(pos)) {
-					_bcNeumann[axis].push_back(PIR(idx, collider->velocityAt(pos)[axis]));
-					break;
-				}
-			}
-		}
-		else if (_domainBoundaryHandler) {
-			const real vel = _domainBoundaryHandler(axis, face);
-			_bcNeumann[axis].push_back(PIR(idx, vel));
-		}
-	});
 }
 
 template <int Dim>
@@ -223,13 +197,30 @@ void EulerianFluid<Dim>::extrapolateVelocity()
 template <int Dim>
 void EulerianFluid<Dim>::enforceBoundaryConditions()
 {
-	for (int axis = 0; axis < Dim; axis++) {
-		for (const auto &bc : _bcNeumann[axis]) {
-			const VectorDi face = _velocity[axis].coordinate(bc.first);
-			const real vel = bc.second;
-			_velocity[axis][face] = vel;
-		}
-	}
+	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		if (_velocity.isBoundary(axis, face) && _domainBoundaryHandler)
+			_velocity[axis][face] = _domainBoundaryHandler(axis, face);
+		else
+			for (const auto &collider : _colliders) {
+				const VectorDr pos = _velocity[axis].position(face);
+				if (collider->surface()->isInside(pos)) {
+					const VectorDr colliderVel = collider->velocityAt(pos);
+					const VectorDr vel = _velocity(pos);
+					const VectorDr n = collider->surface()->closestNormal(pos);
+					if (n.any()) {
+						const VectorDr velR = vel - colliderVel;
+						VectorDr velT = velR - velR.dot(n) * n;
+						if (const real mu = collider->frictionCoefficient(); mu && velT.any()) {
+							const real velN = std::max(-velR.dot(n), real(0));
+							velT *= std::max(1 - mu * velN / velT.norm(), real(0));
+						}
+						_velocity[axis][face] = (velT + colliderVel)[axis];
+					}
+					else _velocity[axis][face] = colliderVel[axis];
+					break;
+				}
+			}
+	});
 }
 
 template class EulerianFluid<2>;

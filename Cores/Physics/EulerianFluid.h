@@ -35,7 +35,6 @@ protected:
 
 	std::function<real(const int, const VectorDi &)> _domainBoundaryHandler;
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
-	std::array<std::vector<PIR>, Dim> _bcNeumann;
 
 	std::unique_ptr<EulerianAdvector<Dim>> _advector;
 	std::unique_ptr<EulerianProjector<Dim>> _projector;
@@ -63,7 +62,6 @@ protected:
 
 	virtual void advectFields(const real dt);
 	virtual void updateColliders(const real dt);
-	virtual void updateBoundaryConditions();
 	virtual void applyBodyForces(const real dt);
 	virtual void projectVelocity();
 
