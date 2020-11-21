@@ -16,6 +16,8 @@ public:
 			return buildCase0<Dim>(scale);
 		case 1:
 			return buildCase1<Dim>(scale);
+		case 2:
+			return buildCase2<Dim>(scale);
 		default:
 			reportError("invalid option");
 			return nullptr;
@@ -59,7 +61,24 @@ protected:
 		liquid->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
 				std::make_unique<ComplementarySurface<Dim>>(
-					std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), length / 2 * 0.9))));
+					std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), length / 2))));
+		liquid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real { return 0; };
+		return liquid;
+	}
+
+	template <int Dim>
+	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase2(const int scale)
+	{
+		DECLARE_DIM_TYPES(Dim)
+		const real length = real(2);
+		const VectorDi resolution = scale * VectorDi::Ones();
+		StaggeredGrid<Dim> grid(length / scale, resolution);
+		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+
+		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
+		ImplicitSphere<Dim> sphere(VectorDr::Unit(1) * length / 8, length / 8);
+		liquid->_levelSet.unionSurface(plane);
+		liquid->_levelSet.unionSurface(sphere);
 		liquid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real { return 0; };
 		return liquid;
 	}
