@@ -198,7 +198,7 @@ template <int Dim>
 void EulerianFluid<Dim>::enforceBoundaryConditions()
 {
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (_domainBoundaryHandler && _velocity.isBoundary(axis, face, 1))
+		if (_domainBoundaryHandler && _velocity.isBoundary(axis, face))
 			_velocity[axis][face] = _domainBoundaryHandler(axis, face);
 		else
 			for (const auto &collider : _colliders) {

@@ -11,6 +11,8 @@ class StaggeredGrid final
 
 protected:
 
+	static constexpr int _kBoundaryWidth = 1;
+
 	const real _spacing;
 	const VectorDi _resolution;
 	const VectorDr _origin;
@@ -21,7 +23,7 @@ protected:
 
 public:
 
-	StaggeredGrid(const real spacing, const VectorDi &resolution, const int offset = 1, const VectorDr &center = VectorDr::Zero());
+	StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center = VectorDr::Zero());
 
 	virtual ~StaggeredGrid() = default;
 
@@ -45,7 +47,7 @@ public:
 	VectorDr cellCenter(const VectorDi &cell) const { return _cellGrid.dataPosition(cell); }
 	VectorDr faceCenter(const int axis, const VectorDi &face) const { return _faceGrids[axis].dataPosition(face); }
 
-	bool isBoundaryFace(const int axis, const VectorDi &face, const int offset = 0) const { return face[axis] <= offset || face[axis] >= _resolution[axis] - offset; }
+	bool isBoundaryFace(const int axis, const VectorDi &face) const { return face[axis] <= _kBoundaryWidth || face[axis] >= _resolution[axis] - _kBoundaryWidth; }
 
 	void forEachNode(const std::function<void(const VectorDi &)> &func) const { _nodeGrid.forEach(func); }
 	void forEachCell(const std::function<void(const VectorDi &)> &func) const { _cellGrid.forEach(func); }

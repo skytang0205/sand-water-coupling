@@ -14,7 +14,7 @@ inline std::unique_ptr<ArgsParser> BuildArgsParser()
 	parser->addArgument<uint>("end", 'e', "the end frame (excluding)", 200);
 	parser->addArgument<uint>("rate", 'r', "the frame rate (frames per second)", 50);
 	parser->addArgument<real>("cfl", 'c', "the CFL number", real(1));
-	parser->addArgument<int>("scale", 's', "the scale of grid", 200);
+	parser->addArgument<int>("scale", 's', "the scale of grid", -1);
 	return parser;
 }
 
@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
 	const auto cfl = std::any_cast<real>(parser->getValueByName("cfl"));
 	const auto scale = std::any_cast<int>(parser->getValueByName("scale"));
 
-	auto fluid = PhysX::EulerianFluidBuilder::build<2>(scale);
-	auto simulator = std::make_unique<PhysX::Simulator>(output, begin, end, rate, cfl, fluid.get());
+	auto fluid = EulerianFluidBuilder::build<2>(scale);
+	auto simulator = std::make_unique<Simulator>(output, begin, end, rate, cfl, fluid.get());
 	simulator->Simulate();
 
 	return 0;

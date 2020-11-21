@@ -50,7 +50,7 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 			const VectorDi face = i & 1 ? cell : nbCell;
 			const int nbIdx = int(_reducedPressure.index(nbCell));
 			real term = 1;
-			if (_reducedPressure.isValid(nbCell)) {
+			if (!velocity.isBoundary(axis, face)) {
 				term *= weights[axis][face];
 				diagCoeff += term;
 				if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
@@ -90,7 +90,7 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 				const VectorDi face = i & 1 ? cell : nbCell;
 				const int nbIdx = int(_reducedPressure.index(nbCell));
 				real term = 1;
-				if (_reducedPressure.isValid(nbCell)) {
+				if (!velocity.isBoundary(axis, face)) {
 					term *= weights[axis][face];
 					if (Surface<Dim>::isInside(phi[nbCell])) {
 						diagCoeff += term;

@@ -30,7 +30,7 @@ public:
 			_components[axis].resize(_grid->faceGrid(axis), value);
 	}
 
-	bool isBoundary(const int axis, const VectorDi &face, const int offset = 0) const { return _grid->isBoundaryFace(axis, face, offset); }
+	bool isBoundary(const int axis, const VectorDi &face) const { return _grid->isBoundaryFace(axis, face); }
 	real spacing() const { return _grid->spacing(); }
 
 	size_t count() const

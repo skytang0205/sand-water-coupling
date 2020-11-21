@@ -14,7 +14,7 @@ inline std::unique_ptr<ArgsParser> BuildArgsParser()
 	parser->addArgument<uint>("end", 'e', "the end frame (excluding)", 200);
 	parser->addArgument<uint>("rate", 'r', "the frame rate (frames per second)", 50);
 	parser->addArgument<real>("cfl", 'c', "the CFL number", real(1));
-	parser->addArgument<int>("scale", 's', "the scale of grid", 200);
+	parser->addArgument<int>("scale", 's', "the scale of grid", -1);
 	return parser;
 }
 

@@ -18,6 +18,8 @@ public:
 			return buildCase1<Dim>(scale);
 		case 2:
 			return buildCase2<Dim>(scale);
+		case 3:
+			return buildCase3<Dim>(scale);
 		default:
 			reportError("invalid option");
 			return nullptr;
@@ -27,9 +29,10 @@ public:
 protected:
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase0(const int scale)
+	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase0(int scale)
 	{
 		DECLARE_DIM_TYPES(Dim)
+		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
@@ -48,9 +51,10 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase1(const int scale)
+	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase1(int scale)
 	{
 		DECLARE_DIM_TYPES(Dim)
+		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
@@ -67,9 +71,10 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase2(const int scale)
+	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase2(int scale)
 	{
 		DECLARE_DIM_TYPES(Dim)
+		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
@@ -79,6 +84,22 @@ protected:
 		ImplicitSphere<Dim> sphere(VectorDr::Unit(1) * length / 8, length / 8);
 		liquid->_levelSet.unionSurface(plane);
 		liquid->_levelSet.unionSurface(sphere);
+		liquid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real { return 0; };
+		return liquid;
+	}
+
+	template <int Dim>
+	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase3(int scale)
+	{
+		DECLARE_DIM_TYPES(Dim)
+		if (scale < 0) scale = 90;
+		const real length = real(2);
+		const VectorDi resolution = scale * (VectorDi::Ones() * 2 + VectorDi::Unit(0));
+		StaggeredGrid<Dim> grid(length / scale, resolution);
+		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+
+		ImplicitBox<Dim> box(-VectorDr::Unit(0) * length / 2, VectorDr::Ones() * length);
+		liquid->_levelSet.unionSurface(box);
 		liquid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real { return 0; };
 		return liquid;
 	}

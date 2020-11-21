@@ -3,9 +3,9 @@
 namespace PhysX {
 
 template <>
-StaggeredGrid<2>::StaggeredGrid(const real spacing, const VectorDi &resolution, const int offset, const VectorDr &center) :
+StaggeredGrid<2>::StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center) :
 	_spacing(spacing),
-	_resolution(resolution + VectorDi::Ones() * offset * 2),
+	_resolution(resolution + VectorDi::Ones() * _kBoundaryWidth * 2),
 	_origin(center - _resolution.cast<real>() * _spacing * real(0.5)),
 	_nodeGrid(_spacing, _resolution + VectorDi::Ones(), _origin),
 	_cellGrid(_spacing, _resolution, _origin + VectorDr::Ones() * real(0.5) * _spacing),
@@ -16,9 +16,9 @@ StaggeredGrid<2>::StaggeredGrid(const real spacing, const VectorDi &resolution, 
 { }
 
 template <>
-StaggeredGrid<3>::StaggeredGrid(const real spacing, const VectorDi &resolution, const int offset, const VectorDr &center) :
+StaggeredGrid<3>::StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center) :
 	_spacing(spacing),
-	_resolution(resolution + VectorDi::Ones() * offset * 2),
+	_resolution(resolution + VectorDi::Ones() * _kBoundaryWidth * 2),
 	_origin(center - _resolution.cast<real>() * _spacing * real(0.5)),
 	_nodeGrid(_spacing, _resolution + VectorDi::Ones(), _origin),
 	_cellGrid(_spacing, _resolution, _origin + VectorDr::Ones() * real(0.5) * _spacing),

@@ -23,9 +23,10 @@ public:
 protected:
 
 	template <int Dim>
-	static std::unique_ptr<EulerianFluid<Dim>> buildCase0(const int scale)
+	static std::unique_ptr<EulerianFluid<Dim>> buildCase0(int scale)
 	{
 		DECLARE_DIM_TYPES(Dim)
+		if (scale < 0) scale = 150;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
