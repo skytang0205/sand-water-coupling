@@ -46,7 +46,7 @@ protected:
 
 public:
 
-	ComplementarySurface(std::unique_ptr<Surface<Dim>> surface) : _surface(surface) { }
+	ComplementarySurface(std::unique_ptr<Surface<Dim>> surface) : _surface(std::move(surface)) { }
 	virtual ~ComplementarySurface() = default;
 
 	virtual VectorDr closestPosition(const VectorDr &pos) const override { return _surface->closestPosition(pos); }

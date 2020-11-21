@@ -27,6 +27,15 @@ void EulerianFluid<Dim>::writeDescription(YAML::Node &root) const
 		node["color_map"]["enabled"] = true;
 		root["objects"].push_back(node);
 	}
+	{ // Description of neumann
+		YAML::Node node;
+		node["name"] = "neumann";
+		node["data_mode"] = "dynamic";
+		node["primitive_type"] = "point_list";
+		node["indexed"] = false;
+		node["material"]["diffuse_albedo"] = Vector4f(0.5f, 0.5f, 0.5, 1.0f);
+		root["objects"].push_back(node);
+	}
 }
 
 template <int Dim>
@@ -47,6 +56,18 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 			IO::writeValue(fout, vel);
 			IO::writeValue(fout, vel);
 		});
+	}
+	{ // Write neumann.
+		std::ofstream fout(frameDir + "/neumann.mesh", std::ios::binary);
+		uint cnt = 0;
+		for (int axis = 0; axis < Dim; axis++) cnt += uint(_bcNeumann[axis].size());
+		IO::writeValue(fout, cnt);
+		for (int axis = 0; axis < Dim; axis++) {
+			for (const auto &bc : _bcNeumann[axis]) {
+				const VectorDi face = _velocity[axis].coordinate(bc.first);
+				IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
+			}
+		}
 	}
 }
 
@@ -123,16 +144,44 @@ void EulerianFluid<Dim>::updateFluidFraction()
 	if (!_colliders.empty()) {
 		_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (!_fluidFraction.isBoundary(axis, face)) {
+				const VectorDr pos0 = _grid.cellCenter(face - VectorDi::Unit(axis));
+				const VectorDr pos1 = _grid.cellCenter(face);
+				real phi0 = std::numeric_limits<real>::infinity();
+				real phi1 = std::numeric_limits<real>::infinity();
 				for (const auto &collider : _colliders) {
-					const VectorDi cell0 = face - VectorDi::Unit(axis);
-					const VectorDi cell1 = face;
-					_fluidFraction[axis][face] -= Surface<Dim>::fraction(
-						collider->surface()->signedDistance(_grid.cellCenter(cell0)),
-						collider->surface()->signedDistance(_grid.cellCenter(cell1)));
+					phi0 = std::min(phi0, collider->surface()->signedDistance(pos0));
+					phi1 = std::min(phi1, collider->surface()->signedDistance(pos1));
 				}
+				_fluidFraction[axis][face] -= Surface<Dim>::fraction(phi0, phi1);
 			}
 		});
 	}
+
+	updateBoundaryConditions();
+}
+
+template <int Dim>
+void EulerianFluid<Dim>::updateBoundaryConditions()
+{
+	for (int axis = 0; axis < Dim; axis++)
+		_bcNeumann[axis].clear();
+
+	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		const int idx = int(_velocity[axis].index(face));
+		if (!_velocity.isBoundary(axis, face)) {
+			const VectorDr pos = _velocity[axis].position(face);
+			for (const auto &collider : _colliders) {
+				if (collider->surface()->isInside(pos)) {
+					_bcNeumann[axis].push_back(PIR(idx, collider->velocityAt(pos)[axis]));
+					break;
+				}
+			}
+		}
+		else if (_domainBoundaryHandler) {
+			const real vel = _domainBoundaryHandler(axis, face);
+			_bcNeumann[axis].push_back(PIR(idx, vel));
+		}
+	});
 }
 
 template <int Dim>
@@ -174,20 +223,13 @@ void EulerianFluid<Dim>::extrapolateVelocity()
 template <int Dim>
 void EulerianFluid<Dim>::enforceBoundaryConditions()
 {
-	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (_velocity.isBoundary(axis, face) && _domainBoundaryHandler) {
-			_velocity[axis][face] = _domainBoundaryHandler(axis, face);
+	for (int axis = 0; axis < Dim; axis++) {
+		for (const auto &bc : _bcNeumann[axis]) {
+			const VectorDi face = _velocity[axis].coordinate(bc.first);
+			const real vel = bc.second;
+			_velocity[axis][face] = vel;
 		}
-		else {
-			for (const auto &collider : _colliders) {
-				const VectorDr pos = _velocity[axis].position(face);
-				if (collider->surface()->isInside(pos)) {
-					_velocity[axis][face] = collider->velocityAt(pos)[axis];
-					break;
-				}
-			}
-		}
-	});
+	}
 }
 
 template class EulerianFluid<2>;

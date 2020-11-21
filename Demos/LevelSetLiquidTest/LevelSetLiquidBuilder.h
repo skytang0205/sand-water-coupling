@@ -35,10 +35,8 @@ protected:
 		liquid->_levelSet.unionSurface(sphere);
 		liquid->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
-				std::make_unique<ImplicitPlane<Dim>>(VectorDr::Zero() - VectorDr::Unit(1) * length / 2, VectorDr::Unit(1) - VectorDr::Unit(0))));
-		liquid->_colliders.push_back(
-			std::make_unique<StaticCollider<Dim>>(
-				std::make_unique<ImplicitPlane<Dim>>(VectorDr::Zero() - VectorDr::Unit(1) * length / 2, VectorDr::Unit(1) + VectorDr::Unit(0))));
+				std::make_unique<ComplementarySurface<Dim>>(
+					std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), length / 2))));
 		liquid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real { return 0; };
 		return liquid;
 	}

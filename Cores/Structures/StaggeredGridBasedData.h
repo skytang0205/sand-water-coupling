@@ -14,7 +14,7 @@ class StaggeredGridBasedData
 protected:
 
 	const StaggeredGrid<Dim> *_grid = nullptr;
-	std::array<GridBasedData<Dim>, Dim> _components;
+	std::array<GridBasedData<Dim, Type>, Dim> _components;
 
 public:
 
@@ -39,8 +39,8 @@ public:
 		else return _components[0].count() + _components[1].count() + _components[2].count();
 	}
 
-	GridBasedData<Dim> &operator[](const int axis) { return _components[axis]; }
-	const GridBasedData<Dim> &operator[](const int axis) const { return _components[axis]; }
+	GridBasedData<Dim, Type> &operator[](const int axis) { return _components[axis]; }
+	const GridBasedData<Dim, Type> &operator[](const int axis) const { return _components[axis]; }
 
 	void setConstant(const Type &value) { for (int axis = 0; axis < Dim; axis++) _components[axis].setConstant(value); }
 	void setZero() { setConstant(Type(0)); }
