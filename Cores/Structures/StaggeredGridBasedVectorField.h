@@ -33,6 +33,12 @@ public:
 	bool isBoundary(const int axis, const VectorDi &face) { return _grid->isBoundaryFace(axis, face); }
 	real spacing() const { return _grid->spacing(); }
 
+	size_t count() const
+	{
+		if constexpr (Dim == 2) return _components[0].count() + _components[1].count();
+		else return _components[0].count() + _components[1].count() + _components[2].count();
+	}
+
 	GridBasedScalarField<Dim> &operator[](const int axis) { return _components[axis]; }
 	const GridBasedScalarField<Dim> &operator[](const int axis) const { return _components[axis]; }
 
@@ -43,6 +49,12 @@ public:
 
 	void setConstant(const VectorDr &value) { for (int axis = 0; axis < Dim; axis++) _components[axis].setConstant(value[axis]); }
 	void setZero() { setConstant(VectorDr::Zero()); }
+
+	real sum() const
+	{
+		if constexpr (Dim == 2) return _components[0].sum() + _components[1].sum();
+		else return _components[0].sum() + _components[1].sum() + _components[2].sum();
+	}
 
 	real min() const
 	{

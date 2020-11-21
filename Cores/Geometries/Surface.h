@@ -2,6 +2,8 @@
 
 #include "Utilities/Types.h"
 
+#include <memory>
+
 namespace PhysX {
 
 template <int Dim>
@@ -31,6 +33,27 @@ public:
 		else if (!isInside(phi0) && isInside(phi1)) return theta(phi1, phi0);
 		else return 0;
 	}
+};
+
+template <int Dim>
+class ComplementarySurface : public Surface<Dim>
+{
+	DECLARE_DIM_TYPES(Dim)
+
+protected:
+
+	std::unique_ptr<Surface<Dim>> _surface;
+
+public:
+
+	ComplementarySurface(std::unique_ptr<Surface<Dim>> surface) : _surface(surface) { }
+	virtual ~ComplementarySurface() = default;
+
+	virtual VectorDr closestPosition(const VectorDr &pos) const override { return _surface->closestPosition(pos); }
+	virtual VectorDr closestNormal(const VectorDr &pos) const override { return -_surface->closestNormal(pos); }
+	virtual real distance(const VectorDr &pos) const override { return _surface->distance(pos); }
+	virtual real signedDistance(const VectorDr &pos) const override { return -_surface->signedDistance(pos); }
+	virtual bool isInside(const VectorDr &pos) const override { return Surface<Dim>::isInside(signedDistance(pos)); }
 };
 
 }

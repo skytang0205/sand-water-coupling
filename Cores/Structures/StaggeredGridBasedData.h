@@ -33,11 +33,24 @@ public:
 	bool isBoundary(const int axis, const VectorDi &face) { return _grid->isBoundaryFace(axis, face); }
 	real spacing() const { return _grid->spacing(); }
 
+	size_t count() const
+	{
+		if constexpr (Dim == 2) return _components[0].count() + _components[1].count();
+		else return _components[0].count() + _components[1].count() + _components[2].count();
+	}
+
 	GridBasedData<Dim> &operator[](const int axis) { return _components[axis]; }
 	const GridBasedData<Dim> &operator[](const int axis) const { return _components[axis]; }
 
 	void setConstant(const Type &value) { for (int axis = 0; axis < Dim; axis++) _components[axis].setConstant(value); }
 	void setZero() { setConstant(Type(0)); }
+
+	template <typename AccType>
+	AccType sum() const
+	{
+		if constexpr (Dim == 2) return _components[0].sum<AccType>() + _components[1].sum<AccType>();
+		else return _components[0].sum<AccType>() + _components[1].sum<AccType>() + _components[2].sum<AccType>();
+	}
 
 	Type min() const
 	{

@@ -10,7 +10,7 @@ template <int Dim>
 LevelSetLiquid<Dim>::LevelSetLiquid(const StaggeredGrid<Dim> &grid) :
 	EulerianFluid<Dim>(grid),
 	_levelSet(_grid.cellGrid()),
-	_levelSetReinitializer(std::make_unique<FastMarchingReinitializer<Dim>>(_grid.cellGrid(), _kLsReinitMaxIters))
+	_levelSetReinitializer(std::make_unique<FastMarchingReinitializer<Dim>>(_grid.cellGrid()))
 { }
 
 template <int Dim>
@@ -142,7 +142,7 @@ void LevelSetLiquid<Dim>::extrapolateVelocity()
 		const VectorDr pos = _velocity[axis].position(face);
 		if (_levelSet.signedDistance(pos) > 0) {
 			_velocity[axis][face] =
-				_levelSet.signedDistance(pos) < bandWidth ? newVelocity[axis](_levelSet.closestPosition(pos)) : real(0);
+				bandWidth < 0 || _levelSet.signedDistance(pos) < bandWidth ? newVelocity[axis](_levelSet.closestPosition(pos)) : real(0);
 		}
 	});
 
@@ -152,7 +152,7 @@ void LevelSetLiquid<Dim>::extrapolateVelocity()
 template <int Dim>
 void LevelSetLiquid<Dim>::reinitializeLevelSet()
 {
-	_levelSetReinitializer->reinitialize(_levelSet);
+	_levelSetReinitializer->reinitialize(_levelSet, _kLsReinitMaxIters);
 }
 
 template class LevelSetLiquid<2>;

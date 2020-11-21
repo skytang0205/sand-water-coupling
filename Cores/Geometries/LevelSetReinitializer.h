@@ -12,19 +12,14 @@ class LevelSetReinitializer
 {
 	DECLARE_DIM_TYPES(Dim)
 
-protected:
-
-	int _reinitMaxIters;
-
 public:
 
-	LevelSetReinitializer(const int reinitMaxIters) : _reinitMaxIters(reinitMaxIters) { }
-
+	LevelSetReinitializer() = default;
 	LevelSetReinitializer(const LevelSetReinitializer &rhs) = delete;
 	LevelSetReinitializer &operator=(const LevelSetReinitializer &rhs) = delete;
 	virtual ~LevelSetReinitializer() = default;
 
-	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet) = 0;
+	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxIterations = -1) = 0;
 };
 
 template <int Dim>
@@ -34,7 +29,6 @@ class FastMarchingReinitializer final : public LevelSetReinitializer<Dim>
 
 protected:
 
-	using LevelSetReinitializer<Dim>::_reinitMaxIters;
 	using PRI = std::pair<real, int>;
 
 	GridBasedData<Dim> _tent; // tentative signed distance
@@ -45,9 +39,12 @@ protected:
 
 public:
 
-	FastMarchingReinitializer(const Grid<Dim> *const grid, const int reinitMaxIters);
+	FastMarchingReinitializer(const Grid<Dim> *const grid);
+	FastMarchingReinitializer(const FastMarchingReinitializer &rhs) = delete;
+	FastMarchingReinitializer &operator=(const FastMarchingReinitializer &rhs) = delete;
+	virtual ~FastMarchingReinitializer() = default;
 
-	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet) override;
+	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxIterations = -1) override;
 
 protected:
 

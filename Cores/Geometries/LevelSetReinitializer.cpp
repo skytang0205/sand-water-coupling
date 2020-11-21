@@ -8,17 +8,16 @@
 namespace PhysX {
 
 template <int Dim>
-FastMarchingReinitializer<Dim>::FastMarchingReinitializer(const Grid<Dim> *const grid, const int reinitMaxIters) :
-	LevelSetReinitializer<Dim>(reinitMaxIters),
+FastMarchingReinitializer<Dim>::FastMarchingReinitializer(const Grid<Dim> *const grid) :
 	_tent(grid),
 	_visited(grid)
 { }
 
 template <int Dim>
-void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim>&levelSet)
+void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxIterations)
 {
 	auto &phi = levelSet.signedDistanceField();
-	const real bandWidth = _reinitMaxIters * phi.spacing();
+	const real bandWidth = maxIterations * phi.spacing();
 	_tent.setConstant(bandWidth > 0 ? bandWidth : std::numeric_limits<real>::infinity());
 	_visited.setZero();
 	initInterface(phi);

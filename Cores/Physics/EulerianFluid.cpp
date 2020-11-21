@@ -141,11 +141,13 @@ void EulerianFluid<Dim>::extrapolateVelocity()
 	auto newVelocity = _velocity;
 	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(&_grid);
 	auto newVisited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(&_grid);
+	
 	visited->parallelForEach([&](const int axis, const VectorDi &face) {
 		if (!((*visited)[axis][face] = _fluidFraction[axis][face] > 0))
 			newVelocity[axis][face] = 0;
 	});
-	for (int iter = 0; iter < _kExtrapMaxIters; iter++) {
+
+	for (int iter = 0; iter < _kExtrapMaxIters || (_kExtrapMaxIters < 0 && visited->sum<size_t>() < visited->count()); iter++) {
 		newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (!(*visited)[axis][face]) {
 				int cnt = 0;

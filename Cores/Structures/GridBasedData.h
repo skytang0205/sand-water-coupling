@@ -4,6 +4,7 @@
 #include "Utilities/IO.h"
 
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 namespace PhysX {
@@ -51,6 +52,9 @@ public:
 
 	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
 	void setZero() { setConstant(Type(0)); }
+
+	template <typename AccType = Type>
+	AccType sum() const { return std::accumulate(_data.begin(), _data.end(), AccType(0)); }
 
 	Type min() const { return *std::min_element(_data.begin(), _data.end()); }
 	Type max() const { return *std::max_element(_data.begin(), _data.end()); }
