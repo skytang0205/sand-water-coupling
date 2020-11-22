@@ -32,6 +32,7 @@ public:
 		_data.resize(_grid->dataCount(), value);
 	}
 
+	bool isInside(const VectorDi &coord, const int offset) const { return _grid->isInside(coord, offset); }
 	bool isValid(const VectorDi &coord) const { return _grid->isValid(coord); }
 
 	Type *data() { return _data.data(); }

@@ -61,11 +61,11 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 		std::ofstream fout(frameDir + "/neumann.mesh", std::ios::binary);
 		uint cnt = 0;
 		_fluidFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (!_fluidFraction.isBoundary(axis, face) && _fluidFraction[axis][face] < 1) cnt++;
+			if (!_fluidFraction.isInside(axis, face)) cnt++;
 		});
 		IO::writeValue(fout, cnt);
 		_fluidFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (!_fluidFraction.isBoundary(axis, face) && _fluidFraction[axis][face] < 1)
+			if (!_fluidFraction.isInside(axis, face))
 				IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
 		});
 	}
@@ -140,10 +140,12 @@ void EulerianFluid<Dim>::projectVelocity()
 template <int Dim>
 void EulerianFluid<Dim>::updateFluidFraction()
 {
-	_fluidFraction.setConstant(1);
-	if (!_colliders.empty()) {
-		_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
-			if (!_fluidFraction.isBoundary(axis, face)) {
+	_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
+		if (_fluidFraction.isBoundary(axis, face) || !_fluidFraction.isInside(axis, face))
+			_fluidFraction[axis][face] = 0;
+		else {
+			_fluidFraction[axis][face] = 1;
+			if (!_colliders.empty()) {
 				const VectorDr pos0 = _grid.cellCenter(face - VectorDi::Unit(axis));
 				const VectorDr pos1 = _grid.cellCenter(face);
 				real phi0 = std::numeric_limits<real>::infinity();
@@ -154,8 +156,8 @@ void EulerianFluid<Dim>::updateFluidFraction()
 				}
 				_fluidFraction[axis][face] -= Surface<Dim>::fraction(phi0, phi1);
 			}
-		});
-	}
+		}
+	});
 }
 
 template <int Dim>
@@ -200,7 +202,7 @@ void EulerianFluid<Dim>::enforceBoundaryConditions()
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (_domainBoundaryHandler && _velocity.isBoundary(axis, face))
 			_velocity[axis][face] = _domainBoundaryHandler(axis, face);
-		else
+		else if (_velocity.isInside(axis, face))
 			for (const auto &collider : _colliders) {
 				const VectorDr pos = _velocity[axis].position(face);
 				if (collider->surface()->isInside(pos)) {

@@ -50,7 +50,7 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 			const VectorDi face = i & 1 ? cell : nbCell;
 			const int nbIdx = int(_reducedPressure.index(nbCell));
 			real term = 1;
-			if (!velocity.isBoundary(axis, face)) {
+			if (_reducedPressure.isValid(nbCell)) {
 				term *= weights[axis][face];
 				diagCoeff += term;
 				if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
@@ -68,7 +68,7 @@ template <int Dim>
 void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights) const
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (!velocity.isBoundary(axis, face) && weights[axis][face] > 0) {
+		if (weights[axis][face] > 0) {
 			velocity[axis][face] += _reducedPressure[face] - _reducedPressure[face - VectorDi::Unit(axis)];
 		}
 	});
@@ -90,7 +90,7 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 				const VectorDi face = i & 1 ? cell : nbCell;
 				const int nbIdx = int(_reducedPressure.index(nbCell));
 				real term = 1;
-				if (!velocity.isBoundary(axis, face)) {
+				if (_reducedPressure.isValid(nbCell)) {
 					term *= weights[axis][face];
 					if (Surface<Dim>::isInside(phi[nbCell])) {
 						diagCoeff += term;
@@ -115,12 +115,12 @@ template <int Dim>
 void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &phi) const
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (!velocity.isBoundary(axis, face) && weights[axis][face] > 0) {
+		if (weights[axis][face] > 0) {
 			const VectorDi cell0 = face - VectorDi::Unit(axis);
 			const VectorDi cell1 = face;
 			if (Surface<Dim>::isInside(phi[cell0]) || Surface<Dim>::isInside(phi[cell1])) {
 				const real fraction = std::max(Surface<Dim>::fraction(phi[cell0], phi[cell1]), real(0.01));
-				velocity[axis][face] += (_reducedPressure[face] - _reducedPressure[face - VectorDi::Unit(axis)]) / fraction;
+				velocity[axis][face] += (_reducedPressure[cell1] - _reducedPressure[cell0]) / fraction;
 			}
 		}
 	});

@@ -28,7 +28,8 @@ public:
 
 	virtual ~Grid() = default;
 
-	bool isValid(const VectorDi &coord) const { return (coord.array() >= 0).all() && (coord.array() < _dataSize.array()).all(); }
+	bool isInside(const VectorDi &coord, const int offset) const { return (coord.array() >= offset).all() && (coord.array() < _dataSize.array() - offset).all(); }
+	bool isValid(const VectorDi &coord) const { return isInside(coord, 0); }
 
 	real spacing() const { return _spacing; }
 	VectorDi dataSize() const { return _dataSize; }
@@ -36,6 +37,7 @@ public:
 
 	size_t dataCount() const { return _dataSize.cast<size_t>().prod(); }
 	VectorDr dataPosition(const VectorDi &coord) const { return _dataOrigin + coord.cast<real>() * _spacing; }
+
 
 	size_t index(const VectorDi &coord) const
 	{
