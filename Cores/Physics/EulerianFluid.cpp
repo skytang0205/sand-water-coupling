@@ -83,13 +83,13 @@ void EulerianFluid<Dim>::loadFrame(const std::string &frameDir)
 {
 	std::ifstream fin(frameDir + "/velocity.sav", std::ios::binary);
 	_velocity.load(fin);
-	updateFluidFraction();
+	updateBoundary();
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::initialize()
 {
-	updateFluidFraction();
+	updateBoundary();
 	extrapolateVelocity();
 	projectVelocity();
 }
@@ -121,7 +121,7 @@ void EulerianFluid<Dim>::updateColliders(const real dt)
 			dirty = true;
 		}
 	}
-	if (dirty) updateFluidFraction();
+	if (dirty) updateBoundary();
 }
 
 template <int Dim>
@@ -138,8 +138,10 @@ void EulerianFluid<Dim>::projectVelocity()
 }
 
 template <int Dim>
-void EulerianFluid<Dim>::updateFluidFraction()
+void EulerianFluid<Dim>::updateBoundary()
 {
+	_boundary->reset(_colliders, _domainBoundaryVelocity);
+	/*
 	_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (_fluidFraction.isBoundary(axis, face) || !_fluidFraction.isInside(axis, face))
 			_fluidFraction[axis][face] = 0;
@@ -157,7 +159,7 @@ void EulerianFluid<Dim>::updateFluidFraction()
 				_fluidFraction[axis][face] -= Surface<Dim>::fraction(phi0, phi1);
 			}
 		}
-	});
+	});*/
 }
 
 template <int Dim>

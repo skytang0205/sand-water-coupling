@@ -17,9 +17,9 @@ template <int Dim>
 void LevelSetLiquid<Dim>::writeDescription(YAML::Node &root) const
 {
 	EulerianFluid<Dim>::writeDescription(root);
-	{ // Description of phi.
+	{ // Description of liquidSdf.
 		YAML::Node node;
-		node["name"] = "phi";
+		node["name"] = "liquidSdf";
 		node["data_mode"] = "semi-dynamic";
 		node["primitive_type"] = "triangle_list";
 		node["indexed"] = true;
@@ -32,8 +32,8 @@ template <int Dim>
 void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
 	EulerianFluid<Dim>::writeFrame(frameDir, staticDraw);
-	{ // Write phi.
-		std::ofstream fout(frameDir + "/phi.mesh", std::ios::binary);
+	{ // Write liquidSdf.
+		std::ofstream fout(frameDir + "/liquidSdf.mesh", std::ios::binary);
 		IO::writeValue(fout, uint(4 * _grid.cellCount()));
 		const VectorDr a = VectorDr::Unit(0) * _grid.spacing() / 2;
 		const VectorDr b = VectorDr::Unit(1) * _grid.spacing() / 2;
@@ -45,11 +45,11 @@ void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 			IO::writeValue(fout, (pos + a + b).cast<float>().eval());
 		});
 		_grid.forEachCell([&](const VectorDi &cell) {
-			const float phi = float(_levelSet.signedDistanceField()[cell]);
-			IO::writeValue(fout, phi);
-			IO::writeValue(fout, phi);
-			IO::writeValue(fout, phi);
-			IO::writeValue(fout, phi);
+			const float liquidSdf = float(_levelSet.signedDistanceField()[cell]);
+			IO::writeValue(fout, liquidSdf);
+			IO::writeValue(fout, liquidSdf);
+			IO::writeValue(fout, liquidSdf);
+			IO::writeValue(fout, liquidSdf);
 		});
 		if (staticDraw) {
 			static constexpr uint indices[] = { 1, 2, 0, 1, 3, 2 };
@@ -66,7 +66,7 @@ template <int Dim>
 void LevelSetLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
 	EulerianFluid<Dim>::saveFrame(frameDir);
-	std::ofstream fout(frameDir + "/phi.sav", std::ios::binary);
+	std::ofstream fout(frameDir + "/liquidSdf.sav", std::ios::binary);
 	_levelSet.signedDistanceField().save(fout);
 }
 
@@ -74,7 +74,7 @@ template <int Dim>
 void LevelSetLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
 	EulerianFluid<Dim>::loadFrame(frameDir);
-	std::ifstream fin(frameDir + "/phi.sav", std::ios::binary);
+	std::ifstream fin(frameDir + "/liquidSdf.sav", std::ios::binary);
 	_levelSet.signedDistanceField().load(fin);
 }
 
@@ -116,12 +116,12 @@ void LevelSetLiquid<Dim>::projectVelocity()
 template <int Dim>
 void LevelSetLiquid<Dim>::extrapolateVelocity()
 {
-	const auto &phi = _levelSet.signedDistanceField();
+	const auto &liquidSdf = _levelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
 		const VectorDi cell0 = face - VectorDi::Unit(axis);
 		const VectorDi cell1 = face;
-		return (phi.isValid(cell0) && Surface<Dim>::isInside(phi[cell0]))
-			|| (phi.isValid(cell1) && Surface<Dim>::isInside(phi[cell1]));
+		return (liquidSdf.isValid(cell0) && Surface<Dim>::isInside(liquidSdf[cell0]))
+			|| (liquidSdf.isValid(cell1) && Surface<Dim>::isInside(liquidSdf[cell1]));
 	};
 
 	auto newVelocity = _velocity;

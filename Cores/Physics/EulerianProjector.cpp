@@ -19,11 +19,11 @@ void EulerianProjector<Dim>::project(StaggeredGridBasedVectorField<Dim> &velocit
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::project(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &phi)
+void EulerianProjector<Dim>::project(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf)
 {
-	buildLinearSystem(velocity, weights, phi);
+	buildLinearSystem(velocity, weights, liquidSdf);
 	solveLinearSystem();
-	applyPressureGradient(velocity, weights, phi);
+	applyPressureGradient(velocity, weights, liquidSdf);
 }
 
 template <int Dim>
@@ -75,7 +75,7 @@ void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &phi)
+void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf)
 {
 	_coefficients.clear();
 	_matLaplacian.setZero();
@@ -83,7 +83,7 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 		const int idx = int(_reducedPressure.index(cell));
 		real diagCoeff = 0;
 		real div = 0;
-		if (Surface<Dim>::isInside(phi[cell])) {
+		if (Surface<Dim>::isInside(liquidSdf[cell])) {
 			for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 				const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
 				const int axis = i >> 1;
@@ -92,12 +92,12 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 				real term = 1;
 				if (_reducedPressure.isValid(nbCell)) {
 					term *= weights[axis][face];
-					if (Surface<Dim>::isInside(phi[nbCell])) {
+					if (Surface<Dim>::isInside(liquidSdf[nbCell])) {
 						diagCoeff += term;
 						if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
 					}
 					else {
-						const real fraction = std::max(Surface<Dim>::theta(phi[cell], phi[nbCell]), real(0.01));
+						const real fraction = std::max(Surface<Dim>::theta(liquidSdf[cell], liquidSdf[nbCell]), real(0.01));
 						diagCoeff += term / fraction;
 					}
 				}
@@ -112,14 +112,14 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &phi) const
+void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf) const
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (weights[axis][face] > 0) {
 			const VectorDi cell0 = face - VectorDi::Unit(axis);
 			const VectorDi cell1 = face;
-			if (Surface<Dim>::isInside(phi[cell0]) || Surface<Dim>::isInside(phi[cell1])) {
-				const real fraction = std::max(Surface<Dim>::fraction(phi[cell0], phi[cell1]), real(0.01));
+			if (Surface<Dim>::isInside(liquidSdf[cell0]) || Surface<Dim>::isInside(liquidSdf[cell1])) {
+				const real fraction = std::max(Surface<Dim>::fraction(liquidSdf[cell0], liquidSdf[cell1]), real(0.01));
 				velocity[axis][face] += (_reducedPressure[cell1] - _reducedPressure[cell0]) / fraction;
 			}
 		}

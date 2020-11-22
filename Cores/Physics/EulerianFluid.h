@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Geometries/Collider.h"
+#include "Geometries/EulerianBoundary.h"
 #include "Geometries/GridBasedImplicitSurface.h"
 #include "Physics/EulerianAdvector.h"
 #include "Physics/EulerianProjector.h"
@@ -33,8 +34,9 @@ protected:
 	StaggeredGridBasedVectorField<Dim> _velocity;
 	StaggeredGridBasedData<Dim> _fluidFraction;
 
-	std::function<real(const int, const VectorDi &)> _domainBoundaryHandler;
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
+	std::function<real(const int, const VectorDi &)> _domainBoundaryVelocity;
+	std::unique_ptr<EulerianBoundary<Dim>> _boundary;
 
 	std::unique_ptr<EulerianAdvector<Dim>> _advector;
 	std::unique_ptr<EulerianProjector<Dim>> _projector;
@@ -65,7 +67,7 @@ protected:
 	virtual void applyBodyForces(const real dt);
 	virtual void projectVelocity();
 
-	virtual void updateFluidFraction();
+	virtual void updateBoundary();
 	virtual void extrapolateVelocity();
 	virtual void enforceBoundaryConditions();
 };
