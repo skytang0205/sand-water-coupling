@@ -15,6 +15,7 @@
     <ClInclude Include="EulerianBoundary.h" />
     <ClInclude Include="GridBasedImplicitSurface.h" />
     <ClInclude Include="ImplicitSurface.h" />
+    <ClInclude Include="LevelSetContourer.h" />
     <ClInclude Include="LevelSetReinitializer.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="SurfaceMesh.h" />
@@ -23,6 +24,7 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="EulerianBoundary.cpp" />
     <ClCompile Include="GridBasedImplicitSurface.cpp" />
+    <ClCompile Include="LevelSetContourer.cpp" />
     <ClCompile Include="LevelSetReinitializer.cpp" />
     <ClCompile Include="SurfaceMesh.cpp" />
   </ItemGroup>

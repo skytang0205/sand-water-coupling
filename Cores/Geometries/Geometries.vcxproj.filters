@@ -36,6 +36,9 @@
     <ClInclude Include="EulerianBoundary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LevelSetContourer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SurfaceMesh.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EulerianBoundary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelSetContourer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

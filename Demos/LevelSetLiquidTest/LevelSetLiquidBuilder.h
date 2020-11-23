@@ -82,6 +82,7 @@ protected:
 		ImplicitSphere<Dim> sphere(VectorDr::Unit(1) * length / 8, length / 8);
 		liquid->_levelSet.unionSurface(plane);
 		liquid->_levelSet.unionSurface(sphere);
+		liquid->_levelSet.intersectSurface(ImplicitBox<Dim>(VectorDr::Zero(), resolution.cast<real>() * length / scale / 2));
 		return liquid;
 	}
 
