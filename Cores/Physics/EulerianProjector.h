@@ -31,18 +31,35 @@ public:
 	EulerianProjector &operator=(const EulerianProjector &rhs) = delete;
 	virtual ~EulerianProjector() = default;
 
-	void project(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights);
-	void project(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf);
+	void project(
+		StaggeredGridBasedVectorField<Dim> &velocity,
+		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity);
+	void project(StaggeredGridBasedVectorField<Dim> &velocity,
+		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
+		const GridBasedScalarField<Dim> &liquidSdf);
 
 protected:
 
 	void solveLinearSystem();
 
-	void buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights);
-	void applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights) const;
+	void buildLinearSystem(
+		StaggeredGridBasedVectorField<Dim> &velocity,
+		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity);
+	void applyPressureGradient(
+		StaggeredGridBasedVectorField<Dim> &velocity,
+		const StaggeredGridBasedData<Dim> &boundaryFraction) const;
 
-	void buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf);
-	void applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf) const;
+	void buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity,
+		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
+		const GridBasedScalarField<Dim> &liquidSdf);
+	void applyPressureGradient(
+		StaggeredGridBasedVectorField<Dim> &velocity,
+		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const GridBasedScalarField<Dim> &liquidSdf) const;
 };
 
 }

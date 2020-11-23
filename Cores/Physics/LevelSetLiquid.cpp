@@ -109,44 +109,9 @@ void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
 template <int Dim>
 void LevelSetLiquid<Dim>::projectVelocity()
 {
-	_projector->project(_velocity, _fluidFraction, _levelSet.signedDistanceField());
-	extrapolateVelocity();
-}
-
-template <int Dim>
-void LevelSetLiquid<Dim>::extrapolateVelocity()
-{
-	const auto &liquidSdf = _levelSet.signedDistanceField();
-	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
-		const VectorDi cell0 = face - VectorDi::Unit(axis);
-		const VectorDi cell1 = face;
-		return (liquidSdf.isValid(cell0) && Surface<Dim>::isInside(liquidSdf[cell0]))
-			|| (liquidSdf.isValid(cell1) && Surface<Dim>::isInside(liquidSdf[cell1]));
-	};
-
-	auto newVelocity = _velocity;
-	newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (isLiquidFace(axis, face)) return;
-		int cnt = 0;
-		real sum = 0;
-		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
-			const VectorDi &nbFace = Grid<Dim>::neighbor(face, i);
-			if (newVelocity[axis].isValid(nbFace) && isLiquidFace(axis, nbFace))
-				sum += newVelocity[axis][nbFace], cnt++;
-		}
-		if (cnt > 0) newVelocity[axis][face] = sum / cnt;
-	});
-
-	const real bandWidth = _kExtrapMaxIters * _grid.spacing();
-	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		const VectorDr pos = _velocity[axis].position(face);
-		if (_levelSet.signedDistance(pos) > 0) {
-			_velocity[axis][face] =
-				bandWidth < 0 || _levelSet.signedDistance(pos) < bandWidth ? newVelocity[axis](_levelSet.closestPosition(pos)) : real(0);
-		}
-	});
-
-	enforceBoundaryConditions();
+	_boundary->enforce(_velocity);
+	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet.signedDistanceField());
+	_boundary->extrapolate(_velocity, _levelSet, _kExtrapMaxIters);
 }
 
 template <int Dim>

@@ -32,6 +32,7 @@ public:
 
 	bool isInside(const int axis, const VectorDi &face) const { return _grid->isInsideFace(axis, face); }
 	bool isBoundary(const int axis, const VectorDi &face) const { return _grid->isBoundaryFace(axis, face); }
+	const StaggeredGrid<Dim> *staggeredGrid() const { return _grid; }
 	real spacing() const { return _grid->spacing(); }
 
 	size_t count() const

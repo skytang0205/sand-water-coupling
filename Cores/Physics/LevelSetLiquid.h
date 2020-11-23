@@ -22,8 +22,8 @@ protected:
 	using EulerianFluid<Dim>::_kExtrapMaxIters;
 	using EulerianFluid<Dim>::_grid;
 	using EulerianFluid<Dim>::_velocity;
-	using EulerianFluid<Dim>::_fluidFraction;
 	using EulerianFluid<Dim>::_colliders;
+	using EulerianFluid<Dim>::_boundary;
 	using EulerianFluid<Dim>::_advector;
 	using EulerianFluid<Dim>::_projector;
 
@@ -50,13 +50,10 @@ public:
 
 protected:
 
-	using EulerianFluid<Dim>::enforceBoundaryConditions;
-
 	virtual void advectFields(const real dt) override;
 	virtual void applyBodyForces(const real dt) override;
 	virtual void projectVelocity() override;
 
-	virtual void extrapolateVelocity() override;
 	virtual void reinitializeLevelSet();
 };
 

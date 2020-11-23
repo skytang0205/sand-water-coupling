@@ -11,19 +11,26 @@ EulerianProjector<Dim>::EulerianProjector(const Grid<Dim> *const grid) :
 { }
 
 template <int Dim>
-void EulerianProjector<Dim>::project(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights)
+void EulerianProjector<Dim>::project(
+	StaggeredGridBasedVectorField<Dim> &velocity,
+	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity)
 {
-	buildLinearSystem(velocity, weights);
+	buildLinearSystem(velocity, boundaryFraction, boundaryVelocity);
 	solveLinearSystem();
-	applyPressureGradient(velocity, weights);
+	applyPressureGradient(velocity, boundaryFraction);
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::project(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf)
+void EulerianProjector<Dim>::project(
+	StaggeredGridBasedVectorField<Dim> &velocity,
+	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
+	const GridBasedScalarField<Dim> &liquidSdf)
 {
-	buildLinearSystem(velocity, weights, liquidSdf);
+	buildLinearSystem(velocity, boundaryFraction, boundaryVelocity, liquidSdf);
 	solveLinearSystem();
-	applyPressureGradient(velocity, weights, liquidSdf);
+	applyPressureGradient(velocity, boundaryFraction, liquidSdf);
 }
 
 template <int Dim>
@@ -36,7 +43,10 @@ void EulerianProjector<Dim>::solveLinearSystem()
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights)
+void EulerianProjector<Dim>::buildLinearSystem(
+	StaggeredGridBasedVectorField<Dim> &velocity,
+	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity)
 {
 	_coefficients.clear();
 	_matLaplacian.setZero();
@@ -47,15 +57,16 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 			const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
 			const int axis = i >> 1;
-			const VectorDi face = i & 1 ? cell : nbCell;
-			const int nbIdx = int(_reducedPressure.index(nbCell));
-			real term = 1;
-			if (_reducedPressure.isValid(nbCell)) {
-				term *= weights[axis][face];
-				diagCoeff += term;
-				if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
+			const int dir = i & 1 ? -1 : 1;
+			const VectorDi face = dir < 0 ? cell : nbCell;
+			const real weight = 1 - boundaryFraction[axis][face];
+			if (weight > 0) {
+				diagCoeff += weight;
+				_coefficients.push_back(Tripletr(idx, int(_reducedPressure.index(nbCell)), -weight));
+				div += dir * weight * velocity[axis][face];
 			}
-			div += (i & 1 ? -1 : 1) * term * velocity[axis][face];
+			if (weight < 1)
+				div += dir * (1 - weight) * boundaryVelocity[axis][face];
 		}
 		if (!diagCoeff) diagCoeff = 1;
 		_velocityDiv[cell] = div;
@@ -65,17 +76,23 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights) const
+void EulerianProjector<Dim>::applyPressureGradient(
+	StaggeredGridBasedVectorField<Dim> &velocity,
+	const StaggeredGridBasedData<Dim> &boundaryFraction) const
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (weights[axis][face] > 0) {
+		if (boundaryFraction[axis][face] < 1) {
 			velocity[axis][face] += _reducedPressure[face] - _reducedPressure[face - VectorDi::Unit(axis)];
 		}
 	});
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf)
+void EulerianProjector<Dim>::buildLinearSystem(
+	StaggeredGridBasedVectorField<Dim> &velocity,
+	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
+	const GridBasedScalarField<Dim> &liquidSdf)
 {
 	_coefficients.clear();
 	_matLaplacian.setZero();
@@ -87,21 +104,22 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 			for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 				const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
 				const int axis = i >> 1;
-				const VectorDi face = i & 1 ? cell : nbCell;
-				const int nbIdx = int(_reducedPressure.index(nbCell));
-				real term = 1;
-				if (_reducedPressure.isValid(nbCell)) {
-					term *= weights[axis][face];
+				const int dir = i & 1 ? -1 : 1;
+				const VectorDi face = dir < 0 ? cell : nbCell;
+				const real weight = 1 - boundaryFraction[axis][face];
+				if (weight > 0) {
 					if (Surface<Dim>::isInside(liquidSdf[nbCell])) {
-						diagCoeff += term;
-						if (term) _coefficients.push_back(Tripletr(idx, nbIdx, -term));
+						diagCoeff += weight;
+						_coefficients.push_back(Tripletr(idx, int(_reducedPressure.index(nbCell)), -weight));
 					}
 					else {
-						const real fraction = std::max(Surface<Dim>::theta(liquidSdf[cell], liquidSdf[nbCell]), real(0.01));
-						diagCoeff += term / fraction;
+						const real theta = std::max(Surface<Dim>::theta(liquidSdf[cell], liquidSdf[nbCell]), real(0.01));
+						diagCoeff += weight / theta;
 					}
+					div += dir * weight * velocity[axis][face];
 				}
-				div += (i & 1 ? -1 : 1) * term * velocity[axis][face];
+				if (weight < 1)
+					div += dir * (1 - weight) * boundaryVelocity[axis][face];
 			}
 		}
 		if (!diagCoeff) diagCoeff = 1;
@@ -112,10 +130,13 @@ void EulerianProjector<Dim>::buildLinearSystem(StaggeredGridBasedVectorField<Dim
 }
 
 template <int Dim>
-void EulerianProjector<Dim>::applyPressureGradient(StaggeredGridBasedVectorField<Dim> &velocity, const StaggeredGridBasedData<Dim> &weights, const GridBasedScalarField<Dim> &liquidSdf) const
+void EulerianProjector<Dim>::applyPressureGradient(
+	StaggeredGridBasedVectorField<Dim> &velocity,
+	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const GridBasedScalarField<Dim> &liquidSdf) const
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (weights[axis][face] > 0) {
+		if (boundaryFraction[axis][face] < 1) {
 			const VectorDi cell0 = face - VectorDi::Unit(axis);
 			const VectorDi cell1 = face;
 			if (Surface<Dim>::isInside(liquidSdf[cell0]) || Surface<Dim>::isInside(liquidSdf[cell1])) {

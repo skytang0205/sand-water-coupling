@@ -39,7 +39,7 @@ protected:
 		fluid->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
 				std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), real(0.5))));
-		fluid->_domainBoundaryHandler = [=](const int axis, const VectorDi &face)->real {
+		fluid->_domainBoundaryVelocity = [=](const int axis, const VectorDi &face)->real {
 			return grid.spacing() * (axis == 0 ? face.y() : face.x());
 		};
 

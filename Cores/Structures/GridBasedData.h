@@ -38,6 +38,7 @@ public:
 	Type *data() { return _data.data(); }
 	const Type *data() const { return _data.data(); }
 
+	const Grid<Dim> *grid() const { return _grid; }
 	real spacing() const { return _grid->spacing(); }
 	VectorDi size() const { return _grid->dataSize(); }
 	size_t count() const { return _data.size(); }

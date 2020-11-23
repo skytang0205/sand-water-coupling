@@ -32,7 +32,6 @@ protected:
 	const StaggeredGrid<Dim> _grid;
 
 	StaggeredGridBasedVectorField<Dim> _velocity;
-	StaggeredGridBasedData<Dim> _fluidFraction;
 
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 	std::function<real(const int, const VectorDi &)> _domainBoundaryVelocity;
@@ -68,8 +67,6 @@ protected:
 	virtual void projectVelocity();
 
 	virtual void updateBoundary();
-	virtual void extrapolateVelocity();
-	virtual void enforceBoundaryConditions();
 };
 
 }

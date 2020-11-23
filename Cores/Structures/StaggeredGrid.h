@@ -47,9 +47,9 @@ public:
 	VectorDr cellCenter(const VectorDi &cell) const { return _cellGrid.dataPosition(cell); }
 	VectorDr faceCenter(const int axis, const VectorDi &face) const { return _faceGrids[axis].dataPosition(face); }
 
-	// TODO: fix the definition of "inside" and "boundary"
 	bool isInsideFace(const int axis, const VectorDi &face) const { return _faceGrids[axis].isInside(face, _kBoundaryWidth); }
 	bool isBoundaryFace(const int axis, const VectorDi &face) const { return face[axis] <= _kBoundaryWidth || face[axis] >= _resolution[axis] - _kBoundaryWidth; }
+	static int boundaryFaceDirection(const int axis, const VectorDi &face) { return face[axis] <= _kBoundaryWidth ? -1 : 1; }
 
 	void forEachNode(const std::function<void(const VectorDi &)> &func) const { _nodeGrid.forEach(func); }
 	void forEachCell(const std::function<void(const VectorDi &)> &func) const { _cellGrid.forEach(func); }

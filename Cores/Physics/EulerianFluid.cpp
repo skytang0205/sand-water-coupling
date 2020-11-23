@@ -10,7 +10,7 @@ template <int Dim>
 EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_grid(grid),
 	_velocity(&_grid),
-	_fluidFraction(&_grid),
+	_boundary(std::make_unique<EulerianBoundary<Dim>>(&_grid)),
 	_advector(std::make_unique<SemiLagrangianAdvector<Dim>>()),
 	_projector(std::make_unique<EulerianProjector<Dim>>(_grid.cellGrid()))
 { }
@@ -60,12 +60,13 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 	{ // Write neumann.
 		std::ofstream fout(frameDir + "/neumann.mesh", std::ios::binary);
 		uint cnt = 0;
-		_fluidFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (!_fluidFraction.isInside(axis, face)) cnt++;
+		const auto &boundaryFraction = _boundary->fraction();
+		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
+			if (!boundaryFraction.isInside(axis, face)) cnt++;
 		});
 		IO::writeValue(fout, cnt);
-		_fluidFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (!_fluidFraction.isInside(axis, face))
+		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
+			if (!boundaryFraction.isInside(axis, face))
 				IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
 		});
 	}
@@ -90,7 +91,6 @@ template <int Dim>
 void EulerianFluid<Dim>::initialize()
 {
 	updateBoundary();
-	extrapolateVelocity();
 	projectVelocity();
 }
 
@@ -108,7 +108,6 @@ template <int Dim>
 void EulerianFluid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_velocity, _velocity, dt);
-	extrapolateVelocity();
 }
 
 template <int Dim>
@@ -127,104 +126,20 @@ void EulerianFluid<Dim>::updateColliders(const real dt)
 template <int Dim>
 void EulerianFluid<Dim>::applyBodyForces(const real dt)
 {
-	extrapolateVelocity();
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::projectVelocity()
 {
-	_projector->project(_velocity, _fluidFraction);
-	extrapolateVelocity();
+	_boundary->enforce(_velocity);
+	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity());
+	_boundary->extrapolate(_velocity, _kExtrapMaxIters);
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::updateBoundary()
 {
 	_boundary->reset(_colliders, _domainBoundaryVelocity);
-	/*
-	_fluidFraction.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (_fluidFraction.isBoundary(axis, face) || !_fluidFraction.isInside(axis, face))
-			_fluidFraction[axis][face] = 0;
-		else {
-			_fluidFraction[axis][face] = 1;
-			if (!_colliders.empty()) {
-				const VectorDr pos0 = _grid.cellCenter(face - VectorDi::Unit(axis));
-				const VectorDr pos1 = _grid.cellCenter(face);
-				real phi0 = std::numeric_limits<real>::infinity();
-				real phi1 = std::numeric_limits<real>::infinity();
-				for (const auto &collider : _colliders) {
-					phi0 = std::min(phi0, collider->surface()->signedDistance(pos0));
-					phi1 = std::min(phi1, collider->surface()->signedDistance(pos1));
-				}
-				_fluidFraction[axis][face] -= Surface<Dim>::fraction(phi0, phi1);
-			}
-		}
-	});*/
-}
-
-template <int Dim>
-void EulerianFluid<Dim>::extrapolateVelocity()
-{
-	auto newVelocity = _velocity;
-	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(&_grid);
-	auto newVisited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(&_grid);
-	
-	visited->parallelForEach([&](const int axis, const VectorDi &face) {
-		if (!((*visited)[axis][face] = _fluidFraction[axis][face] > 0))
-			newVelocity[axis][face] = 0;
-	});
-
-	for (int iter = 0; iter < _kExtrapMaxIters || (_kExtrapMaxIters < 0 && visited->sum<size_t>() < visited->count()); iter++) {
-		newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
-			if (!(*visited)[axis][face]) {
-				int cnt = 0;
-				real sum = 0;
-				for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
-					const VectorDi &nbFace = Grid<Dim>::neighbor(face, i);
-					if (newVelocity[axis].isValid(nbFace) && (*visited)[axis][nbFace])
-						sum += newVelocity[axis][nbFace], cnt++;
-				}
-				if (cnt > 0) {
-					newVelocity[axis][face] = sum / cnt;
-					(*newVisited)[axis][face] = true;
-				}
-			}
-			else (*newVisited)[axis][face] = true;
-		});
-		visited.swap(newVisited);
-	}
-	_velocity = newVelocity;
-
-	enforceBoundaryConditions();
-}
-
-template <int Dim>
-void EulerianFluid<Dim>::enforceBoundaryConditions()
-{
-	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (_domainBoundaryHandler && _velocity.isBoundary(axis, face))
-			_velocity[axis][face] = _domainBoundaryHandler(axis, face);
-		else if (_velocity.isInside(axis, face))
-			for (const auto &collider : _colliders) {
-				const VectorDr pos = _velocity[axis].position(face);
-				if (collider->surface()->isInside(pos)) {
-					const VectorDr colliderVel = collider->velocityAt(pos);
-					const VectorDr vel = _velocity(pos);
-					const VectorDr n = collider->surface()->closestNormal(pos);
-					if (n.any()) {
-						const VectorDr velR = vel - colliderVel;
-						VectorDr velT = velR - velR.dot(n) * n;
-						if (const real mu = collider->frictionCoefficient(); mu && velT.any()) {
-							const real velN = std::max(-velR.dot(n), real(0));
-							velT *= std::max(1 - mu * velN / velT.norm(), real(0));
-						}
-						_velocity[axis][face] = (velT + colliderVel)[axis];
-					}
-					else _velocity[axis][face] = colliderVel[axis];
-					break;
-				}
-			}
-	});
 }
 
 template class EulerianFluid<2>;

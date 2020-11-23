@@ -21,6 +21,7 @@ protected:
 	GridBasedImplicitSurface<Dim> _surface;
 	StaggeredGridBasedData<Dim> _fraction;
 	StaggeredGridBasedVectorField<Dim> _velocity;
+	StaggeredGridBasedVectorField<Dim> _normal;
 
 public:
 
@@ -30,17 +31,17 @@ public:
 	EulerianBoundary &operator=(const EulerianBoundary &rhs) = delete;
 	virtual ~EulerianBoundary() = default;
 
-	StaggeredGridBasedData<Dim> &fraction() { return _fraction; }
 	const StaggeredGridBasedData<Dim> &fraction() const { return _fraction; }
-	StaggeredGridBasedVectorField<Dim> &velocity() { return _velocity; }
 	const StaggeredGridBasedVectorField<Dim> &velocity() const { return _velocity; }
 
 	void reset(
 		const std::vector<std::unique_ptr<Collider<Dim>>> &colliders,
 		const std::function<real(const int axis, const VectorDi &face)> &domainBoundaryVelocity);
 
-	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxIterations = -1);
-	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &fluidLevelSet, const int maxIterations = -1);
+	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity);
+
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxIterations = -1);
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxIterations = -1);
 
 protected:
 
