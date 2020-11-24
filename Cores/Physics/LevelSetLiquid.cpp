@@ -86,7 +86,7 @@ void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
 {
 	if (_enableGravity) {
 		_velocity[1].parallelForEach([&](const VectorDi &face) {
-			_velocity[1][face] -= kGravity * dt;
+			_velocity[1][face] -= real(kGravity) * dt;
 		});
 	}
 

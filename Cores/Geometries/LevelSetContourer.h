@@ -24,7 +24,7 @@ public:
 };
 
 template <int Dim>
-class MarchingCubesContourer : public LevelSetContourer<Dim>
+class MarchingCubesContourer final : public LevelSetContourer<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 

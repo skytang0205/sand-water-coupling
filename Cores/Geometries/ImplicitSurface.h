@@ -100,4 +100,23 @@ public:
 	virtual real signedDistance(const VectorDr &pos) const override { return (pos - _position).dot(_normal); }
 };
 
+template <int Dim>
+class ImplicitEllipsoid final : public ImplicitSurface<Dim>
+{
+	DECLARE_DIM_TYPES(Dim)
+
+protected:
+
+	const VectorDr _center;
+	const VectorDr _semiAxels;
+
+public:
+
+	ImplicitEllipsoid(const VectorDr &center, const VectorDr &semiAxels) : _center(center), _semiAxels(semiAxels) { }
+	virtual ~ImplicitEllipsoid() = default;
+
+	virtual VectorDr closestNormal(const VectorDr &pos) const override { }
+	virtual real signedDistance(const VectorDr &pos) const override { }
+};
+
 }
