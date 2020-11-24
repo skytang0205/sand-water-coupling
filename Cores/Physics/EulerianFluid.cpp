@@ -50,6 +50,12 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 			IO::writeValue(fout, pos.cast<float>().eval());
 			IO::writeValue(fout, (pos + dir).cast<float>().eval());
 		});
+		if constexpr (Dim == 3) {
+			_grid.forEachCell([&](const VectorDi &cell) {
+				IO::writeValue(fout, VectorDf::Unit(2).eval());
+				IO::writeValue(fout, VectorDf::Unit(2).eval());
+			});
+		}
 		_grid.forEachCell([&](const VectorDi &cell) {
 			const VectorDr pos = _grid.cellCenter(cell);
 			const float vel = float(_velocity(pos).norm());
@@ -72,6 +78,13 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 				&& !boundaryFraction.isBoundary(axis, face)
 				&& boundaryFraction[axis][face] == 1) IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
 		});
+		if constexpr (Dim == 3) {
+			boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
+				if (boundaryFraction.isInside(axis, face)
+					&& !boundaryFraction.isBoundary(axis, face)
+					&& boundaryFraction[axis][face] == 1) IO::writeValue(fout, VectorDf::Unit(2).eval());
+			});
+		}
 	}
 }
 

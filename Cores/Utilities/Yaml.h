@@ -14,7 +14,7 @@ struct convert<PhysX::Vector<Scalar, Dim>>
 	{
 		Node node;
 		for (int i = 0; i < rhs.size(); i++) {
-			node.push_back(rhs(i));
+			node.push_back(rhs[i]);
 		}
 		node.SetStyle(EmitterStyle::Flow);
 		return node;
@@ -25,7 +25,7 @@ struct convert<PhysX::Vector<Scalar, Dim>>
 			return false;
 		}
 		for (int i = 0; i < rhs.size(); i++) {
-			rhs(i) = node[i].as<Scalar>();
+			rhs[i] = node[i].as<Scalar>();
 		}
 		return true;
 	}

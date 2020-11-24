@@ -60,7 +60,7 @@ public:
 	void parallelForEachFace(const std::function<void(const int, const VectorDi &)> &func) const { for (int axis = 0; axis < Dim; axis++) _faceGrids[axis].parallelForEach(std::bind(func, axis, std::placeholders::_1)); }
 
 	static constexpr int numberOfCellNodes() { return 1 << Dim; }
-	static constexpr int numberofCellFaces() { return Dim << 1; }
+	static constexpr int numberOfCellFaces() { return Dim << 1; }
 	static constexpr int numberOfCellEdges() { return Dim * (1 << (Dim - 1)); }
 	static constexpr int numberOfFaceNodes() { return 1 << (Dim - 1); }
 

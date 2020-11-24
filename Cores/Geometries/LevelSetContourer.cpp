@@ -35,12 +35,12 @@ MarchingCubesContourer<3>::MarchingCubesContourer(const Grid<3> *const nodeGrid)
 { }
 
 template <int Dim>
-void MarchingCubesContourer<Dim>::contour(const GridBasedImplicitSurface<Dim> &levelSet, std::vector<VectorDr> &positions, std::vector<VectorDr> &normals, std::vector<uint> &indicess)
+void MarchingCubesContourer<Dim>::contour(const GridBasedImplicitSurface<Dim> &levelSet, std::vector<VectorDr> &positions, std::vector<VectorDr> &normals, std::vector<uint> &indices)
 {
 	const auto &sdf = levelSet.signedDistanceField();
 	positions.clear();
 	normals.clear();
-	indicess.clear();
+	indices.clear();
 
 	_cellGrid.forEach([&](const VectorDi &cell) {
 		const uint cellType = getCellType(sdf, cell);
@@ -67,7 +67,7 @@ void MarchingCubesContourer<Dim>::contour(const GridBasedImplicitSurface<Dim> &l
 		for (int i = 0; edgeOrds[i] != -1; i++) {
 			const int axis = StaggeredGrid<Dim>::cellEdgeAxis(edgeOrds[i]);
 			const VectorDi edge = StaggeredGrid<Dim>::cellEdge(cell, edgeOrds[i]);
-			indicess.push_back(uint(_edgeMark[axis][edge]));
+			indices.push_back(uint(_edgeMark[axis][edge]));
 		}
 	});
 

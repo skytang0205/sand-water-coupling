@@ -48,7 +48,7 @@ public:
 		const GridBasedImplicitSurface<Dim> &levelSet,
 		std::vector<VectorDr> &positions,
 		std::vector<VectorDr> &normals,
-		std::vector<uint> &indicess) override;
+		std::vector<uint> &indices) override;
 
 protected:
 
