@@ -59,8 +59,8 @@ public:
 	void forEach(const std::function<void(const VectorDi &)> &func) const;
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const;
 
-	static constexpr int numberOfNeighbors() { return 2 * Dim; }
-	static VectorDi neighbor(const VectorDi &coord, const int ord) { return coord + VectorDi::Unit(ord >> 1) * (ord & 1 ? -1 : 1); }
+	static constexpr int numberOfNeighbors() { return Dim << 1; }
+	static VectorDi neighbor(const VectorDi &coord, const int ord) { return coord + VectorDi::Unit(ord >> 1) * (ord & 1 ? 1 : -1); }
 };
 
 }

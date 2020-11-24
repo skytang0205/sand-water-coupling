@@ -58,6 +58,37 @@ public:
 	void parallelForEachNode(const std::function<void(const VectorDi &)> &func) const { _nodeGrid.parallelForEach(func); }
 	void parallelForEachCell(const std::function<void(const VectorDi &)> &func) const { _cellGrid.parallelForEach(func); }
 	void parallelForEachFace(const std::function<void(const int, const VectorDi &)> &func) const { for (int axis = 0; axis < Dim; axis++) _faceGrids[axis].parallelForEach(std::bind(func, axis, std::placeholders::_1)); }
+
+	static constexpr int numberOfCellNodes() { return 1 << Dim; }
+	static constexpr int numberofCellFaces() { return Dim << 1; }
+	static constexpr int numberOfCellEdges() { return Dim * (1 << (Dim - 1)); }
+	static constexpr int numberOfFaceNodes() { return 1 << (Dim - 1); }
+
+	static VectorDi cellNode(const VectorDi &cell, const int ord)
+	{
+		if constexpr (Dim == 2) return cell + VectorDi(ord & 1, ord >> 1 & 1);
+		else return cell + VectorDi(ord & 1, ord >> 1 & 1, ord >> 2 & 1);
+	};
+
+	static VectorDi faceNode(const int axis, const VectorDi &face, const int ord)
+	{
+		if constexpr (Dim == 2) return face + VectorDi::Unit(axis ^ 1) * (ord & 1);
+		else return face + VectorDi::Unit((axis + 1) % 3) * (ord & 1) + VectorDi::Unit((axis + 2) % 3) * (ord >> 1 & 1);
+	}
+
+	static constexpr int cellFaceAxis(const int ord) { return ord >> 1; }
+	static constexpr int cellFaceDirection(const int ord) { return ord & 1 ? 1 : -1; }
+	static VectorDi cellFace(const VectorDi &cell, const int ord) { return cell + VectorDi::Unit(cellFaceAxis(ord)) * (ord & 1); }
+	static VectorDi faceAdjacentCell(const int axis, const VectorDi &face, const int ord) { return face - VectorDi::Unit(axis) * (ord & 1 ^ 1); }
+
+	static constexpr int cellEdgeAxis(const int ord) { return ord >> (Dim - 1); }
+	static VectorDi edgeAdjacentNode(const int axis, const VectorDi &edge, const int ord) { return edge + VectorDi::Unit(axis) * (ord & 1); }
+
+	static VectorDi cellEdge(const VectorDi &cell, const int ord)
+	{
+		if constexpr (Dim == 2) return cell + VectorDi::Unit(cellEdgeAxis(ord) ^ 1) * (ord & 1);
+		else return cell + VectorDi::Unit((cellEdgeAxis(ord) + 1) % 3) * (ord & 1) + VectorDi::Unit((cellEdgeAxis(ord) + 2) % 3) * (ord >> 1 & 1);
+	}
 };
 
 }

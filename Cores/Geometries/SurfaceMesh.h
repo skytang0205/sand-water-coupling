@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Geometries/GridBasedImplicitSurface.h"
+#include "Utilities/IO.h"
 
 #include <vector>
 
@@ -20,6 +21,13 @@ public:
 	SurfaceMesh() = default;
 	SurfaceMesh(const GridBasedImplicitSurface<Dim> &levelSet);
 	virtual ~SurfaceMesh() = default;
+
+	// TODO: implement following functions.
+	virtual VectorDr closestPosition(const VectorDr &pos) const override { return VectorDr::Zero(); }
+	virtual VectorDr closestNormal(const VectorDr &pos) const override { return VectorDr::Zero(); }
+	virtual real distance(const VectorDr &pos) const override { return 0; }
+	virtual real signedDistance(const VectorDr &pos) const override { return 0; }
+	virtual bool isInside(const VectorDr &pos) const override { return false; }
 };
 
 }

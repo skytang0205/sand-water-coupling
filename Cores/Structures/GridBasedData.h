@@ -41,6 +41,7 @@ public:
 	const Grid<Dim> *grid() const { return _grid; }
 	real spacing() const { return _grid->spacing(); }
 	VectorDi size() const { return _grid->dataSize(); }
+	VectorDr origin() const { return _grid->dataOrigin(); }
 	size_t count() const { return _data.size(); }
 	VectorDr position(const VectorDi &coord) const { return _grid->dataPosition(coord); }
 

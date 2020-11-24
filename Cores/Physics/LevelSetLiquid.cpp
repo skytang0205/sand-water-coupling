@@ -1,5 +1,6 @@
 #include "LevelSetLiquid.h"
 
+#include "Geometries/SurfaceMesh.h"
 #include "Utilities/Constants.h"
 #include "Utilities/IO.h"
 #include "Utilities/Yaml.h"
@@ -17,13 +18,14 @@ template <int Dim>
 void LevelSetLiquid<Dim>::writeDescription(YAML::Node &root) const
 {
 	EulerianFluid<Dim>::writeDescription(root);
-	{ // Description of liquidSdf.
+	{ // Description of liquid.
 		YAML::Node node;
-		node["name"] = "liquidSdf";
-		node["data_mode"] = "semi-dynamic";
-		node["primitive_type"] = "triangle_list";
+		node["name"] = "liquid";
+		node["data_mode"] = "dynamic";
+		if constexpr (Dim == 2) node["primitive_type"] = "line_list";
+		else node["primitive_type"] = "triangle_list";
 		node["indexed"] = true;
-		node["color_map"]["enabled"] = true;
+		node["material"]["diffuse_albedo"] = Vector4f(0, 0, 1, 1);
 		root["objects"].push_back(node);
 	}
 }
@@ -32,33 +34,18 @@ template <int Dim>
 void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
 	EulerianFluid<Dim>::writeFrame(frameDir, staticDraw);
-	{ // Write liquidSdf.
-		std::ofstream fout(frameDir + "/liquidSdf.mesh", std::ios::binary);
-		IO::writeValue(fout, uint(4 * _grid.cellCount()));
-		const VectorDr a = VectorDr::Unit(0) * _grid.spacing() / 2;
-		const VectorDr b = VectorDr::Unit(1) * _grid.spacing() / 2;
-		_grid.forEachCell([&](const VectorDi &cell) {
-			const VectorDr pos = _grid.cellCenter(cell);
-			IO::writeValue(fout, (pos - a - b).cast<float>().eval());
-			IO::writeValue(fout, (pos + a - b).cast<float>().eval());
-			IO::writeValue(fout, (pos - a + b).cast<float>().eval());
-			IO::writeValue(fout, (pos + a + b).cast<float>().eval());
-		});
-		_grid.forEachCell([&](const VectorDi &cell) {
-			const float liquidSdf = float(_levelSet.signedDistanceField()[cell]);
-			IO::writeValue(fout, liquidSdf);
-			IO::writeValue(fout, liquidSdf);
-			IO::writeValue(fout, liquidSdf);
-			IO::writeValue(fout, liquidSdf);
-		});
-		if (staticDraw) {
-			static constexpr uint indices[] = { 1, 2, 0, 1, 3, 2 };
-			IO::writeValue(fout, uint(6 * _grid.cellCount()));
-			for (int i = 0; i < _grid.cellCount(); i++) {
-				for (int j = 0; j < 6; j++)
-					IO::writeValue(fout, uint(i * 4 + indices[j]));
-			}
+	{ // Write liquid.
+		std::ofstream fout(frameDir + "/liquid.mesh", std::ios::binary);
+		SurfaceMesh<Dim> liquidMesh(_levelSet);
+		IO::writeValue(fout, uint(liquidMesh.positions.size()));
+		for (const auto &pos : liquidMesh.positions)
+			IO::writeValue(fout, pos.cast<float>().eval());
+		if constexpr (Dim == 3) {
+			for (const auto &normal : liquidMesh.normals)
+				IO::writeValue(fout, normal.cast<float>().eval());
 		}
+		IO::writeValue(fout, uint(liquidMesh.indices.size()));
+		IO::writeArray(fout, liquidMesh.indices.data(), liquidMesh.indices.size());
 	}
 }
 

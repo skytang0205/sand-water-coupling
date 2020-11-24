@@ -13,6 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Inline Files">
+      <UniqueIdentifier>{a2bbf365-f9f9-43b7-a9cf-25fc898a1626}</UniqueIdentifier>
+      <Extensions>inc</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Surface.h">
@@ -59,5 +63,10 @@
     <ClCompile Include="LevelSetContourer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MarchingCubesTables.inc">
+      <Filter>Inline Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

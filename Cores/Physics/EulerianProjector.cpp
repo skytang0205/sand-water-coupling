@@ -56,9 +56,9 @@ void EulerianProjector<Dim>::buildLinearSystem(
 		real div = 0;
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 			const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
-			const int axis = i >> 1;
-			const int dir = i & 1 ? -1 : 1;
-			const VectorDi face = dir < 0 ? cell : nbCell;
+			const int axis = StaggeredGrid<Dim>::cellFaceAxis(i);
+			const int dir = StaggeredGrid<Dim>::cellFaceDirection(i);
+			const VectorDi face = StaggeredGrid<Dim>::cellFace(cell, i);
 			const real weight = 1 - boundaryFraction[axis][face];
 			if (weight > 0) {
 				diagCoeff += weight;
@@ -82,7 +82,9 @@ void EulerianProjector<Dim>::applyPressureGradient(
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (boundaryFraction[axis][face] < 1) {
-			velocity[axis][face] += _reducedPressure[face] - _reducedPressure[face - VectorDi::Unit(axis)];
+			const VectorDi cell0 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 0);
+			const VectorDi cell1 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 1);
+			velocity[axis][face] += _reducedPressure[cell1] - _reducedPressure[cell0];
 		}
 	});
 }
@@ -103,9 +105,9 @@ void EulerianProjector<Dim>::buildLinearSystem(
 		if (Surface<Dim>::isInside(liquidSdf[cell])) {
 			for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 				const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
-				const int axis = i >> 1;
-				const int dir = i & 1 ? -1 : 1;
-				const VectorDi face = dir < 0 ? cell : nbCell;
+				const int axis = StaggeredGrid<Dim>::cellFaceAxis(i);
+				const int dir = StaggeredGrid<Dim>::cellFaceDirection(i);
+				const VectorDi face = StaggeredGrid<Dim>::cellFace(cell, i);
 				const real weight = 1 - boundaryFraction[axis][face];
 				if (weight > 0) {
 					if (Surface<Dim>::isInside(liquidSdf[nbCell])) {
@@ -137,8 +139,8 @@ void EulerianProjector<Dim>::applyPressureGradient(
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (boundaryFraction[axis][face] < 1) {
-			const VectorDi cell0 = face - VectorDi::Unit(axis);
-			const VectorDi cell1 = face;
+			const VectorDi cell0 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 0);
+			const VectorDi cell1 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 1);
 			if (Surface<Dim>::isInside(liquidSdf[cell0]) || Surface<Dim>::isInside(liquidSdf[cell1])) {
 				const real fraction = std::max(Surface<Dim>::fraction(liquidSdf[cell0], liquidSdf[cell1]), real(0.01));
 				velocity[axis][face] += (_reducedPressure[cell1] - _reducedPressure[cell0]) / fraction;

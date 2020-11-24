@@ -20,46 +20,39 @@ public:
 		const GridBasedImplicitSurface<Dim> &levelSet,
 		std::vector<VectorDr> &positions,
 		std::vector<VectorDr> &normals,
-		std::vector<uint> &indices,
-		const real isoValue = 0) = 0;
+		std::vector<uint> &indices) = 0;
 };
 
-template <int Dim> class MarchingCubesContourer;
-
-template <>
-class MarchingCubesContourer<2> : public LevelSetContourer<2>
+template <int Dim>
+class MarchingCubesContourer : public LevelSetContourer<Dim>
 {
+	DECLARE_DIM_TYPES(Dim)
+
+protected:
+
+#include "MarchingCubesTables.inc"
+
+	const Grid<Dim> *const _nodeGrid;
+	const Grid<Dim> _cellGrid;
+	const std::array<Grid<Dim>, Dim> _edgeGrids;
+	std::array<GridBasedData<Dim, int>, Dim> _edgeMark;
+
 public:
 
-	MarchingCubesContourer() = default;
+	MarchingCubesContourer(const Grid<Dim> *const nodeGrid);
 	MarchingCubesContourer(const MarchingCubesContourer &rhs) = delete;
 	MarchingCubesContourer &operator=(const MarchingCubesContourer &rhs) = delete;
 	virtual ~MarchingCubesContourer() = default;
 
 	virtual void contour(
-		const GridBasedImplicitSurface<2> &levelSet,
-		std::vector<Vector2r> &positions,
-		std::vector<Vector2r> &normals,
-		std::vector<uint> &indicess,
-		const real isoValue = 0) override;
-};
+		const GridBasedImplicitSurface<Dim> &levelSet,
+		std::vector<VectorDr> &positions,
+		std::vector<VectorDr> &normals,
+		std::vector<uint> &indicess) override;
 
-template <>
-class MarchingCubesContourer<3> : public LevelSetContourer<3>
-{
-public:
+protected:
 
-	MarchingCubesContourer() = default;
-	MarchingCubesContourer(const MarchingCubesContourer &rhs) = delete;
-	MarchingCubesContourer &operator=(const MarchingCubesContourer &rhs) = delete;
-	virtual ~MarchingCubesContourer() = default;
-
-	virtual void contour(
-		const GridBasedImplicitSurface<3> &levelSet,
-		std::vector<Vector3r> &positions,
-		std::vector<Vector3r> &normals,
-		std::vector<uint> &indicess,
-		const real isoValue = 0) override;
+	uint getCellType(const GridBasedScalarField<Dim> &sdf, const VectorDi &cell) const;
 };
 
 }

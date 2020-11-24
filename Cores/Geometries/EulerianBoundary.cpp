@@ -1,5 +1,8 @@
 #include "EulerianBoundary.h"
 
+#include <algorithm>
+#include <cstdlib>
+
 namespace PhysX {
 
 template <int Dim>
@@ -97,8 +100,8 @@ void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &flui
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
-		const VectorDi cell0 = face - VectorDi::Unit(axis);
-		const VectorDi cell1 = face;
+		const VectorDi cell0 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 0);
+		const VectorDi cell1 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 1);
 		return (liquidSdf.isValid(cell0) && Surface<Dim>::isInside(liquidSdf[cell0]))
 			|| (liquidSdf.isValid(cell1) && Surface<Dim>::isInside(liquidSdf[cell1]));
 	};
@@ -132,11 +135,21 @@ real EulerianBoundary<Dim>::getFaceFraction(const int axis, const VectorDi &face
 	const auto &sdf = _surface.signedDistanceField();
 	real faceFraction;
 	if constexpr (Dim == 2) {
-		const real phi0 = sdf[face];
-		const real phi1 = sdf[face + VectorDi::Unit(axis ^ 1)];
+		const real phi0 = sdf[StaggeredGrid<Dim>::faceNode(axis, face, 0)];
+		const real phi1 = sdf[StaggeredGrid<Dim>::faceNode(axis, face, 1)];
 		faceFraction = Surface<Dim>::fraction(phi0, phi1);
 	}
-	else faceFraction = 0;
+	else {
+		const real phi0 = sdf[StaggeredGrid<Dim>::faceNode(axis, face, 0)];
+		const real phi1 = sdf[StaggeredGrid<Dim>::faceNode(axis, face, 1)];
+		const real phi2 = sdf[StaggeredGrid<Dim>::faceNode(axis, face, 2)];
+		const real phi3 = sdf[StaggeredGrid<Dim>::faceNode(axis, face, 3)];
+		const real centerPhi = (phi0 + phi1 + phi2 + phi3) * real(0.25);
+		faceFraction = (Surface<Dim>::fraction(centerPhi, phi0, phi1)
+			+ Surface<Dim>::fraction(centerPhi, phi1, phi3)
+			+ Surface<Dim>::fraction(centerPhi, phi3, phi2)
+			+ Surface<Dim>::fraction(centerPhi, phi2, phi0)) * real(0.25);
+	}
 	return faceFraction > real(0.9) ? real(1) : faceFraction;
 }
 

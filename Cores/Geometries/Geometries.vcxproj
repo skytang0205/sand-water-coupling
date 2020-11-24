@@ -33,6 +33,9 @@
       <Project>{11fdb336-d077-4fab-bedf-3444181a927d}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="MarchingCubesTables.inc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
