@@ -32,7 +32,7 @@ public:
 	virtual VectorDr closestNormal(const VectorDr &pos) const { return (_signedDistanceField.gradient(pos)).normalized(); }
 	virtual real signedDistance(const VectorDr &pos) const { return _signedDistanceField(pos); }
 
-	real closestCurvature(const VectorDr &pos) const { return _signedDistanceField.laplacian(pos); }
+	real curvature(const VectorDr &pos) const;
 };
 
 }

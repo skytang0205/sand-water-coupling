@@ -18,12 +18,12 @@ real GridBasedScalarField<Dim>::operator()(const VectorDr &pos) const
 template <int Dim>
 Vector<real, Dim> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi &coord) const
 {
-	VectorDr val;
+	VectorDr acc;
 	for (int i = 0; i < Dim; i++) {
-		val[i] = operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)
+		acc[i] = operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)
 			- operator[](coord[i] > 0 ? coord - VectorDi::Unit(i) : coord);
 	}
-	return val / (2 * _grid->spacing());
+	return acc / (2 * _grid->spacing());
 }
 
 template <int Dim>
@@ -33,21 +33,24 @@ Vector<real, Dim> GridBasedScalarField<Dim>::gradient(const VectorDr &pos) const
 	std::array<real, 1 << Dim> weights;
 	_grid->getLerpCoordsAndWeights(pos, coords, weights);
 
-	VectorDr val = VectorDr::Zero();
+	VectorDr grad = VectorDr::Zero();
 	for (int i = 0; i < (1 << Dim); i++)
-		val += gradientAtDataPoint(coords[i]) * weights[i];
-	return val;
+		grad += gradientAtDataPoint(coords[i]) * weights[i];
+	return grad;
 }
 
 template <int Dim>
 real GridBasedScalarField<Dim>::laplacianAtDataPoint(const VectorDi &coord) const
 {
-	real val = 0;
+	real acc = 0;
+	const real centerVal = operator[](coord);
 	for (int i = 0; i < Dim; i++) {
-		val += (operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord) - operator[](coord))
-			- (operator[](coord) - operator[](coord[i] > 0 ? coord - VectorDi::Unit(i) : coord));
+		if (coord[i] < _grid->dataSize()[i] - 1)
+			acc += operator[](coord + VectorDi::Unit(i)) - centerVal;
+		if (coord[i] > 0)
+			acc -= centerVal - operator[](coord - VectorDi::Unit(i));
 	}
-	return val / (_grid->spacing() * _grid->spacing());
+	return acc / (_grid->spacing() * _grid->spacing());
 }
 
 template <int Dim>
@@ -57,10 +60,10 @@ real GridBasedScalarField<Dim>::laplacian(const VectorDr &pos) const
 	std::array<real, 1 << Dim> weights;
 	_grid->getLerpCoordsAndWeights(pos, coords, weights);
 
-	real val = 0;
+	real lapl = 0;
 	for (int i = 0; i < (1 << Dim); i++)
-		val += laplacianAtDataPoint(coords[i]) * weights[i];
-	return val;
+		lapl += laplacianAtDataPoint(coords[i]) * weights[i];
+	return lapl;
 }
 
 template class GridBasedScalarField<2>;

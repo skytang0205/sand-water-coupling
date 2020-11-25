@@ -14,11 +14,14 @@ Vector<real, Dim> StaggeredGridBasedVectorField<Dim>::operator()(const VectorDr 
 template <int Dim>
 real StaggeredGridBasedVectorField<Dim>::divergenceAtCellCenter(const VectorDi &cell) const
 {
-	real val = 0;
-	for (int axis = 0; axis < Dim; axis++) {
-		val += _components[axis][cell + VectorDi::Unit(axis)] - _components[axis][cell];
+	real acc = 0;
+	for (int i = 0; i < StaggeredGrid<Dim>::numberOfCellFaces(); i++) {
+		const int axis = StaggeredGrid<Dim>::cellFaceAxis(i);
+		const VectorDi face = StaggeredGrid<Dim>::cellFace(cell, i);
+		const int side = StaggeredGrid<Dim>::cellFaceSide(i);
+		acc += _components[axis][face] * side;
 	}
-	return val / (2 * _grid->spacing());
+	return acc / (2 * _grid->spacing());
 }
 
 template <int Dim>
@@ -28,10 +31,10 @@ real StaggeredGridBasedVectorField<Dim>::divergence(const VectorDr &pos) const
 	std::array<real, 1 << Dim> weights;
 	_grid->cellGrid()->getLerpCoordsAndWeights(pos, coords, weights);
 
-	real val = 0;
+	real div = 0;
 	for (int i = 0; i < (1 << Dim); i++)
-		val += divergenceAtCellCenter(coords[i]) * weights[i];
-	return val;
+		div += divergenceAtCellCenter(coords[i]) * weights[i];
+	return div;
 }
 
 template class StaggeredGridBasedVectorField<2>;

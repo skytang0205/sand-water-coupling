@@ -36,7 +36,7 @@ void FastMarchingReinitializer<Dim>::initInterface(const GridBasedScalarField<Di
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 			const VectorDi nbCoord = Grid<Dim>::neighbor(coord, i);
 			if (phi.isValid(nbCoord) && Surface<Dim>::isInterface(phi[coord], phi[nbCoord])) {
-				const int axis = i >> 1;
+				const int axis = Grid<Dim>::neighborAxis(i);
 				tempPhi[axis] = std::min(tempPhi[axis], Surface<Dim>::theta(phi[coord], phi[nbCoord]) * phi.spacing());
 			}
 		}
@@ -68,7 +68,7 @@ void FastMarchingReinitializer<Dim>::updateNeighbors(const VectorDi &coord)
 {
 	for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 		const VectorDi nbCoord = Grid<Dim>::neighbor(coord, i);
-		if (!_tent.isValid(nbCoord)) continue;
+		if (!_tent.isValid(nbCoord) || _visited[nbCoord]) continue;
 		if (const real temp = solveEikonalEquation(nbCoord); temp < _tent[nbCoord]) {
 			_tent[nbCoord] = temp;
 			_heap.push(PRI(temp, int(_tent.index(nbCoord))));
@@ -84,7 +84,7 @@ real FastMarchingReinitializer<Dim>::solveEikonalEquation(const VectorDi &coord)
 	for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 		const VectorDi nbCoord = Grid<Dim>::neighbor(coord, i);
 		if (_tent.isValid(nbCoord) && _visited[nbCoord]) {
-			const int axis = i >> 1;
+			const int axis = Grid<Dim>::neighborAxis(i);
 			tempPhi[axis] = std::min(tempPhi[axis], _tent[nbCoord]);
 		}
 	}

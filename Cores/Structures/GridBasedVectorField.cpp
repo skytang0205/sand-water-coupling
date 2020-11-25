@@ -9,21 +9,21 @@ Vector<real, Dim> GridBasedVectorField<Dim>::operator()(const VectorDr &pos) con
 	std::array<real, 1 << Dim> weights;
 	_grid->getLerpCoordsAndWeights(pos, coords, weights);
 
-	VectorDr val = VectorDr::Zero();
+	VectorDr vec = VectorDr::Zero();
 	for (int i = 0; i < (1 << Dim); i++)
-		val += operator[](coords[i]) * weights[i];
-	return val;
+		vec += operator[](coords[i]) * weights[i];
+	return vec;
 }
 
 template <int Dim>
 real GridBasedVectorField<Dim>::divergenceAtDataPoint(const VectorDi &coord) const
 {
-	real val = 0;
+	real acc = 0;
 	for (int i = 0; i < Dim; i++) {
-		val += operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)[i]
+		acc += operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)[i]
 			- operator[](coord[i] > 0 ? coord - VectorDi::Unit(i) : coord)[i];
 	}
-	return val / (2 * _grid->spacing());
+	return acc / (2 * _grid->spacing());
 }
 
 template <int Dim>
@@ -33,10 +33,10 @@ real GridBasedVectorField<Dim>::divergence(const VectorDr &pos) const
 	std::array<real, 1 << Dim> weights;
 	_grid->getLerpCoordsAndWeights(pos, coords, weights);
 
-	real val = 0;
+	real div = 0;
 	for (int i = 0; i < (1 << Dim); i++)
-		val += divergenceAtDataPoint(coords[i]) * weights[i];
-	return val;
+		div += divergenceAtDataPoint(coords[i]) * weights[i];
+	return div;
 }
 
 template class GridBasedVectorField<2>;

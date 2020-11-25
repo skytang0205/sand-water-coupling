@@ -104,7 +104,7 @@ void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
 			const real phi = _levelSet.signedDistance(pos);
 			if (-bandWidth < phi && phi < bandWidth) {
 				_velocity[axis][face] -= MathFunc::dirac(phi, bandWidth) * _surfaceTensionCoefficient
-					* _levelSet.closestCurvature(pos) * _levelSet.closestNormal(pos)[axis] * dt / _density;
+					* _levelSet.curvature(pos) * _levelSet.closestNormal(pos)[axis] * dt / _density;
 			}
 		});
 	}

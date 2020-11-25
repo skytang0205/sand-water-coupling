@@ -57,16 +57,16 @@ void EulerianProjector<Dim>::buildLinearSystem(
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 			const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
 			const int axis = StaggeredGrid<Dim>::cellFaceAxis(i);
-			const int dir = StaggeredGrid<Dim>::cellFaceDirection(i);
+			const int side = StaggeredGrid<Dim>::cellFaceSide(i);
 			const VectorDi face = StaggeredGrid<Dim>::cellFace(cell, i);
 			const real weight = 1 - boundaryFraction[axis][face];
 			if (weight > 0) {
 				diagCoeff += weight;
 				_coefficients.push_back(Tripletr(idx, int(_reducedPressure.index(nbCell)), -weight));
-				div += dir * weight * velocity[axis][face];
+				div += side * weight * velocity[axis][face];
 			}
 			if (weight < 1)
-				div += dir * (1 - weight) * boundaryVelocity[axis][face];
+				div += side * (1 - weight) * boundaryVelocity[axis][face];
 		}
 		if (!diagCoeff) diagCoeff = 1;
 		_velocityDiv[cell] = div;
@@ -106,7 +106,7 @@ void EulerianProjector<Dim>::buildLinearSystem(
 			for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 				const VectorDi nbCell = Grid<Dim>::neighbor(cell, i);
 				const int axis = StaggeredGrid<Dim>::cellFaceAxis(i);
-				const int dir = StaggeredGrid<Dim>::cellFaceDirection(i);
+				const int side = StaggeredGrid<Dim>::cellFaceSide(i);
 				const VectorDi face = StaggeredGrid<Dim>::cellFace(cell, i);
 				const real weight = 1 - boundaryFraction[axis][face];
 				if (weight > 0) {
@@ -118,10 +118,10 @@ void EulerianProjector<Dim>::buildLinearSystem(
 						const real theta = std::max(Surface<Dim>::theta(liquidSdf[cell], liquidSdf[nbCell]), real(0.01));
 						diagCoeff += weight / theta;
 					}
-					div += dir * weight * velocity[axis][face];
+					div += side * weight * velocity[axis][face];
 				}
 				if (weight < 1)
-					div += dir * (1 - weight) * boundaryVelocity[axis][face];
+					div += side * (1 - weight) * boundaryVelocity[axis][face];
 			}
 		}
 		if (!diagCoeff) diagCoeff = 1;

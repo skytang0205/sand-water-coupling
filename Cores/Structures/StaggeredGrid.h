@@ -79,7 +79,7 @@ public:
 	}
 
 	static constexpr int cellFaceAxis(const int ord) { return ord >> 1; }
-	static constexpr int cellFaceDirection(const int ord) { return ord & 1 ? 1 : -1; }
+	static constexpr int cellFaceSide(const int ord) { return ord & 1 ? 1 : -1; }
 	static VectorDi cellFace(const VectorDi &cell, const int ord) { return cell + VectorDi::Unit(cellFaceAxis(ord)) * (ord & 1); }
 	static VectorDi faceAdjacentCell(const int axis, const VectorDi &face, const int ord) { return face - VectorDi::Unit(axis) * (ord & 1 ^ 1); }
 
