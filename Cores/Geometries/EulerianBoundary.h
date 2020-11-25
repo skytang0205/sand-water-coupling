@@ -18,6 +18,7 @@ class EulerianBoundary
 
 protected:
 
+	ImplicitBox<Dim> _domainBox;
 	GridBasedImplicitSurface<Dim> _surface;
 	StaggeredGridBasedData<Dim> _fraction;
 	StaggeredGridBasedVectorField<Dim> _velocity;

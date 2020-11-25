@@ -68,21 +68,18 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 		uint cnt = 0;
 		const auto &boundaryFraction = _boundary->fraction();
 		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (boundaryFraction.isInside(axis, face)
-				&& !boundaryFraction.isBoundary(axis, face)
-				&& boundaryFraction[axis][face] == 1) cnt++;
+			if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
+				cnt++;
 		});
 		IO::writeValue(fout, cnt);
 		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (boundaryFraction.isInside(axis, face)
-				&& !boundaryFraction.isBoundary(axis, face)
-				&& boundaryFraction[axis][face] == 1) IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
+			if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
+				IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
 		});
 		if constexpr (Dim == 3) {
 			boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
-				if (boundaryFraction.isInside(axis, face)
-					&& !boundaryFraction.isBoundary(axis, face)
-					&& boundaryFraction[axis][face] == 1) IO::writeValue(fout, VectorDf::Unit(2).eval());
+				if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
+					IO::writeValue(fout, VectorDf::Unit(2).eval());
 			});
 		}
 	}

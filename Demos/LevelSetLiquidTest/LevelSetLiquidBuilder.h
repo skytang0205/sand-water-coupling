@@ -20,6 +20,8 @@ public:
 			return buildCase2<Dim>(scale);
 		case 3:
 			return buildCase3<Dim>(scale);
+		case 4:
+			return buildCase4<Dim>(scale);
 		default:
 			reportError("invalid option");
 			return nullptr;
@@ -79,15 +81,31 @@ protected:
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
 		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
-		ImplicitSphere<Dim> sphere(VectorDr::Unit(1) * length / 8, length / 8);
 		liquid->_levelSet.unionSurface(plane);
-		liquid->_levelSet.unionSurface(sphere);
-		liquid->_levelSet.intersectSurface(ImplicitBox<Dim>(VectorDr::Zero(), resolution.cast<real>() * length / scale / 2));
+		liquid->_levelSet.intersectSurface(ImplicitBox<Dim>(grid.domainOrigin(), grid.domainLengths()));
 		return liquid;
 	}
 
 	template <int Dim>
 	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase3(int scale)
+	{
+		DECLARE_DIM_TYPES(Dim)
+		if (scale < 0) scale = 200;
+		const real length = real(2);
+		const VectorDi resolution = scale * VectorDi::Ones();
+		StaggeredGrid<Dim> grid(length / scale, resolution);
+		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+
+		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
+		ImplicitSphere<Dim> sphere(VectorDr::Unit(1) * length / 8, length / 8);
+		liquid->_levelSet.unionSurface(plane);
+		liquid->_levelSet.unionSurface(sphere);
+		liquid->_levelSet.intersectSurface(ImplicitBox<Dim>(grid.domainOrigin(), grid.domainLengths()));
+		return liquid;
+	}
+
+	template <int Dim>
+	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase4(int scale)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 90;
@@ -96,8 +114,9 @@ protected:
 		StaggeredGrid<Dim> grid(length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
-		ImplicitBox<Dim> box(-VectorDr::Unit(0) * length / 2, VectorDr::Ones() * length);
-		liquid->_levelSet.unionSurface(box);
+		ImplicitPlane<Dim> plane(VectorDr::Unit(0) * length / 2, VectorDr::Unit(0));
+		liquid->_levelSet.unionSurface(plane);
+		liquid->_levelSet.intersectSurface(ImplicitBox<Dim>(grid.domainOrigin(), grid.domainLengths()));
 		return liquid;
 	}
 

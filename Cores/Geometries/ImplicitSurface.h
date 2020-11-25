@@ -57,7 +57,7 @@ protected:
 
 public:
 
-	ImplicitBox(const VectorDr &center, const VectorDr &halfLengths) : _center(center), _halfLengths(halfLengths) { }
+	ImplicitBox(const VectorDr &minCorner, const VectorDr &lengths) : _center(minCorner + lengths / 2), _halfLengths(lengths / 2) { }
 	virtual ~ImplicitBox() = default;
 
 	virtual VectorDr closestNormal(const VectorDr &pos) const override

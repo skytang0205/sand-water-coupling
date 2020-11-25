@@ -7,6 +7,7 @@ namespace PhysX {
 
 template <int Dim>
 EulerianBoundary<Dim>::EulerianBoundary(const StaggeredGrid<Dim> *const grid) :
+	_domainBox(grid->domainOrigin(), grid->domainLengths()),
 	_surface(grid->nodeGrid()),
 	_fraction(grid),
 	_velocity(grid),
@@ -23,20 +24,14 @@ void EulerianBoundary<Dim>::reset(
 	// Colliders must not intersect each other, or we should reinitialize _surface here.
 
 	_fraction.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (!_fraction.isInside(axis, face)) {
-			_fraction[axis][face] = 1;
-			_velocity[axis][face] = 0;
-			_normal[axis][face] = 0;
-		}
-		else if (_fraction.isBoundary(axis, face)) {
+		const VectorDr pos = _fraction[axis].position(face);
+		if (_fraction.isBoundary(axis, face)) {
 			_fraction[axis][face] = 1;
 			_velocity[axis][face] = domainBoundaryVelocity ? domainBoundaryVelocity(axis, face) : real(0);
-			_normal[axis][face] = -real(StaggeredGrid<Dim>::boundaryFaceDirection(axis, face));
+			_normal[axis][face] = -_domainBox.closestNormal(pos)[axis];
 		}
 		else {
 			_fraction[axis][face] = getFaceFraction(axis, face);
-			_velocity[axis][face] = 0;
-			const VectorDr pos = _fraction[axis].position(face);
 			for (const auto &collider : colliders) {
 				if (collider->surface()->isInside(pos)) {
 					_velocity[axis][face] = collider->velocityAt(pos)[axis];
@@ -102,8 +97,7 @@ void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &flui
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
 		const VectorDi cell0 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 0);
 		const VectorDi cell1 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 1);
-		return (liquidSdf.isValid(cell0) && Surface<Dim>::isInside(liquidSdf[cell0]))
-			|| (liquidSdf.isValid(cell1) && Surface<Dim>::isInside(liquidSdf[cell1]));
+		return _fraction[axis][face] < 1 && (Surface<Dim>::isInside(liquidSdf[cell0]) || Surface<Dim>::isInside(liquidSdf[cell1]));
 	};
 
 	auto newVelocity = fluidVelocity;

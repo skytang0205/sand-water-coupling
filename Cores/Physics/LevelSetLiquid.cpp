@@ -22,10 +22,17 @@ void LevelSetLiquid<Dim>::writeDescription(YAML::Node &root) const
 		YAML::Node node;
 		node["name"] = "liquid";
 		node["data_mode"] = "dynamic";
-		if constexpr (Dim == 2) node["primitive_type"] = "line_list";
-		else node["primitive_type"] = "triangle_list";
+
+		if constexpr (Dim == 2) {
+			node["primitive_type"] = "line_list";
+			node["material"]["diffuse_albedo"] = Vector4f(0, 0, 1, 1);
+		}
+		else {
+			node["primitive_type"] = "triangle_list";
+			node["material"]["diffuse_albedo"] = Vector4f(147 / 255.0f, 213 / 255.0f, 220 / 255.0f, 1); // Qingshui Blue
+		}
+
 		node["indexed"] = true;
-		node["material"]["diffuse_albedo"] = Vector4f(147 / 255.0f, 213 / 255.0f, 220 / 255.0f, 1); // Qingshui Blue
 		root["objects"].push_back(node);
 	}
 }
