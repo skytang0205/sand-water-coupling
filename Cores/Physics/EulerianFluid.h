@@ -27,7 +27,7 @@ protected:
 
 	using PIR = std::pair<int, real>;
 
-	static constexpr int _kExtrapMaxIters = 3;
+	static constexpr int _kExtrapMaxSteps = 3;
 
 	const StaggeredGrid<Dim> _grid;
 

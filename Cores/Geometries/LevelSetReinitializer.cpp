@@ -14,10 +14,10 @@ FastMarchingReinitializer<Dim>::FastMarchingReinitializer(const Grid<Dim> *const
 { }
 
 template <int Dim>
-void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxIterations)
+void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxSteps)
 {
 	auto &phi = levelSet.signedDistanceField();
-	const real bandWidth = maxIterations * phi.spacing();
+	const real bandWidth = maxSteps * phi.spacing();
 	_tent.setConstant(bandWidth > 0 ? bandWidth : std::numeric_limits<real>::infinity());
 	_visited.setZero();
 	initInterface(phi);

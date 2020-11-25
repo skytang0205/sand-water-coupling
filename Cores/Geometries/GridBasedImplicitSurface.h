@@ -29,14 +29,10 @@ public:
 	GridBasedScalarField<Dim> &signedDistanceField() { return _signedDistanceField; }
 	const GridBasedScalarField<Dim> &signedDistanceField() const { return _signedDistanceField; }
 
-	virtual VectorDr closestNormal(const VectorDr &pos) const
-	{
-		VectorDr n = _signedDistanceField.gradient(pos);
-		if (n.any()) n.normalize();
-		return n;
-	}
-
+	virtual VectorDr closestNormal(const VectorDr &pos) const { return (_signedDistanceField.gradient(pos)).normalized(); }
 	virtual real signedDistance(const VectorDr &pos) const { return _signedDistanceField(pos); }
+
+	real closestCurvature(const VectorDr &pos) const { return _signedDistanceField.laplacian(pos); }
 };
 
 }

@@ -146,7 +146,7 @@ void EulerianFluid<Dim>::projectVelocity()
 {
 	_boundary->enforce(_velocity);
 	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity());
-	_boundary->extrapolate(_velocity, _kExtrapMaxIters);
+	_boundary->extrapolate(_velocity, _kExtrapMaxSteps);
 }
 
 template <int Dim>

@@ -3,6 +3,7 @@
 #include "Geometries/SurfaceMesh.h"
 #include "Utilities/Constants.h"
 #include "Utilities/IO.h"
+#include "Utilities/MathFunc.h"
 #include "Utilities/Yaml.h"
 
 namespace PhysX {
@@ -96,6 +97,17 @@ void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
 			_velocity[1][face] -= real(kGravity) * dt;
 		});
 	}
+	if (_enableSurfaceTension) {
+		const real bandWidth = _kCsfModelMaxSteps * _velocity.spacing();
+		_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
+			const VectorDr pos = _velocity[axis].position(face);
+			const real phi = _levelSet.signedDistance(pos);
+			if (-bandWidth < phi && phi < bandWidth) {
+				_velocity[axis][face] -= MathFunc::dirac(phi, bandWidth) * _surfaceTensionCoefficient
+					* _levelSet.closestCurvature(pos) * _levelSet.closestNormal(pos)[axis] * dt / _density;
+			}
+		});
+	}
 
 	EulerianFluid<Dim>::applyBodyForces(dt);
 }
@@ -105,13 +117,13 @@ void LevelSetLiquid<Dim>::projectVelocity()
 {
 	_boundary->enforce(_velocity);
 	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet.signedDistanceField());
-	_boundary->extrapolate(_velocity, _levelSet, _kExtrapMaxIters);
+	_boundary->extrapolate(_velocity, _levelSet, _kExtrapMaxSteps);
 }
 
 template <int Dim>
 void LevelSetLiquid<Dim>::reinitializeLevelSet()
 {
-	_levelSetReinitializer->reinitialize(_levelSet, _kLsReinitMaxIters);
+	_levelSetReinitializer->reinitialize(_levelSet, _kLsReinitMaxSteps);
 }
 
 template class LevelSetLiquid<2>;

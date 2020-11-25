@@ -41,8 +41,8 @@ public:
 
 	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity);
 
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxIterations = -1);
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxIterations = -1);
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps = -1);
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps = -1);
 
 protected:
 

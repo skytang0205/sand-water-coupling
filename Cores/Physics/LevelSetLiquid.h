@@ -17,9 +17,10 @@ public:
 
 protected:
 
-	static constexpr int _kLsReinitMaxIters = 5;
+	static constexpr int _kLsReinitMaxSteps = 5;
+	static constexpr int _kCsfModelMaxSteps = 2;
 
-	using EulerianFluid<Dim>::_kExtrapMaxIters;
+	using EulerianFluid<Dim>::_kExtrapMaxSteps;
 	using EulerianFluid<Dim>::_grid;
 	using EulerianFluid<Dim>::_velocity;
 	using EulerianFluid<Dim>::_colliders;
@@ -32,6 +33,10 @@ protected:
 	std::unique_ptr<LevelSetReinitializer<Dim>> _levelSetReinitializer;
 
 	bool _enableGravity = true;
+	bool _enableSurfaceTension = false;
+
+	real _density = real(1e3);
+	real _surfaceTensionCoefficient = real(7.28e-2);
 	
 public:
 

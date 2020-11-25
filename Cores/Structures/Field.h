@@ -16,6 +16,7 @@ public:
 
 	virtual real operator()(const VectorDr &pos) const = 0;
 	virtual VectorDr gradient(const VectorDr &pos) const = 0;
+	virtual real laplacian(const VectorDr &pos) const = 0;
 };
 
 template <int Dim>

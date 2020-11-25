@@ -56,7 +56,7 @@ void EulerianBoundary<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fluidVel
 }
 
 template <int Dim>
-void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxIterations)
+void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps)
 {
 	auto newVelocity = fluidVelocity;
 	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(fluidVelocity.staggeredGrid());
@@ -67,7 +67,7 @@ void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &flui
 			newVelocity[axis][face] = 0;
 	});
 
-	for (int iter = 0; iter < maxIterations || (maxIterations < 0 && visited->sum<size_t>() < visited->count()); iter++) {
+	for (int iter = 0; iter < maxSteps || (maxSteps < 0 && visited->sum<size_t>() < visited->count()); iter++) {
 		newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (!(*visited)[axis][face]) {
 				int cnt = 0;
@@ -91,7 +91,7 @@ void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &flui
 
 
 template <int Dim>
-void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxIterations)
+void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps)
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
@@ -113,7 +113,7 @@ void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &flui
 		if (cnt > 0) newVelocity[axis][face] = sum / cnt;
 	});
 
-	const real bandWidth = maxIterations * fluidVelocity.spacing();
+	const real bandWidth = maxSteps * fluidVelocity.spacing();
 	fluidVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		const VectorDr pos = fluidVelocity[axis].position(face);
 		if (liquidLevelSet.signedDistance(pos) > 0) {

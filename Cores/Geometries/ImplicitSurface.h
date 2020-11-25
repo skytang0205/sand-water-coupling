@@ -112,11 +112,16 @@ protected:
 
 public:
 
+	using Surface<Dim>::isInside;
+
 	ImplicitEllipsoid(const VectorDr &center, const VectorDr &semiAxels) : _center(center), _semiAxels(semiAxels) { }
 	virtual ~ImplicitEllipsoid() = default;
 
-	virtual VectorDr closestNormal(const VectorDr &pos) const override { }
-	virtual real signedDistance(const VectorDr &pos) const override { }
+	virtual VectorDr closestPosition(const VectorDr &pos) const override { return pos / pos.cwiseQuotient(_semiAxels).norm(); } // not accurate solution
+	virtual VectorDr closestNormal(const VectorDr &pos) const override { return (pos - closestPosition(pos)).normalized() * (isInside(pos) ? -1 : 1); }
+	virtual real distance(const VectorDr &pos) const override { return (pos - closestPosition(pos)).norm(); }
+	virtual real signedDistance(const VectorDr &pos) const override { return distance(pos) * (isInside(pos) ? -1 : 1); }
+	virtual bool isInside(const VectorDr &pos) const override { return isInside(pos.cwiseQuotient(_semiAxels).squaredNorm() - 1); }
 };
 
 }

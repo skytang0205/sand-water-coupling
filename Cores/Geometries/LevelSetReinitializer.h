@@ -19,7 +19,7 @@ public:
 	LevelSetReinitializer &operator=(const LevelSetReinitializer &rhs) = delete;
 	virtual ~LevelSetReinitializer() = default;
 
-	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxIterations = -1) = 0;
+	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxSteps = -1) = 0;
 };
 
 template <int Dim>
@@ -44,7 +44,7 @@ public:
 	FastMarchingReinitializer &operator=(const FastMarchingReinitializer &rhs) = delete;
 	virtual ~FastMarchingReinitializer() = default;
 
-	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxIterations = -1) override;
+	virtual void reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxSteps = -1) override;
 
 protected:
 

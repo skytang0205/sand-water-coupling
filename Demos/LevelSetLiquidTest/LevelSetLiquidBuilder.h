@@ -22,6 +22,8 @@ public:
 			return buildCase3<Dim>(scale);
 		case 4:
 			return buildCase4<Dim>(scale);
+		case 5:
+			return buildCase5<Dim>(scale);
 		default:
 			reportError("invalid option");
 			return nullptr;
@@ -117,6 +119,24 @@ protected:
 		ImplicitPlane<Dim> plane(VectorDr::Unit(0) * length / 2, VectorDr::Unit(0));
 		liquid->_levelSet.unionSurface(plane);
 		liquid->_levelSet.intersectSurface(ImplicitBox<Dim>(grid.domainOrigin(), grid.domainLengths()));
+		return liquid;
+	}
+
+	template <int Dim>
+	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase5(int scale)
+	{
+		DECLARE_DIM_TYPES(Dim)
+		if (scale < 0) scale = 200;
+		const real length = real(0.2);
+		const VectorDi resolution = scale * VectorDi::Ones();
+		StaggeredGrid<Dim> grid(length / scale, resolution);
+		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+
+		liquid->_enableGravity = false;
+		liquid->_enableSurfaceTension = true;
+
+		ImplicitEllipsoid<Dim> ellipsoid(VectorDr::Zero(), VectorDr::Ones() * length / 4 + VectorDr::Unit(0) * length / 4);
+		liquid->_levelSet.unionSurface(ellipsoid);
 		return liquid;
 	}
 
