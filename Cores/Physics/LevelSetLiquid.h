@@ -18,7 +18,6 @@ public:
 protected:
 
 	static constexpr int _kLsReinitMaxSteps = 5;
-	static constexpr int _kCsfModelMaxSteps = 2;
 
 	using EulerianFluid<Dim>::_kExtrapMaxSteps;
 	using EulerianFluid<Dim>::_grid;
@@ -37,7 +36,7 @@ protected:
 
 	real _density = real(1e3);
 	real _surfaceTensionCoefficient = real(7.28e-2);
-	
+
 public:
 
 	LevelSetLiquid(const StaggeredGrid<Dim> &grid);
@@ -57,7 +56,7 @@ protected:
 
 	virtual void advectFields(const real dt) override;
 	virtual void applyBodyForces(const real dt) override;
-	virtual void projectVelocity() override;
+	virtual void projectVelocity(const real dt = 0) override;
 
 	virtual void reinitializeLevelSet();
 };

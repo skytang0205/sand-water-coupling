@@ -64,7 +64,7 @@ protected:
 	virtual void advectFields(const real dt);
 	virtual void updateColliders(const real dt);
 	virtual void applyBodyForces(const real dt);
-	virtual void projectVelocity();
+	virtual void projectVelocity(const real dt = 0);
 
 	virtual void updateBoundary();
 };

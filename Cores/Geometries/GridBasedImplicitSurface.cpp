@@ -30,6 +30,7 @@ template <int Dim>
 real GridBasedImplicitSurface<Dim>::curvature(const VectorDr &pos) const
 {
 	const real dx = _signedDistanceField.spacing();
+	real acc = 0;
 	for (int i = 0; i < Dim; i++) {
 		acc += closestNormal(pos + VectorDr::Unit(i) * dx / 2)[i] - closestNormal(pos - VectorDr::Unit(i) * dx / 2)[i];
 	}

@@ -114,7 +114,7 @@ void EulerianFluid<Dim>::advance(const real dt)
 
 	advectFields(dt);
 	applyBodyForces(dt);
-	projectVelocity();
+	projectVelocity(dt);
 }
 
 template <int Dim>
@@ -142,7 +142,7 @@ void EulerianFluid<Dim>::applyBodyForces(const real dt)
 }
 
 template <int Dim>
-void EulerianFluid<Dim>::projectVelocity()
+void EulerianFluid<Dim>::projectVelocity(const real dt)
 {
 	_boundary->enforce(_velocity);
 	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity());

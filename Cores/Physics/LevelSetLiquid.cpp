@@ -97,26 +97,20 @@ void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
 			_velocity[1][face] -= real(kGravity) * dt;
 		});
 	}
-	if (_enableSurfaceTension) {
-		const real bandWidth = _kCsfModelMaxSteps * _velocity.spacing();
-		_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-			const VectorDr pos = _velocity[axis].position(face);
-			const real phi = _levelSet.signedDistance(pos);
-			if (-bandWidth < phi && phi < bandWidth) {
-				_velocity[axis][face] -= MathFunc::dirac(phi, bandWidth) * _surfaceTensionCoefficient
-					* _levelSet.curvature(pos) * _levelSet.closestNormal(pos)[axis] * dt / _density;
-			}
-		});
-	}
 
 	EulerianFluid<Dim>::applyBodyForces(dt);
 }
 
 template <int Dim>
-void LevelSetLiquid<Dim>::projectVelocity()
+void LevelSetLiquid<Dim>::projectVelocity(const real dt)
 {
 	_boundary->enforce(_velocity);
-	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet.signedDistanceField());
+
+	if (_enableSurfaceTension && dt)
+		_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet, _surfaceTensionCoefficient * dt / _density / _velocity.spacing());
+	else
+		_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet);
+
 	_boundary->extrapolate(_velocity, _levelSet, _kExtrapMaxSteps);
 }
 

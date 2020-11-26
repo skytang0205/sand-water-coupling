@@ -10,7 +10,7 @@ void CgSolver::solve(const SparseMatrixr &A, Eigen::Ref<VectorXr, Eigen::Aligned
 		std::exit(-1);
 	}
 	solver.setMaxIterations(max_iterations);
-	solver.setTolerance(std::max(tolerance, tolerance / b.norm()));
+	solver.setTolerance(std::max(tolerance, std::numeric_limits<real>::epsilon() / b.norm()));
 	x = solver.solveWithGuess(b, x);
 	if (solver.info() != Eigen::Success) {
 		std::cerr << "Error: [CgSolver] failed to solve linear system." << std::endl;
@@ -27,7 +27,7 @@ void IcPCgSolver::solve(const SparseMatrixr &A, Eigen::Ref<VectorXr, Eigen::Alig
 		std::exit(-1);
 	}
 	solver.setMaxIterations(max_iterations);
-	solver.setTolerance(std::max(tolerance, tolerance / b.norm()));
+	solver.setTolerance(std::max(tolerance, std::numeric_limits<real>::epsilon() / b.norm()));
 	x = solver.solveWithGuess(b, x);
 	if (solver.info() != Eigen::Success) {
 		std::cerr << "Error: [IcPCgSolver] failed to solve linear system." << std::endl;

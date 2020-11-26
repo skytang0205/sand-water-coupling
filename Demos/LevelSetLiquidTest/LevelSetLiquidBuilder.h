@@ -127,7 +127,7 @@ protected:
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
-		const real length = real(0.2);
+		const real length = real(0.5);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
@@ -135,7 +135,7 @@ protected:
 		liquid->_enableGravity = false;
 		liquid->_enableSurfaceTension = true;
 
-		ImplicitEllipsoid<Dim> ellipsoid(VectorDr::Zero(), VectorDr::Ones() * length / 4 + VectorDr::Unit(0) * length / 4);
+		ImplicitEllipsoid<Dim> ellipsoid(VectorDr::Zero(), VectorDr::Ones() * length / 4 + VectorDr::Unit(0) * length / 6);
 		liquid->_levelSet.unionSurface(ellipsoid);
 		return liquid;
 	}
