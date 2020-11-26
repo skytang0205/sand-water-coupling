@@ -11,7 +11,7 @@ EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_grid(grid),
 	_velocity(&_grid),
 	_boundary(std::make_unique<EulerianBoundary<Dim>>(&_grid)),
-	_advector(std::make_unique<SemiLagrangianAdvector<Dim>>()),
+	_advector(std::make_unique<MacCormackAdvector<Dim>>()),
 	_projector(std::make_unique<EulerianProjector<Dim>>(_grid.cellGrid()))
 { }
 

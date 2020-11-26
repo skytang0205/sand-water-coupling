@@ -54,7 +54,14 @@ public:
 			int(index / _dataSize.x() / _dataSize.y()));
 	}
 
+	void getLowerCoordAndFrac(const VectorDr &pos, VectorDi &lower, VectorDr &frac) const
+	{
+		lower = ((pos - _dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones() * 2);
+		frac = ((pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing).cwiseMax(0).cwiseMin(1);
+	}
+
 	void getLerpCoordsAndWeights(const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const;
+	void getSplineCoordsAndWeights(const VectorDr &pos, std::array<VectorDi, 1 << (Dim << 1)> &coords, std::array<real, 1 << (Dim << 1)> &weights) const;
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const;
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const;

@@ -23,7 +23,7 @@ public:
 };
 
 template <int Dim>
-class SemiLagrangianAdvector final : public EulerianAdvector<Dim>
+class SemiLagrangianAdvector : public EulerianAdvector<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
@@ -39,7 +39,26 @@ public:
 
 protected:
 
+	void advect(const GridBasedScalarField<Dim> &field, GridBasedScalarField<Dim> &newField, const VectorField<Dim> &flow, const real dt) const;
+	void advect(const StaggeredGridBasedVectorField<Dim> &field, StaggeredGridBasedVectorField<Dim> &newField, const VectorField<Dim> &flow, const real dt) const;
+
 	VectorDr backtrace(const VectorDr &startPos, const VectorField<Dim> &flow, const real dt) const;
+};
+
+template <int Dim>
+class MacCormackAdvector : public SemiLagrangianAdvector<Dim>
+{
+	DECLARE_DIM_TYPES(Dim)
+
+public:
+
+	MacCormackAdvector() = default;
+	MacCormackAdvector(const MacCormackAdvector & rhs) = delete;
+	MacCormackAdvector &operator=(const MacCormackAdvector & rhs) = delete;
+	virtual ~MacCormackAdvector() = default;
+
+	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
+	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
 };
 
 }
