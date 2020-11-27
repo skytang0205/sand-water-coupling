@@ -12,7 +12,7 @@
 namespace PhysX {
 
 template <int Dim>
-class EulerianBoundary
+class EulerianBoundaryHelper
 {
 	DECLARE_DIM_TYPES(Dim)
 
@@ -26,11 +26,11 @@ protected:
 
 public:
 
-	EulerianBoundary(const StaggeredGrid<Dim> *const grid);
+	EulerianBoundaryHelper(const StaggeredGrid<Dim> *const grid);
 
-	EulerianBoundary(const EulerianBoundary &rhs) = delete;
-	EulerianBoundary &operator=(const EulerianBoundary &rhs) = delete;
-	virtual ~EulerianBoundary() = default;
+	EulerianBoundaryHelper(const EulerianBoundaryHelper &rhs) = delete;
+	EulerianBoundaryHelper &operator=(const EulerianBoundaryHelper &rhs) = delete;
+	virtual ~EulerianBoundaryHelper() = default;
 
 	const StaggeredGridBasedData<Dim> &fraction() const { return _fraction; }
 	const StaggeredGridBasedVectorField<Dim> &velocity() const { return _velocity; }

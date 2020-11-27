@@ -32,15 +32,11 @@ protected:
 		StaggeredGrid<Dim> grid(length / scale, resolution);
 		auto fluid = std::make_unique<EulerianFluid<Dim>>(grid);
 
-		fluid->_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-			const VectorDr pos = fluid->_velocity[axis].position(face);
-			if constexpr (Dim == 2) fluid->_velocity[axis][face] = (axis == 0 ? -pos.y() : pos.x()) * grid.spacing() * 50;
-		});
 		fluid->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
 				std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), real(0.5))));
 		fluid->_domainBoundaryVelocity = [=](const int axis, const VectorDi &face)->real {
-			return grid.spacing() * (axis == 0 ? face.y() : face.x());
+			return axis == 0 ? 1 : 0;
 		};
 
 		return fluid;

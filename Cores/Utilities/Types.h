@@ -50,8 +50,8 @@ DECLARE_REAL_TYPES(double, d)
 
 #undef DECLARE_REAL_TYPES
 
-template <class Scalar, int Dim> using Vector = Eigen::Matrix<Scalar, Dim, 1>;
-template <class Scalar, int Dim> using Matrix = Eigen::Matrix<Scalar, Dim, Dim>;
+template <typename Scalar, int Dim> using Vector = Eigen::Matrix<Scalar, Dim, 1>;
+template <typename Scalar, int Dim> using Matrix = Eigen::Matrix<Scalar, Dim, Dim>;
 
 #define DECLARE_DIM_TYPES(Dim)										\
 static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");	\

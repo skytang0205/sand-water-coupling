@@ -21,6 +21,10 @@ inline std::unique_ptr<ArgsParser> BuildArgsParser()
 
 int main(int argc, char *argv[])
 {
+#ifdef _OPENMP
+	omp_set_num_threads(std::max(omp_get_num_procs() / 3, 1));
+#endif
+
 	auto parser = BuildArgsParser();
 	parser->parse(argc, argv);
 

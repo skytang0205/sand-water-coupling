@@ -12,17 +12,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EulerianAdvector.h" />
+    <ClInclude Include="EulerianBoundaryHelper.h" />
     <ClInclude Include="EulerianFluid.h" />
     <ClInclude Include="EulerianProjector.h" />
     <ClInclude Include="LevelSetLiquid.h" />
+    <ClInclude Include="ParticleInCellLiquid.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EulerianAdvector.cpp" />
+    <ClCompile Include="EulerianBoundaryHelper.cpp" />
     <ClCompile Include="EulerianFluid.cpp" />
     <ClCompile Include="EulerianProjector.cpp" />
     <ClCompile Include="LevelSetLiquid.cpp" />
+    <ClCompile Include="ParticleInCellLiquid.cpp" />
     <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +112,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)Cores</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

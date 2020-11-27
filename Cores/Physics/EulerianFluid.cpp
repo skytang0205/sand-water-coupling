@@ -10,8 +10,8 @@ template <int Dim>
 EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_grid(grid),
 	_velocity(&_grid),
-	_boundary(std::make_unique<EulerianBoundary<Dim>>(&_grid)),
 	_advector(std::make_unique<SemiLagrangianAdvector<Dim>>()),
+	_boundaryHelper(std::make_unique<EulerianBoundaryHelper<Dim>>(&_grid)),
 	_projector(std::make_unique<EulerianProjector<Dim>>(_grid.cellGrid()))
 { }
 
@@ -66,7 +66,7 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 	{ // Write neumann.
 		std::ofstream fout(frameDir + "/neumann.mesh", std::ios::binary);
 		uint cnt = 0;
-		const auto &boundaryFraction = _boundary->fraction();
+		const auto &boundaryFraction = _boundaryHelper->fraction();
 		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
 			if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
 				cnt++;
@@ -144,15 +144,15 @@ void EulerianFluid<Dim>::applyBodyForces(const real dt)
 template <int Dim>
 void EulerianFluid<Dim>::projectVelocity(const real dt)
 {
-	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity());
-	_boundary->extrapolate(_velocity, _kExtrapMaxSteps);
-	_boundary->enforce(_velocity);
+	_projector->project(_velocity, _boundaryHelper->fraction(), _boundaryHelper->velocity());
+	_boundaryHelper->extrapolate(_velocity, _kExtrapMaxSteps);
+	_boundaryHelper->enforce(_velocity);
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::updateBoundary()
 {
-	_boundary->reset(_colliders, _domainBoundaryVelocity);
+	_boundaryHelper->reset(_colliders, _domainBoundaryVelocity);
 }
 
 template class EulerianFluid<2>;

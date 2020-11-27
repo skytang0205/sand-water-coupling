@@ -23,8 +23,8 @@ protected:
 	using EulerianFluid<Dim>::_grid;
 	using EulerianFluid<Dim>::_velocity;
 	using EulerianFluid<Dim>::_colliders;
-	using EulerianFluid<Dim>::_boundary;
 	using EulerianFluid<Dim>::_advector;
+	using EulerianFluid<Dim>::_boundaryHelper;
 	using EulerianFluid<Dim>::_projector;
 
 	GridBasedImplicitSurface<Dim> _levelSet;

@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collider.h" />
-    <ClInclude Include="EulerianBoundary.h" />
     <ClInclude Include="GridBasedImplicitSurface.h" />
     <ClInclude Include="ImplicitSurface.h" />
     <ClInclude Include="LevelSetContourer.h" />
@@ -22,7 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="EulerianBoundary.cpp" />
     <ClCompile Include="GridBasedImplicitSurface.cpp" />
     <ClCompile Include="LevelSetContourer.cpp" />
     <ClCompile Include="LevelSetReinitializer.cpp" />
@@ -111,6 +109,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)Cores</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

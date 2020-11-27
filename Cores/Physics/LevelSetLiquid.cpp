@@ -105,12 +105,12 @@ template <int Dim>
 void LevelSetLiquid<Dim>::projectVelocity(const real dt)
 {
 	if (_enableSurfaceTension && dt)
-		_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet, _surfaceTensionCoefficient * dt / _density / _velocity.spacing());
+		_projector->project(_velocity, _boundaryHelper->fraction(), _boundaryHelper->velocity(), _levelSet, _surfaceTensionCoefficient * dt / _density / _velocity.spacing());
 	else
-		_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet);
+		_projector->project(_velocity, _boundaryHelper->fraction(), _boundaryHelper->velocity(), _levelSet);
 
-	_boundary->extrapolate(_velocity, _levelSet, _kExtrapMaxSteps);
-	_boundary->enforce(_velocity);
+	_boundaryHelper->extrapolate(_velocity, _levelSet, _kExtrapMaxSteps);
+	_boundaryHelper->enforce(_velocity);
 }
 
 template <int Dim>

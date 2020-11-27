@@ -16,6 +16,7 @@
     <ClInclude Include="Field.h" />
     <ClInclude Include="GridBasedScalarField.h" />
     <ClInclude Include="GridBasedVectorField.h" />
+    <ClInclude Include="ParticlesAttribute.h" />
     <ClInclude Include="StaggeredGrid.h" />
     <ClInclude Include="StaggeredGridBasedData.h" />
     <ClInclude Include="StaggeredGridBasedVectorField.h" />
@@ -107,6 +108,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)Cores</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

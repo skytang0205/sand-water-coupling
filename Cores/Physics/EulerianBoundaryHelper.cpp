@@ -1,4 +1,4 @@
-#include "EulerianBoundary.h"
+#include "EulerianBoundaryHelper.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -6,7 +6,7 @@
 namespace PhysX {
 
 template <int Dim>
-EulerianBoundary<Dim>::EulerianBoundary(const StaggeredGrid<Dim> *const grid) :
+EulerianBoundaryHelper<Dim>::EulerianBoundaryHelper(const StaggeredGrid<Dim> *const grid) :
 	_domainBox(grid->domainOrigin(), grid->domainLengths()),
 	_surface(grid->nodeGrid()),
 	_fraction(grid),
@@ -15,7 +15,7 @@ EulerianBoundary<Dim>::EulerianBoundary(const StaggeredGrid<Dim> *const grid) :
 { }
 
 template <int Dim>
-void EulerianBoundary<Dim>::reset(
+void EulerianBoundaryHelper<Dim>::reset(
 	const std::vector<std::unique_ptr<Collider<Dim>>> &colliders,
 	const std::function<real(const int axis, const VectorDi &face)> &domainBoundaryVelocity)
 {
@@ -44,7 +44,7 @@ void EulerianBoundary<Dim>::reset(
 }
 
 template <int Dim>
-void EulerianBoundary<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity)
+void EulerianBoundaryHelper<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity)
 {
 	fluidVelocity.forEach([&](const int axis, const VectorDi &face) {
 		if (_fraction[axis][face] == 1) {
@@ -56,7 +56,7 @@ void EulerianBoundary<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fluidVel
 }
 
 template <int Dim>
-void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps)
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps)
 {
 	auto newVelocity = fluidVelocity;
 	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(fluidVelocity.staggeredGrid());
@@ -91,7 +91,7 @@ void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &flui
 
 
 template <int Dim>
-void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps)
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps)
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
@@ -124,7 +124,7 @@ void EulerianBoundary<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &flui
 }
 
 template <int Dim>
-real EulerianBoundary<Dim>::getFaceFraction(const int axis, const VectorDi &face) const
+real EulerianBoundaryHelper<Dim>::getFaceFraction(const int axis, const VectorDi &face) const
 {
 	const auto &sdf = _surface.signedDistanceField();
 	real faceFraction;
@@ -147,7 +147,7 @@ real EulerianBoundary<Dim>::getFaceFraction(const int axis, const VectorDi &face
 	return faceFraction > real(0.9) ? real(1) : faceFraction;
 }
 
-template class EulerianBoundary<2>;
-template class EulerianBoundary<3>;
+template class EulerianBoundaryHelper<2>;
+template class EulerianBoundaryHelper<3>;
 
 }

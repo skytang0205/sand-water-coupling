@@ -7,7 +7,7 @@
 
 namespace YAML {
 
-template <class Scalar, int Dim>
+template <typename Scalar, int Dim>
 struct convert<PhysX::Vector<Scalar, Dim>>
 {
 	static Node encode(const PhysX::Vector<Scalar, Dim> &rhs)

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Geometries/Collider.h"
-#include "Geometries/EulerianBoundary.h"
 #include "Geometries/GridBasedImplicitSurface.h"
 #include "Physics/EulerianAdvector.h"
+#include "Physics/EulerianBoundaryHelper.h"
 #include "Physics/EulerianProjector.h"
 #include "Physics/Simulation.h"
 #include "Structures/StaggeredGridBasedData.h"
@@ -35,8 +35,8 @@ protected:
 
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 	std::function<real(const int, const VectorDi &)> _domainBoundaryVelocity;
-	std::unique_ptr<EulerianBoundary<Dim>> _boundary;
 
+	std::unique_ptr<EulerianBoundaryHelper<Dim>> _boundaryHelper;
 	std::unique_ptr<EulerianAdvector<Dim>> _advector;
 	std::unique_ptr<EulerianProjector<Dim>> _projector;
 
