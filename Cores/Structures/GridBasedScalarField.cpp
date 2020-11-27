@@ -16,7 +16,7 @@ real GridBasedScalarField<Dim>::operator()(const VectorDr &pos) const
 }
 
 template <int Dim>
-Vector<real, Dim> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi &coord) const
+Vector<Dim, real> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi &coord) const
 {
 	VectorDr acc;
 	for (int i = 0; i < Dim; i++) {
@@ -27,7 +27,7 @@ Vector<real, Dim> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi 
 }
 
 template <int Dim>
-Vector<real, Dim> GridBasedScalarField<Dim>::gradient(const VectorDr &pos) const
+Vector<Dim, real> GridBasedScalarField<Dim>::gradient(const VectorDr &pos) const
 {
 	std::array<VectorDi, 1 << Dim> coords;
 	std::array<real, 1 << Dim> weights;

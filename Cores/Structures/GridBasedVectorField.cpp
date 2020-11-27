@@ -3,7 +3,7 @@
 namespace PhysX {
 
 template <int Dim>
-Vector<real, Dim> GridBasedVectorField<Dim>::operator()(const VectorDr &pos) const
+Vector<Dim, real> GridBasedVectorField<Dim>::operator()(const VectorDr &pos) const
 {
 	std::array<VectorDi, 1 << Dim> coords;
 	std::array<real, 1 << Dim> weights;

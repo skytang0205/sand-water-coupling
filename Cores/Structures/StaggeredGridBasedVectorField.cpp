@@ -3,7 +3,7 @@
 namespace PhysX {
 
 template <int Dim>
-Vector<real, Dim> StaggeredGridBasedVectorField<Dim>::operator()(const VectorDr &pos) const
+Vector<Dim, real> StaggeredGridBasedVectorField<Dim>::operator()(const VectorDr &pos) const
 {
 	VectorDr vec;
 	for (int axis = 0; axis < Dim; axis++)

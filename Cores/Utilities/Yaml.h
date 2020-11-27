@@ -7,10 +7,10 @@
 
 namespace YAML {
 
-template <typename Scalar, int Dim>
-struct convert<PhysX::Vector<Scalar, Dim>>
+template <typename Derived, int Rows>
+struct convert<Eigen::Matrix<Derived, Rows, 1>>
 {
-	static Node encode(const PhysX::Vector<Scalar, Dim> &rhs)
+	static Node encode(const Eigen::Matrix<Derived, Rows, 1> &rhs)
 	{
 		Node node;
 		for (int i = 0; i < rhs.size(); i++) {
@@ -19,13 +19,14 @@ struct convert<PhysX::Vector<Scalar, Dim>>
 		node.SetStyle(EmitterStyle::Flow);
 		return node;
 	}
-	static bool decode(const Node &node, PhysX::Vector<Scalar, Dim> &rhs)
+
+	static bool decode(const Node &node, Eigen::Matrix<Derived, Rows, 1> &rhs)
 	{
 		if (!node.IsSequence() || node.size() != rhs.size()) {
 			return false;
 		}
 		for (int i = 0; i < rhs.size(); i++) {
-			rhs[i] = node[i].as<Scalar>();
+			rhs[i] = node[i].as<Derived>();
 		}
 		return true;
 	}

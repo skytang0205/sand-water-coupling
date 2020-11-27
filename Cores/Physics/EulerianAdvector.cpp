@@ -19,11 +19,19 @@ void SemiLagrangianAdvector<Dim>::advect(StaggeredGridBasedVectorField<Dim> &fie
 }
 
 template <int Dim>
+void SemiLagrangianAdvector<Dim>::advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt)
+{
+	positions.parallelForEach([&](const int i) {
+		positions[i] = trace(positions[i], flow, dt);
+	});
+}
+
+template <int Dim>
 void SemiLagrangianAdvector<Dim>::advect(const GridBasedScalarField<Dim> &field, GridBasedScalarField<Dim> &newField, const VectorField<Dim> &flow, const real dt) const
 {
 	newField.parallelForEach([&](const VectorDi &coord) {
 		const VectorDr pos = newField.position(coord);
-		newField[coord] = field(backtrace(pos, flow, dt));
+		newField[coord] = field(trace(pos, flow, -dt));
 	});
 }
 
@@ -32,15 +40,15 @@ void SemiLagrangianAdvector<Dim>::advect(const StaggeredGridBasedVectorField<Dim
 {
 	newField.parallelForEach([&](const int axis, const VectorDi &face) {
 		const VectorDr pos = newField[axis].position(face);
-		newField[axis][face] = field[axis](backtrace(pos, flow, dt));
+		newField[axis][face] = field[axis](trace(pos, flow, -dt));
 	});
 }
 
 template <int Dim>
-Vector<real, Dim> SemiLagrangianAdvector<Dim>::backtrace(const VectorDr &startPos, const VectorField<Dim> &flow, const real dt) const
+Vector<Dim, real> SemiLagrangianAdvector<Dim>::trace(const VectorDr &startPos, const VectorField<Dim> &flow, const real dt) const
 {
-	const VectorDr midPos = startPos - flow(startPos) * dt * real(0.5);
-	VectorDr stopPos = startPos - flow(midPos) * dt;
+	const VectorDr midPos = startPos + flow(startPos) * dt * real(0.5);
+	VectorDr stopPos = startPos + flow(midPos) * dt;
 	return stopPos;
 }
 
@@ -65,6 +73,16 @@ void MacCormackAdvector<Dim>::advect(StaggeredGridBasedVectorField<Dim> &field, 
 	SemiLagrangianAdvector<Dim>::advect(forwardField, backwardField, flow, -dt);
 	field.parallelForEach([&](const int axis, const VectorDi &coord) {
 		field[axis][coord] = forwardField[axis][coord] + (field[axis][coord] - backwardField[axis][coord]) * real(0.5);
+	});
+}
+
+template <int Dim>
+void MacCormackAdvector<Dim>::advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt)
+{
+	positions.parallelForEach([&](const int i) {
+		const VectorDr forwardPos = trace(positions[i], flow, dt);
+		const VectorDr backwardPos = trace(forwardPos, flow, -dt);
+		positions[i] = forwardPos + (positions[i] - backwardPos) * real(0.5);
 	});
 }
 

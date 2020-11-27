@@ -50,15 +50,15 @@ DECLARE_REAL_TYPES(double, d)
 
 #undef DECLARE_REAL_TYPES
 
-template <typename Scalar, int Dim> using Vector = Eigen::Matrix<Scalar, Dim, 1>;
-template <typename Scalar, int Dim> using Matrix = Eigen::Matrix<Scalar, Dim, Dim>;
+template <int Dim, typename Scalar> using Vector = Eigen::Matrix<Scalar, Dim, 1>;
+template <int Dim, typename Scalar> using Matrix = Eigen::Matrix<Scalar, Dim, Dim>;
 
 #define DECLARE_DIM_TYPES(Dim)										\
 static_assert(2 <= Dim && Dim <= 3, "Dimension must be 2 or 3.");	\
-using	VectorDr			=	Vector<real, Dim>;					\
-using	VectorDf			=	Vector<float, Dim>;					\
-using	VectorDi			=	Vector<int, Dim>;					\
-using	MatrixDr			=	Matrix<real, Dim>;
+using	VectorDr			=	Vector<Dim, real>;					\
+using	VectorDf			=	Vector<Dim, float>;					\
+using	VectorDi			=	Vector<Dim, int>;					\
+using	MatrixDr			=	Matrix<Dim, real>;
 
 using	uchar				=	unsigned char;
 using	ushort				=	unsigned short;

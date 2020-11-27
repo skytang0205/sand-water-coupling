@@ -6,7 +6,7 @@
 namespace PhysX {
 
 template <int Dim>
-class GridBasedVectorField final : public VectorField<Dim>, public GridBasedData<Dim, Vector<real, Dim>>
+class GridBasedVectorField final : public VectorField<Dim>, public GridBasedData<Dim, Vector<Dim, real>>
 {
 	DECLARE_DIM_TYPES(Dim)
 

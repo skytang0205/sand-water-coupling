@@ -2,6 +2,7 @@
 
 #include "Structures/GridBasedScalarField.h"
 #include "Structures/GridBasedVectorField.h"
+#include "Structures/ParticlesAttribute.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
 
 namespace PhysX {
@@ -20,6 +21,7 @@ public:
 
 	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) = 0;
 	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) = 0;
+	virtual void advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt) = 0;
 };
 
 template <int Dim>
@@ -36,13 +38,14 @@ public:
 
 	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
 	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
+	virtual void advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt) override;
 
 protected:
 
 	void advect(const GridBasedScalarField<Dim> &field, GridBasedScalarField<Dim> &newField, const VectorField<Dim> &flow, const real dt) const;
 	void advect(const StaggeredGridBasedVectorField<Dim> &field, StaggeredGridBasedVectorField<Dim> &newField, const VectorField<Dim> &flow, const real dt) const;
 
-	VectorDr backtrace(const VectorDr &startPos, const VectorField<Dim> &flow, const real dt) const;
+	VectorDr trace(const VectorDr &startPos, const VectorField<Dim> &flow, const real dt) const;
 };
 
 template <int Dim>
@@ -59,6 +62,11 @@ public:
 
 	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
 	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
+	virtual void advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt) override;
+
+protected:
+
+	using SemiLagrangianAdvector<Dim>::trace;
 };
 
 }

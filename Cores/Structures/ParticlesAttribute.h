@@ -17,32 +17,39 @@ protected:
 
 public:
 
-	ParticlesAttribute() = default;
+	ParticlesAttribute(const size_t cnt = 0, const Type &val = Type()) { resize(cnt, val); }
+
 	virtual ~ParticlesAttribute() = default;
 
 	size_t size() const { return _data.size(); }
-	void resize(const size_t cnt) { _data.resize(cnt); }
+	void resize(const size_t cnt, const Type &val = Type()) { _data.resize(cnt, val); }
 	void clear() { _data.clear(); }
 	void add(const Type &val) { _data.push_back(val); }
 
-	Type &operator[](const size_t idx) { return _data[idx]; }
-	const Type &operator[](const size_t idx) const { return _data[idx]; }
+	Type *data() { return _data.data(); }
+	const Type *data() const { return _data.data(); }
 
-	void forEach(const std::function<void(const size_t)> &func) const
+	Type &operator[](const int idx) { return _data[idx]; }
+	const Type &operator[](const int idx) const { return _data[idx]; }
+
+	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
+	void setZero() { setConstant(Type(0)); }
+
+	void forEach(const std::function<void(const int)> &func) const
 	{
-		for (size_t i = 0; i < _data.size(); i++) func(i);
+		for (int i = 0; i < _data.size(); i++) func(i);
 	}
 
-	void parallelForEach(const std::function<void(const size_t)> &func) const
+	void parallelForEach(const std::function<void(const int)> &func) const
 	{
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-		for (size_t i = 0; i < _data.size(); i++) func(i);
+		for (int i = 0; i < _data.size(); i++) func(i);
 	}
 };
 
 template <int Dim> using ParticlesScalarAttribute = ParticlesAttribute<Dim, real>;
-template <int Dim> using ParticlesVectorAttribute = ParticlesAttribute<Dim, VectorDr>;
+template <int Dim> using ParticlesVectorAttribute = ParticlesAttribute<Dim, Vector<Dim, real>>;
 
 }
