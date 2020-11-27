@@ -104,14 +104,13 @@ void LevelSetLiquid<Dim>::applyBodyForces(const real dt)
 template <int Dim>
 void LevelSetLiquid<Dim>::projectVelocity(const real dt)
 {
-	_boundary->enforce(_velocity);
-
 	if (_enableSurfaceTension && dt)
 		_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet, _surfaceTensionCoefficient * dt / _density / _velocity.spacing());
 	else
 		_projector->project(_velocity, _boundary->fraction(), _boundary->velocity(), _levelSet);
 
 	_boundary->extrapolate(_velocity, _levelSet, _kExtrapMaxSteps);
+	_boundary->enforce(_velocity);
 }
 
 template <int Dim>

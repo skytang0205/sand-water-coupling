@@ -11,7 +11,7 @@ EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 	_grid(grid),
 	_velocity(&_grid),
 	_boundary(std::make_unique<EulerianBoundary<Dim>>(&_grid)),
-	_advector(std::make_unique<MacCormackAdvector<Dim>>()),
+	_advector(std::make_unique<SemiLagrangianAdvector<Dim>>()),
 	_projector(std::make_unique<EulerianProjector<Dim>>(_grid.cellGrid()))
 { }
 
@@ -144,9 +144,9 @@ void EulerianFluid<Dim>::applyBodyForces(const real dt)
 template <int Dim>
 void EulerianFluid<Dim>::projectVelocity(const real dt)
 {
-	_boundary->enforce(_velocity);
 	_projector->project(_velocity, _boundary->fraction(), _boundary->velocity());
 	_boundary->extrapolate(_velocity, _kExtrapMaxSteps);
+	_boundary->enforce(_velocity);
 }
 
 template <int Dim>

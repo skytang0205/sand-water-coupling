@@ -49,7 +49,7 @@ void EulerianBoundary<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fluidVel
 	fluidVelocity.forEach([&](const int axis, const VectorDi &face) {
 		if (_fraction[axis][face] == 1) {
 			const VectorDr pos = fluidVelocity[axis].position(face);
-			const VectorDr n = _normal(pos);
+			const VectorDr n = _normal(pos).normalized();
 			fluidVelocity[axis][face] -= (fluidVelocity(pos) - _velocity(pos)).dot(n) * _normal[axis][face];
 		}
 	});
