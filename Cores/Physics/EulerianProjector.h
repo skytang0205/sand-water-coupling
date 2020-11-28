@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Geometries/Collider.h"
-#include "Geometries/GridBasedImplicitSurface.h"
+#include "Geometries/LevelSet.h"
 #include "Solvers/SparseSolver.h"
 #include "Structures/GridBasedScalarField.h"
 #include "Structures/StaggeredGridBasedData.h"
@@ -39,7 +39,7 @@ public:
 	void project(StaggeredGridBasedVectorField<Dim> &velocity,
 		const StaggeredGridBasedData<Dim> &boundaryFraction,
 		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
-		const GridBasedImplicitSurface<Dim> &liquidSurface,
+		const LevelSet<Dim> &liquidLevelSet,
 		const real surfaceTensionMultiplier = 0);
 
 protected:
@@ -57,19 +57,19 @@ protected:
 	void buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity,
 		const StaggeredGridBasedData<Dim> &boundaryFraction,
 		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
-		const GridBasedImplicitSurface<Dim> &liquidSurface,
+		const LevelSet<Dim> &liquidLevelSet,
 		const real surfaceTensionMultiplier);
 	void applyPressureGradient(
 		StaggeredGridBasedVectorField<Dim> &velocity,
 		const StaggeredGridBasedData<Dim> &boundaryFraction,
-		const GridBasedImplicitSurface<Dim> &liquidSurface,
+		const LevelSet<Dim> &liquidLevelSet,
 		const real surfaceTensionMultiplier) const;
 
 	real getReducedPressureJump(
 		const VectorDi &cell0,
 		const VectorDi &cell1,
 		const real theta,
-		const GridBasedImplicitSurface<Dim> &liquidSurface,
+		const LevelSet<Dim> &liquidLevelSet,
 		const real surfaceTensionMultiplier) const;
 };
 

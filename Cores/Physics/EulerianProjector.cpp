@@ -26,12 +26,12 @@ void EulerianProjector<Dim>::project(
 	StaggeredGridBasedVectorField<Dim> &velocity,
 	const StaggeredGridBasedData<Dim> &boundaryFraction,
 	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
-	const GridBasedImplicitSurface<Dim> &liquidSurface,
+	const LevelSet<Dim> &liquidLevelSet,
 	const real surfaceTensionMultiplier)
 {
-	buildLinearSystem(velocity, boundaryFraction, boundaryVelocity, liquidSurface, surfaceTensionMultiplier);
+	buildLinearSystem(velocity, boundaryFraction, boundaryVelocity, liquidLevelSet, surfaceTensionMultiplier);
 	solveLinearSystem();
-	applyPressureGradient(velocity, boundaryFraction, liquidSurface, surfaceTensionMultiplier);
+	applyPressureGradient(velocity, boundaryFraction, liquidLevelSet, surfaceTensionMultiplier);
 }
 
 template <int Dim>
@@ -95,13 +95,13 @@ void EulerianProjector<Dim>::buildLinearSystem(
 	StaggeredGridBasedVectorField<Dim> &velocity,
 	const StaggeredGridBasedData<Dim> &boundaryFraction,
 	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
-	const GridBasedImplicitSurface<Dim> &liquidSurface,
+	const LevelSet<Dim> &liquidLevelSet,
 	const real surfaceTensionMultiplier)
 {
 	_coefficients.clear();
 	_matLaplacian.setZero();
 
-	const auto &liquidSdf = liquidSurface.signedDistanceField();
+	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	_reducedPressure.forEach([&](const VectorDi &cell) {
 		const int idx = int(_reducedPressure.index(cell));
 		real diagCoeff = 0;
@@ -123,7 +123,7 @@ void EulerianProjector<Dim>::buildLinearSystem(
 						const real intfCoef = 1 / std::max(theta, real(0.001));
 						diagCoeff += weight * intfCoef;
 						if (surfaceTensionMultiplier)
-							div -= getReducedPressureJump(cell, nbCell, theta, liquidSurface, surfaceTensionMultiplier) * weight * intfCoef;
+							div -= getReducedPressureJump(cell, nbCell, theta, liquidLevelSet, surfaceTensionMultiplier) * weight * intfCoef;
 					}
 					div += side * weight * velocity[axis][face];
 				}
@@ -142,10 +142,10 @@ template <int Dim>
 void EulerianProjector<Dim>::applyPressureGradient(
 	StaggeredGridBasedVectorField<Dim> &velocity,
 	const StaggeredGridBasedData<Dim> &boundaryFraction,
-	const GridBasedImplicitSurface<Dim> &liquidSurface,
+	const LevelSet<Dim> &liquidLevelSet,
 	const real surfaceTensionMultiplier) const
 {
-	const auto &liquidSdf = liquidSurface.signedDistanceField();
+	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (boundaryFraction[axis][face] < 1) {
 			const VectorDi cell0 = StaggeredGrid<Dim>::faceAdjacentCell(axis, face, 0);
@@ -157,7 +157,7 @@ void EulerianProjector<Dim>::applyPressureGradient(
 				velocity[axis][face] += (_reducedPressure[cell1] - _reducedPressure[cell0]) * intfCoef;
 				if (surfaceTensionMultiplier && Surface<Dim>::isInterface(phi0, phi1)) {
 					const real theta = Surface<Dim>::theta(phi0, phi1);
-					const real reducedPressureJump = getReducedPressureJump(cell0, cell1, theta, liquidSurface, surfaceTensionMultiplier) * intfCoef;
+					const real reducedPressureJump = getReducedPressureJump(cell0, cell1, theta, liquidLevelSet, surfaceTensionMultiplier) * intfCoef;
 					velocity[axis][face] += (Surface<Dim>::isInside(phi0) ? -1 : 1) * reducedPressureJump;
 				}
 			}
@@ -170,11 +170,11 @@ real EulerianProjector<Dim>::getReducedPressureJump(
 	const VectorDi &cell0,
 	const VectorDi &cell1,
 	const real theta,
-	const GridBasedImplicitSurface<Dim> &liquidSurface,
+	const LevelSet<Dim> &liquidLevelSet,
 	const real surfaceTensionMultiplier) const
 {
 	const VectorDr pos = (1 - theta) * _reducedPressure.position(cell0) + theta * _reducedPressure.position(cell1);
-	return liquidSurface.curvature(pos) * surfaceTensionMultiplier;
+	return liquidLevelSet.curvature(pos) * surfaceTensionMultiplier;
 }
 
 template class EulerianProjector<2>;

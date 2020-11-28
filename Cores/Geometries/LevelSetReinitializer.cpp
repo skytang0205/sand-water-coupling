@@ -14,7 +14,7 @@ FastMarchingReinitializer<Dim>::FastMarchingReinitializer(const Grid<Dim> *const
 { }
 
 template <int Dim>
-void FastMarchingReinitializer<Dim>::reinitialize(GridBasedImplicitSurface<Dim> &levelSet, const int maxSteps)
+void FastMarchingReinitializer<Dim>::reinitialize(LevelSet<Dim> &levelSet, const int maxSteps)
 {
 	auto &phi = levelSet.signedDistanceField();
 	const real bandWidth = maxSteps * phi.spacing();

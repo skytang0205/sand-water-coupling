@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Geometries/GridBasedImplicitSurface.h"
+#include "Geometries/LevelSet.h"
 #include "Utilities/IO.h"
 
 #include <vector>
@@ -19,7 +19,7 @@ public:
 	std::vector<uint> indices;
 
 	SurfaceMesh() = default;
-	SurfaceMesh(const GridBasedImplicitSurface<Dim> &levelSet);
+	SurfaceMesh(const LevelSet<Dim> &levelSet);
 	virtual ~SurfaceMesh() = default;
 
 	// TODO: implement following functions.

@@ -28,9 +28,6 @@
     <ClInclude Include="Collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GridBasedImplicitSurface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImplicitSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -38,6 +35,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LevelSetContourer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleLevelSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -48,13 +51,13 @@
     <ClCompile Include="Collider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GridBasedImplicitSurface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LevelSetReinitializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LevelSetContourer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

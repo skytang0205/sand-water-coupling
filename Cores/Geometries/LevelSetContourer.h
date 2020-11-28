@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Geometries/GridBasedImplicitSurface.h"
+#include "Geometries/LevelSet.h"
 
 namespace PhysX {
 
@@ -17,7 +17,7 @@ public:
 	virtual ~LevelSetContourer() = default;
 
 	virtual void contour(
-		const GridBasedImplicitSurface<Dim> &levelSet,
+		const LevelSet<Dim> &levelSet,
 		std::vector<VectorDr> &positions,
 		std::vector<VectorDr> &normals,
 		std::vector<uint> &indices) = 0;
@@ -45,7 +45,7 @@ public:
 	virtual ~MarchingCubesContourer() = default;
 
 	virtual void contour(
-		const GridBasedImplicitSurface<Dim> &levelSet,
+		const LevelSet<Dim> &levelSet,
 		std::vector<VectorDr> &positions,
 		std::vector<VectorDr> &normals,
 		std::vector<uint> &indices) override;

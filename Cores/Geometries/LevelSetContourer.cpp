@@ -2,6 +2,10 @@
 
 #include "Structures/StaggeredGrid.h"
 
+#include <iostream>
+
+#include <cstdlib>
+
 namespace PhysX {
 
 template <>
@@ -35,9 +39,14 @@ MarchingCubesContourer<3>::MarchingCubesContourer(const Grid<3> *const nodeGrid)
 { }
 
 template <int Dim>
-void MarchingCubesContourer<Dim>::contour(const GridBasedImplicitSurface<Dim> &levelSet, std::vector<VectorDr> &positions, std::vector<VectorDr> &normals, std::vector<uint> &indices)
+void MarchingCubesContourer<Dim>::contour(const LevelSet<Dim> &levelSet, std::vector<VectorDr> &positions, std::vector<VectorDr> &normals, std::vector<uint> &indices)
 {
 	const auto &sdf = levelSet.signedDistanceField();
+	if (sdf.grid() != _nodeGrid) {
+		std::cerr << "Error: [MarchingCubesContourer] encountered incompatible grid." << std::endl;
+		std::exit(-1);
+	}
+
 	positions.clear();
 	normals.clear();
 	indices.clear();

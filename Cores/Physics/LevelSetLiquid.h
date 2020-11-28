@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Geometries/GridBasedImplicitSurface.h"
 #include "Geometries/LevelSetReinitializer.h"
 #include "Physics/EulerianFluid.h"
 
@@ -27,7 +26,7 @@ protected:
 	using EulerianFluid<Dim>::_boundaryHelper;
 	using EulerianFluid<Dim>::_projector;
 
-	GridBasedImplicitSurface<Dim> _levelSet;
+	LevelSet<Dim> _levelSet;
 
 	std::unique_ptr<LevelSetReinitializer<Dim>> _levelSetReinitializer;
 

@@ -6,7 +6,7 @@
 namespace PhysX {
 
 template <int Dim>
-class GridBasedImplicitSurface final : public ImplicitSurface<Dim>
+class LevelSet : public ImplicitSurface<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
@@ -16,10 +16,10 @@ protected:
 
 public:
 
-	GridBasedImplicitSurface(const Grid<Dim> *const grid) : _signedDistanceField(grid, std::numeric_limits<real>::infinity()) { }
-	GridBasedImplicitSurface(const Grid<Dim> *const grid, const Surface<Dim> &surface) : _signedDistanceField(grid, std::numeric_limits<real>::infinity()) { unionSurface(surface); }
+	LevelSet(const Grid<Dim> *const grid) : _signedDistanceField(grid, std::numeric_limits<real>::infinity()) { }
+	LevelSet(const Grid<Dim> *const grid, const Surface<Dim> &surface) : _signedDistanceField(grid, std::numeric_limits<real>::infinity()) { unionSurface(surface); }
 
-	virtual ~GridBasedImplicitSurface() = default;
+	virtual ~LevelSet() = default;
 
 	void clear() { _signedDistanceField.setConstant(std::numeric_limits<real>::infinity()); }
 	void unionSurface(const Surface<Dim> &surface);

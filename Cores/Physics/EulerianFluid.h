@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Geometries/Collider.h"
-#include "Geometries/GridBasedImplicitSurface.h"
 #include "Physics/EulerianAdvector.h"
 #include "Physics/EulerianBoundaryHelper.h"
 #include "Physics/EulerianProjector.h"

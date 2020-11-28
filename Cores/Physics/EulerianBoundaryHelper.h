@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Geometries/Collider.h"
-#include "Geometries/GridBasedImplicitSurface.h"
-#include "Geometries/LevelSetReinitializer.h"
+#include "Geometries/LevelSet.h"
 #include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
 #include "Structures/ParticlesAttribute.h"
@@ -20,7 +19,7 @@ class EulerianBoundaryHelper
 protected:
 
 	ImplicitBox<Dim> _domainBox;
-	GridBasedImplicitSurface<Dim> _surface;
+	LevelSet<Dim> _surface;
 	StaggeredGridBasedData<Dim> _fraction;
 	StaggeredGridBasedVectorField<Dim> _velocity;
 	StaggeredGridBasedVectorField<Dim> _normal;
@@ -44,7 +43,7 @@ public:
 	void enforce(ParticlesVectorAttribute<Dim> &markerPositions) const;
 
 	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps = -1) const;
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps = -1) const;
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps = -1) const;
 
 protected:
 

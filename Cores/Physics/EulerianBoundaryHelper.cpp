@@ -67,7 +67,7 @@ void EulerianBoundaryHelper<Dim>::enforce(ParticlesVectorAttribute<Dim> &markerP
 		VectorDr &pos = markerPositions[i];
 		if (!_domainBox.isInside(pos))
 			pos = _domainBox.closestPosition(pos);
-		else if (_surface.isInside(pos)
+		else if (_surface.isInside(pos))
 			pos = _surface.closestPosition(pos);
 	});
 }
@@ -108,7 +108,7 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps) const
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps) const
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
