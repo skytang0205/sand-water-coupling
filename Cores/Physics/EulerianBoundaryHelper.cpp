@@ -44,7 +44,7 @@ void EulerianBoundaryHelper<Dim>::reset(
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity)
+void EulerianBoundaryHelper<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity) const
 {
 	auto newFluidVelocity = fluidVelocity;
 	newFluidVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
@@ -61,7 +61,19 @@ void EulerianBoundaryHelper<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fl
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, const int maxSteps)
+void EulerianBoundaryHelper<Dim>::enforce(ParticlesVectorAttribute<Dim> &markerPositions) const
+{
+	markerPositions.parallelForEach([&](const int i) {
+		VectorDr &pos = markerPositions[i];
+		if (!_domainBox.isInside(pos))
+			pos = _domainBox.closestPosition(pos);
+		else if (_surface.isInside(pos)
+			pos = _surface.closestPosition(pos);
+	});
+}
+
+template <int Dim>
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, const int maxSteps) const
 {
 	auto newVelocty = velocity;
 	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(velocity.staggeredGrid());
@@ -96,7 +108,7 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps)
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps) const
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {

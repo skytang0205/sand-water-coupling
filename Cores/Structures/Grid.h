@@ -12,6 +12,8 @@ class Grid final
 {
 	DECLARE_DIM_TYPES(Dim)
 
+	using IntrplDataPoint = std::pair<VectorDi, real>;
+
 protected:
 
 	const real _spacing;
@@ -54,14 +56,15 @@ public:
 			int(index / _dataSize.x() / _dataSize.y()));
 	}
 
-	void getLowerCoordAndFrac(const VectorDr &pos, VectorDi &lower, VectorDr &frac) const
+	auto getLowerCoordAndFrac(const VectorDr &pos) const
 	{
-		lower = ((pos - _dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones() * 2);
-		frac = ((pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing).cwiseMax(0).cwiseMin(1);
+		const VectorDi lower = ((pos - _dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones() * 2);
+		const VectorDr frac = ((pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing).cwiseMax(0).cwiseMin(1);
+		return std::make_pair(lower, frac);
 	}
 
-	void getLerpCoordsAndWeights(const VectorDr &pos, std::array<VectorDi, 1 << Dim> &coords, std::array<real, 1 << Dim> &weights) const;
-	void getSplineCoordsAndWeights(const VectorDr &pos, std::array<VectorDi, 1 << (Dim << 1)> &coords, std::array<real, 1 << (Dim << 1)> &weights) const;
+	std::array<IntrplDataPoint, 1 << Dim> linearIntrplDataPoints(const VectorDr &pos) const;
+	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const;
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const;
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const;

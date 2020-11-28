@@ -24,10 +24,12 @@ public:
 	virtual void advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt) = 0;
 };
 
-template <int Dim>
+template <int Dim, int RungeKuttaOrder = 2>
 class SemiLagrangianAdvector : public EulerianAdvector<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
+
+	static_assert(1 <= RungeKuttaOrder && RungeKuttaOrder <= 4, "Runge-Kutta order must be 1, 2, 3 or 4.");
 
 public:
 
@@ -48,10 +50,12 @@ protected:
 	VectorDr trace(const VectorDr &startPos, const VectorField<Dim> &flow, const real dt) const;
 };
 
-template <int Dim>
-class MacCormackAdvector : public SemiLagrangianAdvector<Dim>
+template <int Dim, int RungeKuttaOrder = 2>
+class MacCormackAdvector : public SemiLagrangianAdvector<Dim, RungeKuttaOrder>
 {
 	DECLARE_DIM_TYPES(Dim)
+
+	static_assert(1 <= RungeKuttaOrder && RungeKuttaOrder <= 4, "Runge-Kutta order must be 1, 2, 3 or 4.");
 
 public:
 
@@ -66,7 +70,7 @@ public:
 
 protected:
 
-	using SemiLagrangianAdvector<Dim>::trace;
+	using SemiLagrangianAdvector<Dim, RungeKuttaOrder>::trace;
 };
 
 }

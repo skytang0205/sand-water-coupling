@@ -5,13 +5,9 @@ namespace PhysX {
 template <int Dim>
 real GridBasedScalarField<Dim>::operator()(const VectorDr &pos) const
 {
-	std::array<VectorDi, 1 << Dim> coords;
-	std::array<real, 1 << Dim> weights;
-	_grid->getLerpCoordsAndWeights(pos, coords, weights);
-
 	real val = 0;
-	for (int i = 0; i < (1 << Dim); i++)
-		val += operator[](coords[i]) * weights[i];
+	for (const auto [coord, weight] : _grid->linearIntrplDataPoints(pos))
+		val += operator[](coord) * weight;
 	return val;
 }
 
@@ -29,13 +25,9 @@ Vector<Dim, real> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi 
 template <int Dim>
 Vector<Dim, real> GridBasedScalarField<Dim>::gradient(const VectorDr &pos) const
 {
-	std::array<VectorDi, 1 << Dim> coords;
-	std::array<real, 1 << Dim> weights;
-	_grid->getLerpCoordsAndWeights(pos, coords, weights);
-
 	VectorDr grad = VectorDr::Zero();
-	for (int i = 0; i < (1 << Dim); i++)
-		grad += gradientAtDataPoint(coords[i]) * weights[i];
+	for (const auto [coord, weight] : _grid->linearIntrplDataPoints(pos))
+		grad += gradientAtDataPoint(coord) * weight;
 	return grad;
 }
 
@@ -56,13 +48,9 @@ real GridBasedScalarField<Dim>::laplacianAtDataPoint(const VectorDi &coord) cons
 template <int Dim>
 real GridBasedScalarField<Dim>::laplacian(const VectorDr &pos) const
 {
-	std::array<VectorDi, 1 << Dim> coords;
-	std::array<real, 1 << Dim> weights;
-	_grid->getLerpCoordsAndWeights(pos, coords, weights);
-
 	real lapl = 0;
-	for (int i = 0; i < (1 << Dim); i++)
-		lapl += laplacianAtDataPoint(coords[i]) * weights[i];
+	for (const auto [coord, weight] : _grid->linearIntrplDataPoints(pos))
+		lapl += laplacianAtDataPoint(coord) * weight;
 	return lapl;
 }
 

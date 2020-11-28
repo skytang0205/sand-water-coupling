@@ -27,15 +27,15 @@ class FastMarchingReinitializer final : public LevelSetReinitializer<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
-protected:
+	using HeapElement = std::pair<real, int>;
 
-	using PRI = std::pair<real, int>;
+protected:
 
 	GridBasedData<Dim> _tent; // tentative signed distance
 	GridBasedData<Dim, uchar> _visited;
 
 	std::vector<int> _intfIndices;
-	std::priority_queue<PRI, std::vector<PRI>, std::greater<PRI>> _heap;
+	std::priority_queue<HeapElement, std::vector<HeapElement>, std::greater<HeapElement>> _heap;
 
 public:
 

@@ -9,7 +9,7 @@
 namespace PhysX::MathFunc
 {
 
-inline constexpr real cubicSplineCoefficient(const int i, const real x)
+inline constexpr real cubicCatmullRomSplineCoefficient(const int i, const real x)
 {
 	switch (i) {
 	case 0: return -x / 3 + x * x / 2 - x * x * x / 6;

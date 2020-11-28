@@ -5,6 +5,7 @@
 #include "Geometries/LevelSetReinitializer.h"
 #include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
+#include "Structures/ParticlesAttribute.h"
 
 #include <functional>
 #include <memory>
@@ -39,10 +40,11 @@ public:
 		const std::vector<std::unique_ptr<Collider<Dim>>> &colliders,
 		const std::function<real(const int axis, const VectorDi &face)> &domainBoundaryVelocity);
 
-	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity);
+	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity) const;
+	void enforce(ParticlesVectorAttribute<Dim> &markerPositions) const;
 
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps = -1);
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps = -1);
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps = -1) const;
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, GridBasedImplicitSurface<Dim> &liquidLevelSet, const int maxSteps = -1) const;
 
 protected:
 

@@ -5,13 +5,9 @@ namespace PhysX {
 template <int Dim>
 Vector<Dim, real> GridBasedVectorField<Dim>::operator()(const VectorDr &pos) const
 {
-	std::array<VectorDi, 1 << Dim> coords;
-	std::array<real, 1 << Dim> weights;
-	_grid->getLerpCoordsAndWeights(pos, coords, weights);
-
 	VectorDr vec = VectorDr::Zero();
-	for (int i = 0; i < (1 << Dim); i++)
-		vec += operator[](coords[i]) * weights[i];
+	for (const auto [coord, weight] : _grid->linearIntrplDataPoints(pos))
+		vec += operator[](coord) * weight;
 	return vec;
 }
 
@@ -29,13 +25,9 @@ real GridBasedVectorField<Dim>::divergenceAtDataPoint(const VectorDi &coord) con
 template <int Dim>
 real GridBasedVectorField<Dim>::divergence(const VectorDr &pos) const
 {
-	std::array<VectorDi, 1 << Dim> coords;
-	std::array<real, 1 << Dim> weights;
-	_grid->getLerpCoordsAndWeights(pos, coords, weights);
-
 	real div = 0;
-	for (int i = 0; i < (1 << Dim); i++)
-		div += divergenceAtDataPoint(coords[i]) * weights[i];
+	for (const auto [coord, weight] : _grid->linearIntrplDataPoints(pos))
+		div += divergenceAtDataPoint(coord) * weight;
 	return div;
 }
 

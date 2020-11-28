@@ -24,7 +24,13 @@ public:
 	size_t size() const { return _data.size(); }
 	void resize(const size_t cnt, const Type &val = Type()) { _data.resize(cnt, val); }
 	void clear() { _data.clear(); }
+	bool empty() const { return _data.empty(); }
 	void add(const Type &val) { _data.push_back(val); }
+
+	auto begin() { return _data.begin(); }
+	auto begin() const { return _data.begin(); }
+	auto end() { return _data.end(); }
+	auto end() const { return _data.end(); }
 
 	Type *data() { return _data.data(); }
 	const Type *data() const { return _data.data(); }

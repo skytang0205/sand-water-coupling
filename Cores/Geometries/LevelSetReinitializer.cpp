@@ -71,7 +71,7 @@ void FastMarchingReinitializer<Dim>::updateNeighbors(const VectorDi &coord)
 		if (!_tent.isValid(nbCoord) || _visited[nbCoord]) continue;
 		if (const real temp = solveEikonalEquation(nbCoord); temp < _tent[nbCoord]) {
 			_tent[nbCoord] = temp;
-			_heap.push(PRI(temp, int(_tent.index(nbCoord))));
+			_heap.push(HeapElement(temp, int(_tent.index(nbCoord))));
 		}
 	}
 }
