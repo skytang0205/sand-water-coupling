@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Physics/AffineParticleInCellLiquid.h"
 #include "Physics/ImplicitParticleLiquid.h"
 #include "Physics/ParticleInCellLiquid.h"
 
@@ -124,9 +125,12 @@ protected:
 	template <int Dim>
 	static std::unique_ptr<ParticleInCellLiquid<Dim>> makeLiquid(const StaggeredGrid<Dim> &grid, const int markers, real alpha)
 	{
-		alpha = std::clamp(alpha, real(0), real(1));
-		if (alpha == 1) return std::make_unique<ParticleInCellLiquid<Dim>>(grid, markers);
-		else return std::make_unique<ImplicitParticleLiquid<Dim>>(grid, markers, alpha);
+		if (alpha >= 1)
+			return std::make_unique<ParticleInCellLiquid<Dim>>(grid, markers);
+		else if (alpha >= 0)
+			return std::make_unique<ImplicitParticleLiquid<Dim>>(grid, markers, alpha);
+		else
+			return std::make_unique<AffineParticleInCellLiquid<Dim>>(grid, markers);
 	}
 
 	static void reportError(const std::string &msg);

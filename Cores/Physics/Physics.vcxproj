@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AffineParticleInCellLiquid.h" />
     <ClInclude Include="EulerianAdvector.h" />
     <ClInclude Include="EulerianBoundaryHelper.h" />
     <ClInclude Include="EulerianFluid.h" />
@@ -22,6 +23,7 @@
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AffineParticleInCellLiquid.cpp" />
     <ClCompile Include="EulerianAdvector.cpp" />
     <ClCompile Include="EulerianBoundaryHelper.cpp" />
     <ClCompile Include="EulerianFluid.cpp" />

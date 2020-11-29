@@ -13,6 +13,7 @@ class Grid final
 	DECLARE_DIM_TYPES(Dim)
 
 	using IntrplDataPoint = std::pair<VectorDi, real>;
+	using GradientIntrplDataPoint = std::pair<VectorDi, VectorDr>;
 
 protected:
 
@@ -69,6 +70,7 @@ public:
 	std::array<VectorDi, 1 << (Dim << 1)> twoLayersNearbyDataPoints(const VectorDr &pos) const;
 
 	std::array<IntrplDataPoint, 1 << Dim> linearIntrplDataPoints(const VectorDr &pos) const;
+	std::array<GradientIntrplDataPoint, 1 << Dim> gradientLinearIntrplDataPoints(const VectorDr &pos) const;
 	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const;
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const;

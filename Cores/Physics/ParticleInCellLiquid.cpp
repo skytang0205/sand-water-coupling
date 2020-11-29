@@ -146,7 +146,6 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::reinitializeMarkers()
 {
 	_markerPositions.clear();
-	_markerVelocities.clear();
 
 	auto &liquidSdf = _levelSet.signedDistanceField();
 	const real dx = liquidSdf.spacing();

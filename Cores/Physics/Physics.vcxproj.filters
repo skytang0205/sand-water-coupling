@@ -42,6 +42,9 @@
     <ClInclude Include="ImplicitParticleLiquid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AffineParticleInCellLiquid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Simulator.cpp">
@@ -66,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImplicitParticleLiquid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AffineParticleInCellLiquid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

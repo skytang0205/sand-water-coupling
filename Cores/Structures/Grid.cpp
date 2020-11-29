@@ -70,6 +70,33 @@ auto Grid<Dim>::linearIntrplDataPoints(const VectorDr &pos) const->std::array<In
 }
 
 template <int Dim>
+auto Grid<Dim>::gradientLinearIntrplDataPoints(const VectorDr &pos) const->std::array<GradientIntrplDataPoint, 1 << Dim>
+{
+	const auto [lower, frac] = getLowerCoordAndFrac(pos);
+	const real dx = _spacing;
+	if constexpr (Dim == 2) {
+		return {
+			GradientIntrplDataPoint(lower + Vector2i(0, 0), Vector2r(frac.y() - 1, frac.x() - 1) / dx),
+			GradientIntrplDataPoint(lower + Vector2i(1, 0), -Vector2r(frac.y() - 1, frac.x()) / dx),
+			GradientIntrplDataPoint(lower + Vector2i(0, 1), -Vector2r(frac.y(), frac.x() - 1) / dx),
+			GradientIntrplDataPoint(lower + Vector2i(1, 1), Vector2r(frac.y(), frac.x()) / dx)
+		};
+	}
+	else {
+		return {
+			GradientIntrplDataPoint(lower + Vector3i(0, 0, 0), -Vector3r((1 - frac.y()) * (1 - frac.z()), (1 - frac.x()) * (1 - frac.z()), (1 - frac.x()) * (1 - frac.y())) / dx),
+			GradientIntrplDataPoint(lower + Vector3i(1, 0, 0), Vector3r((1 - frac.y()) * (1 - frac.z()), frac.x() * (frac.z() - 1), frac.x() * (frac.y() - 1)) / dx),
+			GradientIntrplDataPoint(lower + Vector3i(0, 1, 0), Vector3r(frac.y() * (frac.z() - 1), (1 - frac.x()) * (1 - frac.z()), (frac.x() - 1) * frac.y()) / dx),
+			GradientIntrplDataPoint(lower + Vector3i(1, 1, 0), -Vector3r(frac.y() * (frac.z() - 1), frac.x() * (frac.z() - 1), frac.x() * frac.y()) / dx),
+			GradientIntrplDataPoint(lower + Vector3i(0, 0, 1), Vector3r((frac.y() - 1) * frac.z(), (frac.x() - 1) * frac.z(), (1 - frac.x()) * (1 - frac.y())) / dx),
+			GradientIntrplDataPoint(lower + Vector3i(1, 0, 1), -Vector3r((frac.y() - 1) * frac.z(), frac.x() * frac.z(), frac.x() * (frac.y() - 1)) / dx),
+			GradientIntrplDataPoint(lower + Vector3i(0, 1, 1), -Vector3r(frac.y() * frac.z(), (frac.x() - 1) * frac.z(), (frac.x() - 1) * frac.y()) / dx),
+			GradientIntrplDataPoint(lower + Vector3i(1, 1, 1), Vector3r(frac.y() * frac.z(), frac.x() * frac.z(), frac.x() * frac.y()) / dx)
+		};
+	}
+}
+
+template <int Dim>
 auto Grid<Dim>::cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const->std::array<IntrplDataPoint, 1 << (Dim << 1)>
 {
 	const auto [lower, frac] = getLowerCoordAndFrac(pos);
