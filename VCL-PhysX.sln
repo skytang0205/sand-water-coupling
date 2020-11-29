@@ -32,6 +32,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EulerianFluidTest", "Demos\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LevelSetLiquidTest", "Demos\LevelSetLiquidTest\LevelSetLiquidTest.vcxproj", "{95D18440-C2B8-4F12-89E3-18C48F64417E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleInCellLiquidTest", "Demos\ParticleInCellLiquidTest\ParticleInCellLiquidTest.vcxproj", "{3F68C0DF-A53E-4829-8434-314572F3A49D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -74,6 +76,10 @@ Global
 		{95D18440-C2B8-4F12-89E3-18C48F64417E}.Debug|x64.Build.0 = Debug|x64
 		{95D18440-C2B8-4F12-89E3-18C48F64417E}.Release|x64.ActiveCfg = Release|x64
 		{95D18440-C2B8-4F12-89E3-18C48F64417E}.Release|x64.Build.0 = Release|x64
+		{3F68C0DF-A53E-4829-8434-314572F3A49D}.Debug|x64.ActiveCfg = Debug|x64
+		{3F68C0DF-A53E-4829-8434-314572F3A49D}.Debug|x64.Build.0 = Debug|x64
+		{3F68C0DF-A53E-4829-8434-314572F3A49D}.Release|x64.ActiveCfg = Release|x64
+		{3F68C0DF-A53E-4829-8434-314572F3A49D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{0E8FCBBD-E115-45CA-9C7A-5D23BEE91033} = {DE281693-1993-479C-A672-10D61E74B412}
 		{8CC693A5-0BBC-4364-961B-26E77E60ACE4} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
 		{95D18440-C2B8-4F12-89E3-18C48F64417E} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
+		{3F68C0DF-A53E-4829-8434-314572F3A49D} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FF25F6D-05AD-416D-82C1-A2E523A66E8D}

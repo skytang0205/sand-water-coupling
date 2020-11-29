@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -11,45 +11,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Collider.h" />
-    <ClInclude Include="LevelSet.h" />
-    <ClInclude Include="ImplicitSurface.h" />
-    <ClInclude Include="LevelSetContourer.h" />
-    <ClInclude Include="LevelSetReinitializer.h" />
-    <ClInclude Include="Surface.h" />
-    <ClInclude Include="SurfaceMesh.h" />
+    <ClCompile Include="ParticleInCellLiquidTest.cpp" />
+    <ClCompile Include="ParticleInCellLiquidBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="LevelSet.cpp" />
-    <ClCompile Include="LevelSetContourer.cpp" />
-    <ClCompile Include="LevelSetReinitializer.cpp" />
-    <ClCompile Include="SurfaceMesh.cpp" />
+    <ClInclude Include="ParticleInCellLiquidBuilder.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Structures\Structures.vcxproj">
-      <Project>{11fdb336-d077-4fab-bedf-3444181a927d}</Project>
+    <ProjectReference Include="..\..\Cores\Physics\Physics.vcxproj">
+      <Project>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MarchingCubesTables.inc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c94749bc-3d90-4972-9e0d-d8c5d6d0df60}</ProjectGuid>
-    <RootNamespace>Geometries</RootNamespace>
+    <ProjectGuid>{3f68c0df-a53e-4829-8434-314572f3a49d}</ProjectGuid>
+    <RootNamespace>ParticleInCellLiquidTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>

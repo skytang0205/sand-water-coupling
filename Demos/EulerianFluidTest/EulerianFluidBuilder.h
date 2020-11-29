@@ -9,7 +9,7 @@ class EulerianFluidBuilder final
 public:
 
 	template <int Dim>
-	static std::unique_ptr<EulerianFluid<Dim>> build(const int scale, const int option = 0)
+	static std::unique_ptr<EulerianFluid<Dim>> build(const int scale, const int option)
 	{
 		switch (option) {
 		case 0:

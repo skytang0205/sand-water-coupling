@@ -40,9 +40,6 @@
     <ClInclude Include="LevelSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleLevelSet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SurfaceMesh.cpp">

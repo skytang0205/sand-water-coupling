@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utilities/Types.h"
+#include "Utilities/IO.h"
 
 #include <vector>
 
@@ -53,6 +54,9 @@ public:
 #endif
 		for (int i = 0; i < _data.size(); i++) func(i);
 	}
+
+	void load(std::istream &in) { IO::readArray(in, _data.data(), _data.size()); }
+	void save(std::ostream &out) const { IO::writeArray(out, _data.data(), _data.size()); }
 };
 
 template <int Dim> using ParticlesScalarAttribute = ParticlesAttribute<Dim, real>;

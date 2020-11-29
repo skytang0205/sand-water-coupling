@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Physics/EulerianFluid.h"
+#include "Physics/LevelSetLiquid.h"
 #include "Structures/ParticlesAttribute.h"
 
 namespace PhysX {
 
 template <int Dim>
-class ParticleInCellLiquid : public EulerianFluid<Dim>
+class ParticleInCellLiquid : public LevelSetLiquid<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
@@ -16,22 +16,49 @@ public:
 
 protected:
 
+	using EulerianFluid<Dim>::_kExtrapMaxSteps;
+	using EulerianFluid<Dim>::_grid;
+	using EulerianFluid<Dim>::_velocity;
+	using EulerianFluid<Dim>::_advector;
+	using EulerianFluid<Dim>::_boundaryHelper;
+	using LevelSetLiquid<Dim>::_kLsReinitMaxSteps;
+	using LevelSetLiquid<Dim>::_levelSet;
+	using LevelSetLiquid<Dim>::_levelSetReinitializer;
+
+
+	const int _markersCntPerSubCell;
 	ParticlesVectorAttribute<Dim> _markerPositions;
 	ParticlesVectorAttribute<Dim> _markerVelocities;
 
 public:
 
-	ParticleInCellLiquid(const StaggeredGrid<Dim> &grid);
+	ParticleInCellLiquid(const StaggeredGrid<Dim> &grid, const int markersCntPerSubcell);
 
 	ParticleInCellLiquid(const ParticleInCellLiquid &rhs) = delete;
 	ParticleInCellLiquid &operator=(const ParticleInCellLiquid &rhs) = delete;
 	virtual ~ParticleInCellLiquid() = default;
 
+	virtual void writeDescription(YAML::Node &root) const override;
+	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const override;
+	virtual void saveFrame(const std::string &frameDir) const override;
+	virtual void loadFrame(const std::string &frameDir) override;
+
+	virtual void initialize() override;
 	virtual void advance(const real dt) override;
 
 protected:
 
+	using EulerianFluid<Dim>::updateColliders;
+	using LevelSetLiquid<Dim>::applyBodyForces;
+	using LevelSetLiquid<Dim>::projectVelocity;
+
 	virtual void advectFields(const real dt) override;
+	virtual void applyMarkerForces(const real dt) { }
+	virtual void transferFromGridsToParticles();
+	virtual void transferFromParticlesToGrids();
+
+	virtual void reinitializeLevelSet() override;
+	virtual void reinitializeMarkers();
 };
 
 }

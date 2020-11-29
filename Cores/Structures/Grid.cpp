@@ -5,6 +5,45 @@
 namespace PhysX {
 
 template <int Dim>
+auto Grid<Dim>::oneLayerNearbyDataPoints(const VectorDr &pos) const->std::array<VectorDi, 1 << Dim>
+{
+	const VectorDi lower = getLowerCoord(pos);
+	if constexpr (Dim == 2) {
+		return {
+			lower + Vector2i(0, 0), lower + Vector2i(1, 0),
+			lower + Vector2i(0, 1), lower + Vector2i(1, 1)
+		};
+	}
+	else {
+		return {
+			lower + Vector3i(0, 0, 0), lower + Vector3i(1, 0, 0),
+			lower + Vector3i(0, 1, 0), lower + Vector3i(1, 1, 0),
+			lower + Vector3i(0, 0, 1), lower + Vector3i(1, 0, 1),
+			lower + Vector3i(0, 1, 1), lower + Vector3i(1, 1, 1)
+		};
+	}
+}
+
+template <int Dim>
+auto Grid<Dim>::twoLayersNearbyDataPoints(const VectorDr &pos) const->std::array<VectorDi, 1 << (Dim << 1)>
+{
+	const VectorDi lower = getLowerCoord(pos);
+	std::array<VectorDi, 1 << (Dim << 1)> dataPoints;
+	if constexpr (Dim == 2) {
+		for (int j = 0; j < 4; j++)
+			for (int i = 0; i < 4; i++)
+				dataPoints[j << 2 | i] = lower + Vector2i(i - 1, j - 1);
+	}
+	else {
+		for (int k = 0; k < 4; k++)
+			for (int j = 0; j < 4; j++)
+				for (int i = 0; i < 4; i++)
+					dataPoints[k << 4 | j << 2 | i] = lower + Vector3i(i - 1, j - 1, k - 1);
+	}
+	return dataPoints;
+}
+
+template <int Dim>
 auto Grid<Dim>::linearIntrplDataPoints(const VectorDr &pos) const->std::array<IntrplDataPoint, 1 << Dim>
 {
 	const auto [lower, frac] = getLowerCoordAndFrac(pos);
@@ -39,7 +78,7 @@ auto Grid<Dim>::cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const->std:
 		for (int j = 0; j < 4; j++)
 			for (int i = 0; i < 4; i++)
 				dataPoints[j << 2 | i] = IntrplDataPoint(
-					(lower + Vector2i(i - 1, j - 1)).cwiseMax(Vector2i::Zero()).cwiseMin(_dataSize - Vector2i::Ones()),
+					lower + Vector2i(i - 1, j - 1),
 					MathFunc::cubicCatmullRomSplineCoefficient(i, frac[0]) * MathFunc::cubicCatmullRomSplineCoefficient(j, frac[1])
 				);
 	}
@@ -48,7 +87,7 @@ auto Grid<Dim>::cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const->std:
 			for (int j = 0; j < 4; j++)
 				for (int i = 0; i < 4; i++)
 					dataPoints[k << 4 | j << 2 | i] = IntrplDataPoint(
-						(lower + Vector3i(i - 1, j - 1, k - 1)).cwiseMax(Vector3i::Zero()).cwiseMin(_dataSize - Vector3i::Ones()),
+						lower + Vector3i(i - 1, j - 1, k - 1),
 						MathFunc::cubicCatmullRomSplineCoefficient(i, frac[0]) * MathFunc::cubicCatmullRomSplineCoefficient(j, frac[1]) * MathFunc::cubicCatmullRomSplineCoefficient(k, frac[2])
 					);
 	}

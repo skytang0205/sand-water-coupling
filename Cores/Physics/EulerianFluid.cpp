@@ -18,15 +18,6 @@ EulerianFluid<Dim>::EulerianFluid(const StaggeredGrid<Dim> &grid) :
 template <int Dim>
 void EulerianFluid<Dim>::writeDescription(YAML::Node &root) const
 {
-	{ // Description of velocity.
-		YAML::Node node;
-		node["name"] = "velocity";
-		node["data_mode"] = "dynamic";
-		node["primitive_type"] = "line_list";
-		node["indexed"] = false;
-		node["color_map"]["enabled"] = true;
-		root["objects"].push_back(node);
-	}
 	{ // Description of neumann
 		YAML::Node node;
 		node["name"] = "neumann";
@@ -36,12 +27,41 @@ void EulerianFluid<Dim>::writeDescription(YAML::Node &root) const
 		node["material"]["diffuse_albedo"] = Vector4f(0.5f, 0.5f, 0.5, 1.0f);
 		root["objects"].push_back(node);
 	}
+	if constexpr (Dim == 2) { // Description of velocity.
+		YAML::Node node;
+		node["name"] = "velocity";
+		node["data_mode"] = "dynamic";
+		node["primitive_type"] = "line_list";
+		node["indexed"] = false;
+		node["color_map"]["enabled"] = true;
+		root["objects"].push_back(node);
+	}
 }
 
 template <int Dim>
 void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
-	{ // Write velocity.
+	{ // Write neumann.
+		std::ofstream fout(frameDir + "/neumann.mesh", std::ios::binary);
+		uint cnt = 0;
+		const auto &boundaryFraction = _boundaryHelper->fraction();
+		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
+			if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
+				cnt++;
+		});
+		IO::writeValue(fout, cnt);
+		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
+			if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
+				IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
+		});
+		if constexpr (Dim == 3) {
+			boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
+				if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
+					IO::writeValue(fout, VectorDf::Unit(2).eval());
+			});
+		}
+	}
+	if constexpr (Dim == 2) { // Write velocity.
 		std::ofstream fout(frameDir + "/velocity.mesh", std::ios::binary);
 		IO::writeValue(fout, uint(2 * _grid.cellCount()));
 		_grid.forEachCell([&](const VectorDi &cell) {
@@ -62,26 +82,6 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 			IO::writeValue(fout, vel);
 			IO::writeValue(fout, vel);
 		});
-	}
-	{ // Write neumann.
-		std::ofstream fout(frameDir + "/neumann.mesh", std::ios::binary);
-		uint cnt = 0;
-		const auto &boundaryFraction = _boundaryHelper->fraction();
-		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
-				cnt++;
-		});
-		IO::writeValue(fout, cnt);
-		boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
-			if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
-				IO::writeValue(fout, _grid.faceCenter(axis, face).cast<float>().eval());
-		});
-		if constexpr (Dim == 3) {
-			boundaryFraction.forEach([&](const int axis, const VectorDi &face) {
-				if (!boundaryFraction.isBoundary(axis, face) && boundaryFraction[axis][face] == 1)
-					IO::writeValue(fout, VectorDf::Unit(2).eval());
-			});
-		}
 	}
 }
 
@@ -134,11 +134,6 @@ void EulerianFluid<Dim>::updateColliders(const real dt)
 		}
 	}
 	if (dirty) updateBoundary();
-}
-
-template <int Dim>
-void EulerianFluid<Dim>::applyBodyForces(const real dt)
-{
 }
 
 template <int Dim>

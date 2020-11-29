@@ -1,29 +1,28 @@
 #pragma once
 
-#include "Physics/LevelSetLiquid.h"
+#include "Physics/ImplicitParticleLiquid.h"
+#include "Physics/ParticleInCellLiquid.h"
 
 namespace PhysX {
 
-class LevelSetLiquidBuilder final
+class ParticleInCellLiquidBuilder final
 {
 public:
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> build(const int scale, const int option)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> build(const int scale, const int option, const int markers, const real alpha)
 	{
 		switch (option) {
 		case 0:
-			return buildCase0<Dim>(scale);
+			return buildCase0<Dim>(scale, markers, alpha);
 		case 1:
-			return buildCase1<Dim>(scale);
+			return buildCase1<Dim>(scale, markers, alpha);
 		case 2:
-			return buildCase2<Dim>(scale);
+			return buildCase2<Dim>(scale, markers, alpha);
 		case 3:
-			return buildCase3<Dim>(scale);
+			return buildCase3<Dim>(scale, markers, alpha);
 		case 4:
-			return buildCase4<Dim>(scale);
-		case 5:
-			return buildCase5<Dim>(scale);
+			return buildCase4<Dim>(scale, markers, alpha);
 		default:
 			reportError("invalid option");
 			return nullptr;
@@ -33,14 +32,14 @@ public:
 protected:
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase0(int scale)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase0(int scale, int markers, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
-		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+		auto liquid = makeLiquid<Dim>(grid, markers, alpha);
 
 		ImplicitSphere<Dim> sphere(VectorDr::Zero(), length / 4);
 		liquid->_levelSet.unionSurface(sphere);
@@ -54,14 +53,14 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase1(int scale)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase1(int scale, int markers, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
-		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+		auto liquid = makeLiquid<Dim>(grid, markers, alpha);
 
 		ImplicitSphere<Dim> sphere(VectorDr::Zero(), length / 4);
 		liquid->_levelSet.unionSurface(sphere);
@@ -73,14 +72,14 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase2(int scale)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase2(int scale, int markers, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
-		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+		auto liquid = makeLiquid<Dim>(grid, markers, alpha);
 
 		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
 		liquid->_levelSet.unionSurface(plane);
@@ -89,14 +88,14 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase3(int scale)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase3(int scale, int markers, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(length / scale, resolution);
-		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+		auto liquid = makeLiquid<Dim>(grid, markers, alpha);
 
 		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
 		ImplicitSphere<Dim> sphere(VectorDr::Unit(1) * length / 8, length / 8);
@@ -107,14 +106,14 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase4(int scale)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase4(int scale, int markers, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 90;
 		const real length = real(2);
 		const VectorDi resolution = scale * (VectorDi::Ones() * 2 + VectorDi::Unit(0));
 		StaggeredGrid<Dim> grid(length / scale, resolution);
-		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
+		auto liquid = makeLiquid<Dim>(grid, markers, alpha);
 
 		ImplicitPlane<Dim> plane(VectorDr::Unit(0) * length / 2, VectorDr::Unit(0));
 		liquid->_levelSet.unionSurface(plane);
@@ -123,21 +122,11 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<LevelSetLiquid<Dim>> buildCase5(int scale)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> makeLiquid(const StaggeredGrid<Dim> &grid, const int markers, real alpha)
 	{
-		DECLARE_DIM_TYPES(Dim)
-		if (scale < 0) scale = 200;
-		const real length = real(0.5);
-		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
-		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
-
-		liquid->_enableGravity = false;
-		liquid->_enableSurfaceTension = true;
-
-		ImplicitEllipsoid<Dim> ellipsoid(VectorDr::Zero(), VectorDr::Ones() * length / 4 + VectorDr::Unit(0) * length / 6);
-		liquid->_levelSet.unionSurface(ellipsoid);
-		return liquid;
+		alpha = std::clamp(alpha, real(0), real(1));
+		if (alpha == 1) return std::make_unique<ParticleInCellLiquid<Dim>>(grid, markers);
+		else return std::make_unique<ImplicitParticleLiquid<Dim>>(grid, markers, alpha);
 	}
 
 	static void reportError(const std::string &msg);

@@ -56,12 +56,17 @@ public:
 			int(index / _dataSize.x() / _dataSize.y()));
 	}
 
+	VectorDi getLowerCoord(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones() * 2); }
+
 	auto getLowerCoordAndFrac(const VectorDr &pos) const
 	{
-		const VectorDi lower = ((pos - _dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones() * 2);
+		const VectorDi lower = getLowerCoord(pos);
 		const VectorDr frac = ((pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing).cwiseMax(0).cwiseMin(1);
 		return std::make_pair(lower, frac);
 	}
+
+	std::array<VectorDi, 1 << Dim> oneLayerNearbyDataPoints(const VectorDr &pos) const;
+	std::array<VectorDi, 1 << (Dim << 1)> twoLayersNearbyDataPoints(const VectorDr &pos) const;
 
 	std::array<IntrplDataPoint, 1 << Dim> linearIntrplDataPoints(const VectorDr &pos) const;
 	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const;

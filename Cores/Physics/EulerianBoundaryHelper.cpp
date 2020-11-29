@@ -73,29 +73,29 @@ void EulerianBoundaryHelper<Dim>::enforce(ParticlesVectorAttribute<Dim> &markerP
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, const int maxSteps) const
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps) const
 {
-	auto newVelocty = velocity;
-	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(velocity.staggeredGrid());
-	auto newVisited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(velocity.staggeredGrid());
+	auto newFluidVelocty = fluidVelocity;
+	auto visited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(fluidVelocity.staggeredGrid());
+	auto newVisited = std::make_unique<StaggeredGridBasedData<Dim, uchar>>(fluidVelocity.staggeredGrid());
 
 	visited->parallelForEach([&](const int axis, const VectorDi &face) {
 		if (!((*visited)[axis][face] = _fraction[axis][face] < 1))
-			newVelocty[axis][face] = 0;
+			newFluidVelocty[axis][face] = 0;
 	});
 
 	for (int iter = 0; iter < maxSteps || (maxSteps < 0 && visited->sum<size_t>() < visited->count()); iter++) {
-		newVelocty.parallelForEach([&](const int axis, const VectorDi &face) {
+		newFluidVelocty.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (!(*visited)[axis][face]) {
 				int cnt = 0;
 				real sum = 0;
 				for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 					const VectorDi &nbFace = Grid<Dim>::neighbor(face, i);
-					if (newVelocty[axis].isValid(nbFace) && (*visited)[axis][nbFace])
-						sum += newVelocty[axis][nbFace], cnt++;
+					if (newFluidVelocty[axis].isValid(nbFace) && (*visited)[axis][nbFace])
+						sum += newFluidVelocty[axis][nbFace], cnt++;
 				}
 				if (cnt > 0) {
-					newVelocty[axis][face] = sum / cnt;
+					newFluidVelocty[axis][face] = sum / cnt;
 					(*newVisited)[axis][face] = true;
 				}
 			}
@@ -103,12 +103,12 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 		});
 		visited.swap(newVisited);
 	}
-	velocity = newVelocty;
+	fluidVelocity = newFluidVelocty;
 }
 
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &velocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps) const
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps) const
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
@@ -117,25 +117,56 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 		return _fraction[axis][face] < 1 && (Surface<Dim>::isInside(liquidSdf[cell0]) || Surface<Dim>::isInside(liquidSdf[cell1]));
 	};
 
-	auto newVelocity = velocity;
-	newVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
+	auto newFluidVelocity = fluidVelocity;
+	newFluidVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (isLiquidFace(axis, face)) return;
 		int cnt = 0;
 		real sum = 0;
 		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
 			const VectorDi &nbFace = Grid<Dim>::neighbor(face, i);
-			if (newVelocity[axis].isValid(nbFace) && isLiquidFace(axis, nbFace))
-				sum += newVelocity[axis][nbFace], cnt++;
+			if (newFluidVelocity[axis].isValid(nbFace) && isLiquidFace(axis, nbFace))
+				sum += newFluidVelocity[axis][nbFace], cnt++;
 		}
-		if (cnt > 0) newVelocity[axis][face] = sum / cnt;
+		if (cnt > 0) newFluidVelocity[axis][face] = sum / cnt;
 	});
 
-	const real bandWidth = maxSteps * velocity.spacing();
-	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		const VectorDr pos = velocity[axis].position(face);
+	const real bandWidth = maxSteps * fluidVelocity.spacing();
+	fluidVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		const VectorDr pos = fluidVelocity[axis].position(face);
 		if (!isLiquidFace(axis, face)) {
-			velocity[axis][face] =
-				bandWidth < 0 || liquidLevelSet.signedDistance(pos) < bandWidth ? newVelocity[axis](liquidLevelSet.closestPosition(pos)) : real(0);
+			fluidVelocity[axis][face] =
+				bandWidth < 0 || liquidLevelSet.signedDistance(pos) < bandWidth ? newFluidVelocity[axis](liquidLevelSet.closestPosition(pos)) : real(0);
+		}
+	});
+}
+
+template <int Dim>
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, StaggeredGridBasedData<Dim> &weightSum, const int maxSteps) const
+{
+	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
+	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
+		return _fraction[axis][face] < 1 && weightSum[axis][face];
+	};
+
+	auto newFluidVelocity = fluidVelocity;
+	newFluidVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		if (isLiquidFace(axis, face)) return;
+		int cnt = 0;
+		real sum = 0;
+		for (int i = 0; i < Grid<Dim>::numberOfNeighbors(); i++) {
+			const VectorDi &nbFace = Grid<Dim>::neighbor(face, i);
+			if (newFluidVelocity[axis].isValid(nbFace) && isLiquidFace(axis, nbFace))
+				sum += newFluidVelocity[axis][nbFace], cnt++;
+		}
+		if (cnt > 0) newFluidVelocity[axis][face] = sum / cnt;
+	});
+
+	const real bandWidth = maxSteps * fluidVelocity.spacing();
+	fluidVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		const VectorDr pos = fluidVelocity[axis].position(face);
+		if (!isLiquidFace(axis, face)) {
+			fluidVelocity[axis][face] =
+				bandWidth < 0 || liquidLevelSet.signedDistance(pos) < bandWidth ? newFluidVelocity[axis](liquidLevelSet.closestPosition(pos)) : real(0);
 		}
 	});
 }
