@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	const auto cfl = std::any_cast<real>(parser->getValueByName("cfl"));
 	const auto scale = std::any_cast<int>(parser->getValueByName("scale"));
 
-	auto fluid = EulerianFluidBuilder::build<2>(scale);
+	auto fluid = EulerianFluidBuilder::build<2>(scale, test);
 	auto simulator = std::make_unique<Simulator>(output, begin, end, rate, cfl, fluid.get());
 	simulator->Simulate();
 
