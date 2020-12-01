@@ -14,10 +14,10 @@ inline std::unique_ptr<ArgsParser> BuildArgsParser()
 	parser->addArgument<uint>("begin", 'b', "the begin frame (including)", 0);
 	parser->addArgument<uint>("end", 'e', "the end frame (excluding)", 200);
 	parser->addArgument<uint>("rate", 'r', "the frame rate (frames per second)", 50);
-	parser->addArgument<real>("cfl", 'c', "the CFL number", real(1));
+	parser->addArgument<real>("cfl", 'c', "the CFL number", 1);
 	parser->addArgument<int>("scale", 's', "the scale of grid", -1);
 	parser->addArgument<int>("markers", 'm', "the number of markers per sub-cell", 2);
-	parser->addArgument<real>("alpha", 'a', "the proportion of PIC algorithm versus FLIP", 0);
+	parser->addArgument<real>("alpha", 'a', "-1: APIC; [0, 1): FLIP; 1: PIC", 0);
 	return parser;
 }
 
@@ -41,16 +41,16 @@ int main(int argc, char *argv[])
 	const auto markers = std::any_cast<int>(parser->getValueByName("markers"));
 	const auto alpha = std::any_cast<real>(parser->getValueByName("alpha"));
 
-	std::unique_ptr<Simulation> simulation;
+	std::unique_ptr<Simulation> liquid;
 	if (dim == 2)
-		simulation = ParticleInCellLiquidBuilder::build<2>(scale, test, markers, alpha);
+		liquid = ParticleInCellLiquidBuilder::build<2>(scale, test, markers, alpha);
 	else if (dim == 3)
-		simulation = ParticleInCellLiquidBuilder::build<3>(scale, test, markers, alpha);
+		liquid = ParticleInCellLiquidBuilder::build<3>(scale, test, markers, alpha);
 	else {
 		std::cerr << "Error: [main] encountered invalid dimension." << std::endl;
 		std::exit(-1);
 	}
-	auto simulator = std::make_unique<Simulator>(output, begin, end, rate, cfl, simulation.get());
+	auto simulator = std::make_unique<Simulator>(output, begin, end, rate, cfl, liquid.get());
 	simulator->Simulate();
 
 	return 0;

@@ -45,6 +45,9 @@
     <ClInclude Include="AffineParticleInCellLiquid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SpringMassSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Simulator.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AffineParticleInCellLiquid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpringMassSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

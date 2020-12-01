@@ -11,54 +11,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AffineParticleInCellLiquid.h" />
-    <ClInclude Include="EulerianAdvector.h" />
-    <ClInclude Include="EulerianBoundaryHelper.h" />
-    <ClInclude Include="EulerianFluid.h" />
-    <ClInclude Include="EulerianProjector.h" />
-    <ClInclude Include="ImplicitParticleLiquid.h" />
-    <ClInclude Include="LevelSetLiquid.h" />
-    <ClInclude Include="ParticleInCellLiquid.h" />
-    <ClInclude Include="Simulation.h" />
-    <ClInclude Include="Simulator.h" />
-    <ClInclude Include="SpringMassSystem.h" />
+    <ClCompile Include="SpringMassSystemBuilder.cpp" />
+    <ClCompile Include="SpringMassSystemTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AffineParticleInCellLiquid.cpp" />
-    <ClCompile Include="EulerianAdvector.cpp" />
-    <ClCompile Include="EulerianBoundaryHelper.cpp" />
-    <ClCompile Include="EulerianFluid.cpp" />
-    <ClCompile Include="EulerianProjector.cpp" />
-    <ClCompile Include="ImplicitParticleLiquid.cpp" />
-    <ClCompile Include="LevelSetLiquid.cpp" />
-    <ClCompile Include="ParticleInCellLiquid.cpp" />
-    <ClCompile Include="Simulator.cpp" />
-    <ClCompile Include="SpringMassSystem.cpp" />
+    <ClInclude Include="SpringMassSystemBuilder.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Geometries\Geometries.vcxproj">
-      <Project>{c94749bc-3d90-4972-9e0d-d8c5d6d0df60}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Solvers\Solvers.vcxproj">
-      <Project>{0e8fcbbd-e115-45ca-9c7a-5d23bee91033}</Project>
+    <ProjectReference Include="..\..\Cores\Physics\Physics.vcxproj">
+      <Project>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</ProjectGuid>
-    <RootNamespace>Physics</RootNamespace>
+    <ProjectGuid>{4ea403ef-c84c-4386-ad53-5231dd057316}</ProjectGuid>
+    <RootNamespace>SpringMassSystemTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>

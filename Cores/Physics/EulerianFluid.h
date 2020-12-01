@@ -51,7 +51,7 @@ public:
 	virtual void writeDescription(YAML::Node &root) const override;
 	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const override;
 	virtual void saveFrame(const std::string &frameDir) const override;
-	virtual void loadFrame(const std::string &framdDir) override;
+	virtual void loadFrame(const std::string &frameDir) override;
 
 	virtual void initialize() override;
 	virtual void advance(const real dt) override;
