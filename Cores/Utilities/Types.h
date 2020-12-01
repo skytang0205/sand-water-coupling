@@ -68,4 +68,11 @@ using	ullong				=	unsigned long long;
 
 using	std::size_t;
 
+template <typename Type>
+inline constexpr Type Zero() { return Type(0); }
+
+template <typename Type>
+requires requires { Type::Zero(); }
+inline Type Zero() { return Type::Zero(); }
+
 } // namespaxe PhysX

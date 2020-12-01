@@ -18,12 +18,12 @@ protected:
 
 public:
 
-	ParticlesAttribute(const size_t cnt = 0, const Type &val = Type()) { resize(cnt, val); }
+	ParticlesAttribute(const size_t cnt = 0, const Type &val = Zero<Type>()) { resize(cnt, val); }
 
 	virtual ~ParticlesAttribute() = default;
 
 	size_t size() const { return _data.size(); }
-	void resize(const size_t cnt, const Type &val = Type()) { _data.resize(cnt, val); }
+	void resize(const size_t cnt, const Type &val = Zero<Type>()) { _data.resize(cnt, val); }
 	void clear() { _data.clear(); }
 	bool empty() const { return _data.empty(); }
 	void add(const Type &val) { _data.push_back(val); }
@@ -40,7 +40,7 @@ public:
 	const Type &operator[](const int idx) const { return _data[idx]; }
 
 	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
-	void setZero() { setConstant(Type(0)); }
+	void setZero() { setConstant(Zero<Type>()); }
 
 	void forEach(const std::function<void(const int)> &func) const
 	{

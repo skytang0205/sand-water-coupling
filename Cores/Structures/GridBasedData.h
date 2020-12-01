@@ -21,12 +21,12 @@ protected:
 
 public:
 
-	GridBasedData(const Grid<Dim> *const grid, const Type &value = Type()) { resize(grid, value); }
+	GridBasedData(const Grid<Dim> *const grid, const Type &value = Zero<Type>()) { resize(grid, value); }
 
 	GridBasedData() = default;
 	virtual ~GridBasedData() = default;
 
-	void resize(const Grid<Dim> *const grid, const Type &value = Type())
+	void resize(const Grid<Dim> *const grid, const Type &value = Zero<Type>())
 	{
 		_grid = grid;
 		_data.resize(_grid->dataCount(), value);
@@ -54,10 +54,10 @@ public:
 	const Type &operator[](const VectorDi &coord) const { return _data[_grid->index(coord)]; }
 
 	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
-	void setZero() { setConstant(Type(0)); }
+	void setZero() { setConstant(Zero<Type>()); }
 
 	template <typename AccType = Type>
-	AccType sum() const { return std::accumulate(_data.begin(), _data.end(), AccType(0)); }
+	AccType sum() const { return std::accumulate(_data.begin(), _data.end(), Zero<AccType>()); }
 
 	Type min() const { return *std::min_element(_data.begin(), _data.end()); }
 	Type max() const { return *std::max_element(_data.begin(), _data.end()); }
