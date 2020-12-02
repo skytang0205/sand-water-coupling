@@ -19,7 +19,7 @@ real StaggeredGridBasedVectorField<Dim>::divergenceAtCellCenter(const VectorDi &
 		const int axis = StaggeredGrid<Dim>::cellFaceAxis(i);
 		const VectorDi face = StaggeredGrid<Dim>::cellFace(cell, i);
 		const int side = StaggeredGrid<Dim>::cellFaceSide(i);
-		acc += _components[axis][face] * side;
+		acc += _components[axis].at(face) * side;
 	}
 	return acc / (2 * _grid->spacing());
 }

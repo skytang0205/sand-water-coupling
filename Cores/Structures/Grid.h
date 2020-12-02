@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utilities/MathFunc.h"
 #include "Utilities/Types.h"
 
 #include <array>
@@ -16,6 +17,10 @@ class Grid final
 	using GradientIntrplDataPoint = std::pair<VectorDi, VectorDr>;
 
 protected:
+
+	static constexpr int _kCntNb1 = MathFunc::pow(2, Dim);
+	static constexpr int _kCntNb2 = MathFunc::pow(3, Dim);
+	static constexpr int _kCntNb3 = MathFunc::pow(4, Dim);
 
 	const real _spacing;
 	const VectorDi _dataSize;
@@ -40,7 +45,7 @@ public:
 
 	size_t dataCount() const { return _dataSize.cast<size_t>().prod(); }
 	VectorDr dataPosition(const VectorDi &coord) const { return _dataOrigin + coord.cast<real>() * _spacing; }
-
+	VectorDi clamp(const VectorDi &coord) const { return coord.cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones()); }
 
 	size_t index(const VectorDi &coord) const
 	{
@@ -57,23 +62,21 @@ public:
 			int(index / _dataSize.x() / _dataSize.y()));
 	}
 
-	VectorDi getLowerCoord(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).cast<int>().cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones() * 2); }
+	// TODO: fix floor
+	VectorDi getLinearLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).cast<int>(); }
+	VectorDi getQuadraticLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing - VectorDr::Ones() / 2).cast<int>(); }
+	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).cast<int>() - VectorDi::Ones(); }
+	VectorDr getLowerFrac(const VectorDr &pos, const VectorDi &lower) const { return (pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing; }
 
-	auto getLowerCoordAndFrac(const VectorDr &pos) const
-	{
-		const VectorDi lower = getLowerCoord(pos);
-		const VectorDr frac = ((pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing).cwiseMax(0).cwiseMin(1);
-		return std::make_pair(lower, frac);
-	}
+	std::array<VectorDi, _kCntNb1> linearNearbyDataPoints(const VectorDr &pos) const;
+	std::array<VectorDi, _kCntNb3> cubicNearbyDataPoints(const VectorDr &pos) const;
 
-	std::array<VectorDi, 1 << Dim> oneLayerNearbyDataPoints(const VectorDr &pos) const;
-	std::array<VectorDi, 1 << (Dim << 1)> twoLayersNearbyDataPoints(const VectorDr &pos) const;
-
-	std::array<IntrplDataPoint, 1 << Dim> linearIntrplDataPoints(const VectorDr &pos) const;
-	std::array<GradientIntrplDataPoint, 1 << Dim> gradientLinearIntrplDataPoints(const VectorDr &pos) const;
-	std::array<IntrplDataPoint, 1 << (Dim << 1)> quadraticBasisSplineIntrplDataPoints(const VectorDr &pos) const;
-	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicBasisSplineIntrplDataPoints(const VectorDr &pos) const;
-	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicCatmullRomSplineIntrplDataPoints(const VectorDr &pos) const;
+	// TODO: fix methods to get coefficients
+	std::array<IntrplDataPoint, _kCntNb1> linearIntrplDataPoints(const VectorDr &pos) const;
+	std::array<GradientIntrplDataPoint, _kCntNb1> gradientLinearIntrplDataPoints(const VectorDr &pos) const;
+	std::array<IntrplDataPoint, _kCntNb2> quadraticBasisSplineIntrplDataPoints(const VectorDr &pos) const;
+	std::array<IntrplDataPoint, _kCntNb3> cubicBasisSplineIntrplDataPoints(const VectorDr &pos) const;
+	std::array<IntrplDataPoint, _kCntNb3> cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const;
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const;
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const;

@@ -16,7 +16,7 @@ protected:
 
 public:
 
-	using GridBasedData<Dim>::operator[];
+	using GridBasedData<Dim>::at;
 
 	GridBasedScalarField(const Grid<Dim> *const grid, const real value = 0) : GridBasedData<Dim>(grid, value) { }
 

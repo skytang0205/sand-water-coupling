@@ -7,7 +7,7 @@ real GridBasedScalarField<Dim>::operator()(const VectorDr &pos) const
 {
 	real val = 0;
 	for (const auto [coord, weight] : _grid->linearIntrplDataPoints(pos))
-		val += operator[](coord) * weight;
+		val += at(coord) * weight;
 	return val;
 }
 
@@ -16,8 +16,7 @@ Vector<Dim, real> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi 
 {
 	VectorDr acc;
 	for (int i = 0; i < Dim; i++) {
-		acc[i] = operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)
-			- operator[](coord[i] > 0 ? coord - VectorDi::Unit(i) : coord);
+		acc[i] = at(coord + VectorDi::Unit(i)) - at(coord - VectorDi::Unit(i));
 	}
 	return acc / (2 * _grid->spacing());
 }
@@ -35,12 +34,10 @@ template <int Dim>
 real GridBasedScalarField<Dim>::laplacianAtDataPoint(const VectorDi &coord) const
 {
 	real acc = 0;
-	const real centerVal = operator[](coord);
+	const real centerVal = at(coord);
 	for (int i = 0; i < Dim; i++) {
-		if (coord[i] < _grid->dataSize()[i] - 1)
-			acc += operator[](coord + VectorDi::Unit(i)) - centerVal;
-		if (coord[i] > 0)
-			acc -= centerVal - operator[](coord - VectorDi::Unit(i));
+		acc += at(coord + VectorDi::Unit(i)) - centerVal;
+		acc -= centerVal - at(coord - VectorDi::Unit(i));
 	}
 	return acc / (_grid->spacing() * _grid->spacing());
 }

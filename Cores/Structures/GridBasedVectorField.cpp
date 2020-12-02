@@ -7,7 +7,7 @@ Vector<Dim, real> GridBasedVectorField<Dim>::operator()(const VectorDr &pos) con
 {
 	VectorDr vec = VectorDr::Zero();
 	for (const auto [coord, weight] : _grid->linearIntrplDataPoints(pos))
-		vec += operator[](coord) * weight;
+		vec += at(coord) * weight;
 	return vec;
 }
 
@@ -16,8 +16,7 @@ real GridBasedVectorField<Dim>::divergenceAtDataPoint(const VectorDi &coord) con
 {
 	real acc = 0;
 	for (int i = 0; i < Dim; i++) {
-		acc += operator[](coord[i] < _grid->dataSize()[i] - 1 ? coord + VectorDi::Unit(i) : coord)[i]
-			- operator[](coord[i] > 0 ? coord - VectorDi::Unit(i) : coord)[i];
+		acc += at(coord + VectorDi::Unit(i))[i] - at(coord - VectorDi::Unit(i))[i];
 	}
 	return acc / (2 * _grid->spacing());
 }

@@ -9,6 +9,8 @@
 namespace PhysX::MathFunc
 {
 
+inline constexpr int pow(int base, uint exp) { return exp ? base * pow(base, exp - 1) : 1; }
+
 inline constexpr real quadraticBasisSplineCoefficient(real x)
 {
 	if (x < 0) x = -x;
@@ -25,8 +27,9 @@ inline constexpr real cubicBasisSplineCoefficient(real x)
 	else return 0;
 }
 
-inline constexpr real cubicCatmullRomSplineCoefficient(const int i, const real x)
+inline constexpr real cubicCatmullRomCoefficient(const int i, const real x)
 {
+	// TODO: fix range of x
 	switch (i) {
 	case 0: return -x / 3 + x * x / 2 - x * x * x / 6;
 	case 1: return 1 - x * x + (x * x * x - x) / 2;

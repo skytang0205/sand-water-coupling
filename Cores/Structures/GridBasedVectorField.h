@@ -16,7 +16,7 @@ protected:
 
 public:
 
-	using GridBasedData<Dim, VectorDr>::operator[];
+	using GridBasedData<Dim, VectorDr>::at;
 
 	GridBasedVectorField(const Grid<Dim> *const grid, const VectorDr &value = VectorDr::Zero()) : GridBasedData<Dim, VectorDr>(grid, value) { }
 

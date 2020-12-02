@@ -52,6 +52,7 @@ public:
 	const Type &operator[](const size_t index) const { return _data[index]; }
 	Type &operator[](const VectorDi &coord) { return _data[_grid->index(coord)]; }
 	const Type &operator[](const VectorDi &coord) const { return _data[_grid->index(coord)]; }
+	const Type &at(const VectorDi &coord) const { return _data[_grid->index(_grid->clamp(coord))]; }
 
 	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
 	void setZero() { setConstant(Zero<Type>()); }
