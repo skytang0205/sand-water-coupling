@@ -9,6 +9,22 @@
 namespace PhysX::MathFunc
 {
 
+inline constexpr real quadraticBasisSplineCoefficient(real x)
+{
+	if (x < 0) x = -x;
+	if (x < real(1) / 2) return real(3) / 4 - x * x;
+	else if (x < real(3) / 2) return (real(3) / 2 - x) * (real(3) / 2 - x) / 2;
+	else return 0;
+}
+
+inline constexpr real cubicBasisSplineCoefficient(real x)
+{
+	if (x < 0) x = -x;
+	if (x < 1) return x * x * x / 2 - x * x + real(2) / 3;
+	else if (x < 2) return (2 - x) * (2 - x) * (2 - x) / 6;
+	else return 0;
+}
+
 inline constexpr real cubicCatmullRomSplineCoefficient(const int i, const real x)
 {
 	switch (i) {

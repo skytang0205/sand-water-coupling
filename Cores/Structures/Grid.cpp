@@ -97,7 +97,57 @@ auto Grid<Dim>::gradientLinearIntrplDataPoints(const VectorDr &pos) const->std::
 }
 
 template <int Dim>
-auto Grid<Dim>::cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const->std::array<IntrplDataPoint, 1 << (Dim << 1)>
+auto Grid<Dim>::quadraticBasisSplineIntrplDataPoints(const VectorDr &pos) const->std::array<IntrplDataPoint, 1 << (Dim << 1)>
+{
+	const auto [lower, frac] = getLowerCoordAndFrac(pos);
+	std::array<IntrplDataPoint, 1 << (Dim << 1)> dataPoints;
+	if constexpr (Dim == 2) {
+		for (int j = 0; j < 4; j++)
+			for (int i = 0; i < 4; i++)
+				dataPoints[j << 2 | i] = IntrplDataPoint(
+					lower + Vector2i(i - 1, j - 1),
+					MathFunc::quadraticBasisSplineCoefficient(i - 1 - frac[0]) * MathFunc::quadraticBasisSplineCoefficient(j - 1 - frac[1])
+				);
+	}
+	else {
+		for (int k = 0; k < 4; k++)
+			for (int j = 0; j < 4; j++)
+				for (int i = 0; i < 4; i++)
+					dataPoints[k << 4 | j << 2 | i] = IntrplDataPoint(
+						lower + Vector3i(i - 1, j - 1, k - 1),
+						MathFunc::quadraticBasisSplineCoefficient(i - 1 - frac[0]) * MathFunc::quadraticBasisSplineCoefficient(j - 1 - frac[1]) * MathFunc::quadraticBasisSplineCoefficient(k - 1 - frac[2])
+					);
+	}
+	return dataPoints;
+}
+
+template <int Dim>
+auto Grid<Dim>::cubicBasisSplineIntrplDataPoints(const VectorDr &pos) const->std::array<IntrplDataPoint, 1 << (Dim << 1)>
+{
+	const auto [lower, frac] = getLowerCoordAndFrac(pos);
+	std::array<IntrplDataPoint, 1 << (Dim << 1)> dataPoints;
+	if constexpr (Dim == 2) {
+		for (int j = 0; j < 4; j++)
+			for (int i = 0; i < 4; i++)
+				dataPoints[j << 2 | i] = IntrplDataPoint(
+					lower + Vector2i(i - 1, j - 1),
+					MathFunc::cubicBasisSplineCoefficient(i - 1 - frac[0]) * MathFunc::cubicBasisSplineCoefficient(j - 1 - frac[1])
+				);
+	}
+	else {
+		for (int k = 0; k < 4; k++)
+			for (int j = 0; j < 4; j++)
+				for (int i = 0; i < 4; i++)
+					dataPoints[k << 4 | j << 2 | i] = IntrplDataPoint(
+						lower + Vector3i(i - 1, j - 1, k - 1),
+						MathFunc::cubicBasisSplineCoefficient(i - 1 - frac[0]) * MathFunc::cubicBasisSplineCoefficient(j - 1 - frac[1]) * MathFunc::cubicBasisSplineCoefficient(k - 1 - frac[2])
+					);
+	}
+	return dataPoints;
+}
+
+template <int Dim>
+auto Grid<Dim>::cubicCatmullRomSplineIntrplDataPoints(const VectorDr &pos) const->std::array<IntrplDataPoint, 1 << (Dim << 1)>
 {
 	const auto [lower, frac] = getLowerCoordAndFrac(pos);
 	std::array<IntrplDataPoint, 1 << (Dim << 1)> dataPoints;

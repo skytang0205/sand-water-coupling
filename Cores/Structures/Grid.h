@@ -71,7 +71,9 @@ public:
 
 	std::array<IntrplDataPoint, 1 << Dim> linearIntrplDataPoints(const VectorDr &pos) const;
 	std::array<GradientIntrplDataPoint, 1 << Dim> gradientLinearIntrplDataPoints(const VectorDr &pos) const;
-	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const;
+	std::array<IntrplDataPoint, 1 << (Dim << 1)> quadraticBasisSplineIntrplDataPoints(const VectorDr &pos) const;
+	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicBasisSplineIntrplDataPoints(const VectorDr &pos) const;
+	std::array<IntrplDataPoint, 1 << (Dim << 1)> cubicCatmullRomSplineIntrplDataPoints(const VectorDr &pos) const;
 
 	void forEach(const std::function<void(const VectorDi &)> &func) const;
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const;
