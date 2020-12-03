@@ -84,7 +84,7 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_markerPositions, _velocity, dt);
-	_boundaryHelper->enforce(_markerPositions);
+	_boundaryHelper->enforce(_markerPositions, _markerVelocities);
 
 	reinitializeLevelSet();
 }

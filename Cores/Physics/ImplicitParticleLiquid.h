@@ -31,8 +31,6 @@ public:
 	virtual void saveFrame(const std::string &frameDir) const override;
 	virtual void loadFrame(const std::string &frameDir) override;
 
-	virtual void initialize() override;
-
 protected:
 
 	virtual void transferFromGridsToParticles() override;

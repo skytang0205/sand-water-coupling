@@ -40,13 +40,6 @@ void ImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
 }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::initialize()
-{
-	ParticleInCellLiquid<Dim>::initialize();
-	_deltaVelocity = _velocity;
-}
-
-template <int Dim>
 void ImplicitParticleLiquid<Dim>::transferFromGridsToParticles()
 {
 	_deltaVelocity.parallelForEach([&](const int axis, const VectorDi &face) {

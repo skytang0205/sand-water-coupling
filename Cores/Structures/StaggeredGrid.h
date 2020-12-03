@@ -11,7 +11,7 @@ class StaggeredGrid final
 
 protected:
 
-	static constexpr int _kBoundaryWidth = 2;
+	static constexpr int _kBoundaryWidth = 10;
 
 	const real _spacing;
 	const VectorDi _resolution;

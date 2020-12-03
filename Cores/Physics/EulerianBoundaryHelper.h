@@ -40,7 +40,7 @@ public:
 		const std::function<real(const int axis, const VectorDi &face)> &domainBoundaryVelocity);
 
 	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity) const;
-	void enforce(ParticlesVectorAttribute<Dim> &markerPositions) const;
+	void enforce(ParticlesVectorAttribute<Dim> &markerPositions, ParticlesVectorAttribute<Dim> &markerVelocities) const;
 
 	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps = -1) const;
 	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps = -1) const;
