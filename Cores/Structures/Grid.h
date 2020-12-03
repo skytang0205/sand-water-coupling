@@ -62,16 +62,14 @@ public:
 			int(index / _dataSize.x() / _dataSize.y()));
 	}
 
-	// TODO: fix floor
-	VectorDi getLinearLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).cast<int>(); }
-	VectorDi getQuadraticLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing - VectorDr::Ones() / 2).cast<int>(); }
-	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).cast<int>() - VectorDi::Ones(); }
+	VectorDi getLinearLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().cast<int>().matrix(); }
+	VectorDi getQuadraticLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing - VectorDr::Ones() / 2).array().floor().cast<int>().matrix(); }
+	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().cast<int>().matrix() - VectorDi::Ones(); }
 	VectorDr getLowerFrac(const VectorDr &pos, const VectorDi &lower) const { return (pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing; }
 
 	std::array<VectorDi, _kCntNb1> linearNearbyDataPoints(const VectorDr &pos) const;
 	std::array<VectorDi, _kCntNb3> cubicNearbyDataPoints(const VectorDr &pos) const;
 
-	// TODO: fix methods to get coefficients
 	std::array<IntrplDataPoint, _kCntNb1> linearIntrplDataPoints(const VectorDr &pos) const;
 	std::array<GradientIntrplDataPoint, _kCntNb1> gradientLinearIntrplDataPoints(const VectorDr &pos) const;
 	std::array<IntrplDataPoint, _kCntNb2> quadraticBasisSplineIntrplDataPoints(const VectorDr &pos) const;

@@ -114,16 +114,17 @@ auto Grid<Dim>::quadraticBasisSplineIntrplDataPoints(const VectorDr &pos) const-
 	const VectorDi lower = getQuadraticLower(pos);
 	const VectorDr frac = getLowerFrac(pos, lower);
 	const std::array<VectorDr, 3> w = {
-		(frac - VectorDr::Ones() * 0).unaryExpr(MathFunc::cubicBasisSplineCoefficient),
-		(frac - VectorDr::Ones() * 1).unaryExpr(MathFunc::cubicBasisSplineCoefficient),
-		(frac - VectorDr::Ones() * 2).unaryExpr(MathFunc::cubicBasisSplineCoefficient)
+		((real(3) / 2 - frac.array()).abs2() / 2).matrix(),
+		(real(3) / 4 - (frac.array() - 1).abs2()).matrix(),
+		((frac.array() - real(1) / 2).abs2() / 2).matrix()
 	};
 
 	std::array<IntrplDataPoint, _kCntNb2> dataPoints;
+	int idx = 0;
 	if constexpr (Dim == 2) {
 		for (int j = 0; j < 3; j++)
 			for (int i = 0; i < 3; i++)
-				dataPoints[(j << 1) + j + i] = IntrplDataPoint(
+				dataPoints[idx++] = IntrplDataPoint(
 					lower + Vector2i(i, j),
 					w[i][0] * w[j][1]
 				);
@@ -132,7 +133,7 @@ auto Grid<Dim>::quadraticBasisSplineIntrplDataPoints(const VectorDr &pos) const-
 		for (int k = 0; k < 3; k++)
 			for (int j = 0; j < 3; j++)
 				for (int i = 0; i < 3; i++)
-					dataPoints[(k << 3) + k + (j << 1) + j + i] = IntrplDataPoint(
+					dataPoints[idx++] = IntrplDataPoint(
 						lower + Vector3i(i, j, k),
 						w[i][0] * w[j][1] * w[k][2]
 					);
@@ -146,10 +147,10 @@ auto Grid<Dim>::cubicBasisSplineIntrplDataPoints(const VectorDr &pos) const->std
 	const VectorDi lower = getCubicLower(pos);
 	const VectorDr frac = getLowerFrac(pos, lower);
 	const std::array<VectorDr, 4> w = {
-		(frac - VectorDr::Ones() * 0).unaryExpr(MathFunc::cubicBasisSplineCoefficient),
-		(frac - VectorDr::Ones() * 1).unaryExpr(MathFunc::cubicBasisSplineCoefficient),
-		(frac - VectorDr::Ones() * 2).unaryExpr(MathFunc::cubicBasisSplineCoefficient),
-		(frac - VectorDr::Ones() * 3).unaryExpr(MathFunc::cubicBasisSplineCoefficient)
+		((2 - frac.array()).abs2() * (2 - frac.array()) / 6).matrix(),
+		((frac.array() - 1).abs2() * (frac.array() - 3) / 2 + real(2) / 3).matrix(),
+		((frac.array() - 2).abs2() * (-frac.array()) / 2 + real(2) / 3).matrix(),
+		((frac.array() - 1).abs2() * (frac.array() - 1) / 6).matrix()
 	};
 
 	std::array<IntrplDataPoint, _kCntNb3> dataPoints;
@@ -179,10 +180,10 @@ auto Grid<Dim>::cubicCatmullRomIntrplDataPoints(const VectorDr &pos) const->std:
 	const VectorDi lower = getCubicLower(pos);
 	const VectorDr frac = getLowerFrac(pos, lower);
 	const std::array<VectorDr, 4> w = {
-		frac.unaryExpr(std::bind(MathFunc::cubicCatmullRomCoefficient, 0, std::placeholders::_1)),
-		frac.unaryExpr(std::bind(MathFunc::cubicCatmullRomCoefficient, 1, std::placeholders::_1)),
-		frac.unaryExpr(std::bind(MathFunc::cubicCatmullRomCoefficient, 2, std::placeholders::_1)),
-		frac.unaryExpr(std::bind(MathFunc::cubicCatmullRomCoefficient, 3, std::placeholders::_1))
+		((frac.array() - 1) * (frac.array() - 2) * (frac.array() - 3) / -6).matrix(),
+		(frac.array() * (frac.array() - 2) * (frac.array() - 3) / 2).matrix(),
+		(frac.array() * (frac.array() - 1) * (frac.array() - 3) / -2).matrix(),
+		(frac.array() * (frac.array() - 1) * (frac.array() - 2) / 6).matrix()
 	};
 
 	std::array<IntrplDataPoint, _kCntNb3> dataPoints;

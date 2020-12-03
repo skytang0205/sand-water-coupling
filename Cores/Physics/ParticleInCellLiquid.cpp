@@ -133,7 +133,7 @@ void ParticleInCellLiquid<Dim>::reinitializeLevelSet()
 	_markerPositions.forEach([&](const int i) {
 		const VectorDr pos = _markerPositions[i];
 		const ImplicitSphere<Dim> sphere(pos, radius);
-		for (const auto &cell : liquidSdf.grid()->twoLayersNearbyDataPoints(pos)) {
+		for (const auto &cell : liquidSdf.grid()->cubicNearbyDataPoints(pos)) {
 			if (liquidSdf.isValid(cell))
 				liquidSdf[cell] = std::min(liquidSdf[cell], sphere.signedDistance(liquidSdf.position(cell)));
 		}
