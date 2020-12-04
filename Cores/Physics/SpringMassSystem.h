@@ -31,9 +31,10 @@ protected:
 	ParticlesVectorAttribute<Dim> _invSqrtMasses;
 	ParticlesVectorAttribute<Dim> _positions;
 	ParticlesVectorAttribute<Dim> _velocities;
+	ParticlesVectorAttribute<Dim> _accelerations;
 	std::vector<Spring> _springs;
 
-	ParticlesVectorAttribute<Dim> _accelerations;
+	std::vector<Tripletr> _coeffBackwardEuler;
 	SparseMatrixr _matBackwardEuler;
 	VectorXr _rhsBackwardEuler;
 
@@ -64,7 +65,6 @@ protected:
 
 	void calculateAccelarations();
 	void reinitializeAttributes();
-	void resetSparse();
 	void buildAndSolveLinearSystem(const real dt);
 
 	virtual void applyElasticForces();

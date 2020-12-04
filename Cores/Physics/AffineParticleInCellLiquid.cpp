@@ -24,11 +24,8 @@ void AffineParticleInCellLiquid<Dim>::transferFromGridsToParticles()
 }
 
 template <int Dim>
-void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrids()
+void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrids(StaggeredGridBasedData<Dim> &weightSum)
 {
-	StaggeredGridBasedData<Dim> weightSum(_velocity.staggeredGrid());
-	_velocity.setZero();
-
 	_markerVelocities.forEach([&](const int i) {
 		const VectorDr pos = _markerPositions[i];
 		const VectorDr vel = _markerVelocities[i];
@@ -41,12 +38,6 @@ void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrids()
 			}
 		}
 	});
-	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (weightSum[axis][face])
-			_velocity[axis][face] /= weightSum[axis][face];
-	});
-
-	_boundaryHelper->extrapolate(_velocity, _levelSet, weightSum, _kExtrapMaxSteps);
 }
 
 template <int Dim>

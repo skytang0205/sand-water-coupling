@@ -57,6 +57,8 @@ protected:
 	virtual void transferFromGridsToParticles();
 	virtual void transferFromParticlesToGrids();
 
+	virtual void transferFromParticlesToGrids(StaggeredGridBasedData<Dim> &weightSum);
+	virtual void maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum);
 	virtual void reinitializeLevelSet() override;
 	virtual void reinitializeMarkers();
 };

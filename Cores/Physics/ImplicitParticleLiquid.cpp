@@ -52,11 +52,10 @@ void ImplicitParticleLiquid<Dim>::transferFromGridsToParticles()
 }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::transferFromParticlesToGrids()
+void ImplicitParticleLiquid<Dim>::maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum)
 {
-	ParticleInCellLiquid<Dim>::transferFromParticlesToGrids();
-
 	_deltaVelocity = _velocity;
+	ParticleInCellLiquid<Dim>::maintainGridsBasedData(weightSum);
 }
 
 template class ImplicitParticleLiquid<2>;

@@ -94,22 +94,18 @@ void SpringMassSystem<Dim>::loadFrame(const std::string &frameDir)
 	}
 	// Reinitialize attributs and reset the sparse matrix.
 	reinitializeAttributes();
-	resetSparse();
 }
 
 template <int Dim>
 void SpringMassSystem<Dim>::initialize()
 {
 	reinitializeAttributes();
-	resetSparse();
 }
 
 template <int Dim>
 void SpringMassSystem<Dim>::advance(const real dt)
 {
 	// Advance by the backward Euler method.
-	_matBackwardEuler.resize(_positions.size() * Dim, _positions.size() * Dim);
-	_matBackwardEuler.setZero();
 
 	calculateAccelarations();
 
@@ -143,39 +139,19 @@ void SpringMassSystem<Dim>::reinitializeAttributes()
 }
 
 template <int Dim>
-void SpringMassSystem<Dim>::resetSparse()
+void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 {
 	_matBackwardEuler.resize(_masses.size() * Dim, _masses.size() * Dim);
 	_rhsBackwardEuler.resize(_masses.size() * Dim);
-	std::vector<Tripletr> elements;
+	_coeffBackwardEuler.clear();
 
-	const auto addSparseTriplets = [&](const int pid0, const int pid1) {
+	const auto addSparseBlockValue = [&](const int pid0, const int pid1, const MatrixDr &block) {
 		const int offset0 = pid0 * Dim;
 		const int offset1 = pid1 * Dim;
-		for (int i = 0; i < Dim; i++)
-			for (int j = 0; j < Dim; j++)
-				elements.push_back(Tripletr(offset0 + i, offset1 + j));
-	};
-
-	for (int pid = 0; pid < _positions.size(); pid++)
-		addSparseTriplets(pid, pid);
-	for (const auto &spring : _springs) {
-		addSparseTriplets(spring.pid0, spring.pid1);
-		addSparseTriplets(spring.pid1, spring.pid0);
-	}
-	_matBackwardEuler.setFromTriplets(elements.begin(), elements.end());
-}
-
-template <int Dim>
-void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
-{
-	const auto addSparseBlockValue = [&](const int pid0, const int pid1, const MatrixDr &block) {
-		const size_t offset0 = size_t(pid0) * Dim;
-		const size_t offset1 = size_t(pid1) * Dim;
 		const MatrixDr reducedBlock = _invSqrtMasses[pid0].asDiagonal() * block * _invSqrtMasses[pid1].asDiagonal();
 		for (int i = 0; i < Dim; i++)
 			for (int j = 0; j < Dim; j++)
-				_matBackwardEuler.coeffRef(offset0 + i, offset1 + j) += reducedBlock(i, j);
+				_coeffBackwardEuler.push_back(Tripletr(offset0 + i, offset1 + j, reducedBlock(i, j)));
 	};
 	const auto asVectorXr = [&](ParticlesVectorAttribute<Dim> &attr) {
 		return Eigen::Map<VectorXr, Eigen::Aligned>(reinterpret_cast<real *>(attr.data()), attr.size() * Dim);
@@ -198,6 +174,7 @@ void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 		addSparseBlockValue(pid1, pid1, -block);
 	}
 
+	_matBackwardEuler.setFromTriplets(_coeffBackwardEuler.begin(), _coeffBackwardEuler.end());
 	_rhsBackwardEuler = _matBackwardEuler * asVectorXr(_velocities) + asVectorXr(_accelerations) * dt;
 
 	// Set Jacobian of acceleration to position.
@@ -213,6 +190,8 @@ void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 		addSparseBlockValue(pid1, pid0, block);
 		addSparseBlockValue(pid1, pid1, -block);
 	}
+
+	_matBackwardEuler.setFromTriplets(_coeffBackwardEuler.begin(), _coeffBackwardEuler.end());
 	_solver->solve(_matBackwardEuler, asVectorXr(_velocities), _rhsBackwardEuler);
 }
 

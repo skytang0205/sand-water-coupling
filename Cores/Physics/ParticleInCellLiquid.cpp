@@ -85,8 +85,6 @@ void ParticleInCellLiquid<Dim>::advectFields(const real dt)
 {
 	_advector->advect(_markerPositions, _velocity, dt);
 	_boundaryHelper->enforce(_markerPositions, _markerVelocities);
-
-	reinitializeLevelSet();
 }
 
 template <int Dim>
@@ -104,6 +102,19 @@ void ParticleInCellLiquid<Dim>::transferFromParticlesToGrids()
 	StaggeredGridBasedData<Dim> weightSum(_velocity.staggeredGrid());
 	_velocity.setZero();
 
+	transferFromParticlesToGrids(weightSum);
+
+	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
+		if (weightSum[axis][face])
+			_velocity[axis][face] /= weightSum[axis][face];
+	});
+
+	maintainGridsBasedData(weightSum);
+}
+
+template <int Dim>
+void ParticleInCellLiquid<Dim>::transferFromParticlesToGrids(StaggeredGridBasedData<Dim> &weightSum)
+{
 	_markerVelocities.forEach([&](const int i) {
 		const VectorDr pos = _markerPositions[i];
 		const VectorDr vel = _markerVelocities[i];
@@ -114,11 +125,12 @@ void ParticleInCellLiquid<Dim>::transferFromParticlesToGrids()
 			}
 		}
 	});
-	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
-		if (weightSum[axis][face])
-			_velocity[axis][face] /= weightSum[axis][face];
-	});
+}
 
+template <int Dim>
+void ParticleInCellLiquid<Dim>::maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum)
+{
+	reinitializeLevelSet();
 	_boundaryHelper->extrapolate(_velocity, _levelSet, weightSum, _kExtrapMaxSteps);
 }
 

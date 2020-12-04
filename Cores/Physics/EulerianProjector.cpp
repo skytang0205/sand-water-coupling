@@ -50,7 +50,6 @@ void EulerianProjector<Dim>::buildLinearSystem(
 	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity)
 {
 	_coefficients.clear();
-	_matLaplacian.setZero();
 	_reducedPressure.forEach([&](const VectorDi &cell) {
 		const int idx = int(_reducedPressure.index(cell));
 		real diagCoeff = 0;
@@ -99,7 +98,6 @@ void EulerianProjector<Dim>::buildLinearSystem(
 	const real surfaceTensionMultiplier)
 {
 	_coefficients.clear();
-	_matLaplacian.setZero();
 
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	_reducedPressure.forEach([&](const VectorDi &cell) {
