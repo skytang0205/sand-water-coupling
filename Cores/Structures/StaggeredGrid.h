@@ -32,7 +32,7 @@ public:
 	VectorDr origin() const { return _origin; }
 
 	VectorDr domainOrigin() const { return _origin + VectorDr::Ones() * _kBoundaryWidth * _spacing; }
-	VectorDr domainLengths() const { return (_resolution - VectorDi::Ones() * _kBoundaryWidth * 2).cast<real>() * _spacing; }
+	VectorDr domainLengths() const { return (_resolution - VectorDi::Ones() * _kBoundaryWidth * 2).template cast<real>() * _spacing; }
 
 	const Grid<Dim> *nodeGrid() const { return &_nodeGrid; }
 	const Grid<Dim> *cellGrid() const { return &_cellGrid; }

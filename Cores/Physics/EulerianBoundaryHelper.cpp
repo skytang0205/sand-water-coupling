@@ -93,7 +93,7 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 			newFluidVelocty[axis][face] = 0;
 	});
 
-	for (int iter = 0; iter < maxSteps || (maxSteps < 0 && visited->sum<size_t>() < visited->count()); iter++) {
+	for (int iter = 0; iter < maxSteps || (maxSteps < 0 && visited->template sum<size_t>() < visited->count()); iter++) {
 		newFluidVelocty.parallelForEach([&](const int axis, const VectorDi &face) {
 			if (!(*visited)[axis][face]) {
 				int cnt = 0;

@@ -33,7 +33,7 @@ void ParticleInCellLiquid<Dim>::writeFrame(const std::string &frameDir, const bo
 		std::ofstream fout(frameDir + "/markers.mesh", std::ios::binary);
 		IO::writeValue(fout, uint(_markerPositions.size()));
 		_markerPositions.forEach([&](const int i) {
-			IO::writeValue(fout, _markerPositions[i].cast<float>().eval());
+			IO::writeValue(fout, _markerPositions[i].template cast<float>().eval());
 		});
 	}
 }

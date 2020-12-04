@@ -47,10 +47,10 @@ void LevelSetLiquid<Dim>::writeFrame(const std::string &frameDir, const bool sta
 		SurfaceMesh<Dim> liquidMesh(_levelSet);
 		IO::writeValue(fout, uint(liquidMesh.positions.size()));
 		for (const auto &pos : liquidMesh.positions)
-			IO::writeValue(fout, pos.cast<float>().eval());
+			IO::writeValue(fout, pos.template cast<float>().eval());
 		if constexpr (Dim == 3) {
 			for (const auto &normal : liquidMesh.normals)
-				IO::writeValue(fout, normal.cast<float>().eval());
+				IO::writeValue(fout, normal.template cast<float>().eval());
 		}
 		IO::writeValue(fout, uint(liquidMesh.indices.size()));
 		IO::writeArray(fout, liquidMesh.indices.data(), liquidMesh.indices.size());

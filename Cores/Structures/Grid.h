@@ -43,8 +43,8 @@ public:
 	VectorDi dataSize() const { return _dataSize; }
 	VectorDr dataOrigin() const { return _dataOrigin; }
 
-	size_t dataCount() const { return _dataSize.cast<size_t>().prod(); }
-	VectorDr dataPosition(const VectorDi &coord) const { return _dataOrigin + coord.cast<real>() * _spacing; }
+	size_t dataCount() const { return _dataSize.template cast<size_t>().prod(); }
+	VectorDr dataPosition(const VectorDi &coord) const { return _dataOrigin + coord.template cast<real>() * _spacing; }
 	VectorDi clamp(const VectorDi &coord) const { return coord.cwiseMax(0).cwiseMin(_dataSize - VectorDi::Ones()); }
 
 	size_t index(const VectorDi &coord) const
@@ -62,10 +62,10 @@ public:
 			int(index / _dataSize.x() / _dataSize.y()));
 	}
 
-	VectorDi getLinearLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().cast<int>().matrix(); }
-	VectorDi getQuadraticLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing - VectorDr::Ones() / 2).array().floor().cast<int>().matrix(); }
-	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().cast<int>().matrix() - VectorDi::Ones(); }
-	VectorDr getLowerFrac(const VectorDr &pos, const VectorDi &lower) const { return (pos - _dataOrigin - lower.cast<real>() * _spacing) / _spacing; }
+	VectorDi getLinearLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().template cast<int>().matrix(); }
+	VectorDi getQuadraticLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing - VectorDr::Ones() / 2).array().floor().template cast<int>().matrix(); }
+	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().template cast<int>().matrix() - VectorDi::Ones(); }
+	VectorDr getLowerFrac(const VectorDr &pos, const VectorDi &lower) const { return (pos - _dataOrigin - lower.template cast<real>() * _spacing) / _spacing; }
 
 	std::array<VectorDi, _kCntNb1> linearNearbyDataPoints(const VectorDr &pos) const;
 	std::array<VectorDi, _kCntNb3> cubicNearbyDataPoints(const VectorDr &pos) const;

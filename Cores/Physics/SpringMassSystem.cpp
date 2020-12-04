@@ -39,7 +39,7 @@ void SpringMassSystem<Dim>::writeFrame(const std::string &frameDir, const bool s
 		std::ofstream fout(frameDir + "/particles.mesh", std::ios::binary);
 		IO::writeValue(fout, uint(_positions.size()));
 		_positions.forEach([&](const int i) {
-			IO::writeValue(fout, _positions[i].cast<float>().eval());
+			IO::writeValue(fout, _positions[i].template cast<float>().eval());
 		});
 		if constexpr (Dim == 3) {
 			_positions.forEach([&](const int i) {
@@ -51,7 +51,7 @@ void SpringMassSystem<Dim>::writeFrame(const std::string &frameDir, const bool s
 		std::ofstream fout(frameDir + "/springs.mesh", std::ios::binary);
 		IO::writeValue(fout, uint(_positions.size()));
 		_positions.forEach([&](const int i) {
-			IO::writeValue(fout, _positions[i].cast<float>().eval());
+			IO::writeValue(fout, _positions[i].template cast<float>().eval());
 		});
 		if constexpr (Dim == 3) {
 			_positions.forEach([&](const int i) {

@@ -21,7 +21,7 @@ GeometryGenerator::Data GeometryGenerator::createBox(const Vector3f &lengths)
 			for (int i = 0; i < 4; i++) {
 				coeff[(axis + 1) % 3] = (i & 1) * 2 - 1;
 				coeff[(axis + 2) % 3] = (i & 2) - 1;
-				Vector3f pos = halfLengths.cwiseProduct(coeff.cast<float>());
+				Vector3f pos = halfLengths.cwiseProduct(coeff.template cast<float>());
 				Vector3f normal = Vector3f::Unit(axis) * coeff[axis];
 				data.vertices.push_back({ pos, normal });
 			}

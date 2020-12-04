@@ -50,8 +50,8 @@ public:
 	template <typename AccType>
 	AccType sum() const
 	{
-		if constexpr (Dim == 2) return _components[0].sum<AccType>() + _components[1].sum<AccType>();
-		else return _components[0].sum<AccType>() + _components[1].sum<AccType>() + _components[2].sum<AccType>();
+		if constexpr (Dim == 2) return _components[0].template sum<AccType>() + _components[1].template sum<AccType>();
+		else return _components[0].template sum<AccType>() + _components[1].template sum<AccType>() + _components[2].template sum<AccType>();
 	}
 
 	Type min() const
