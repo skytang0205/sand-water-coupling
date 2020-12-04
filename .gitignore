@@ -338,3 +338,14 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+## Ignore Visual Studio Code generated files
+.vscode
+
+## Ignore xmake generated files
+.xmake
+compile_commands.json
+
+## Ignore output files
+output
+build
