@@ -15,7 +15,7 @@ protected:
 	uint _beginFrame;
 	uint _endFrame;
 	const uint _frameRate; // number of frames per second
-	const real _stepRate; // number of steps per frame
+	const real _stepRate; // CFL for fluids, number of steps per frame for others
 
 	Simulation *const _simulation;
 
