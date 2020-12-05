@@ -8,9 +8,9 @@ AffineParticleInCellLiquid<Dim>::AffineParticleInCellLiquid(const StaggeredGrid<
 { }
 
 template <int Dim>
-void AffineParticleInCellLiquid<Dim>::transferFromGridsToParticles()
+void AffineParticleInCellLiquid<Dim>::transferFromGridToParticles()
 {
-	ParticleInCellLiquid<Dim>::transferFromGridsToParticles();
+	ParticleInCellLiquid<Dim>::transferFromGridToParticles();
 
 	_markerVelocities.parallelForEach([&](const int i) {
 		const VectorDr pos = _markerPositions[i];
@@ -24,7 +24,7 @@ void AffineParticleInCellLiquid<Dim>::transferFromGridsToParticles()
 }
 
 template <int Dim>
-void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrids(StaggeredGridBasedData<Dim> &weightSum)
+void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum)
 {
 	_markerVelocities.forEach([&](const int i) {
 		const VectorDr pos = _markerPositions[i];

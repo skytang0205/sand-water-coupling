@@ -71,10 +71,10 @@ void ParticleInCellLiquid<Dim>::advance(const real dt)
 {
 	updateColliders(dt);
 
-	transferFromGridsToParticles();
+	transferFromGridToParticles();
 	advectFields(dt);
 	applyMarkerForces(dt);
-	transferFromParticlesToGrids();
+	transferFromParticlesToGrid();
 
 	applyBodyForces(dt);
 	projectVelocity(dt);
@@ -88,7 +88,7 @@ void ParticleInCellLiquid<Dim>::advectFields(const real dt)
 }
 
 template <int Dim>
-void ParticleInCellLiquid<Dim>::transferFromGridsToParticles()
+void ParticleInCellLiquid<Dim>::transferFromGridToParticles()
 {
 	_markerVelocities.parallelForEach([&](const int i) {
 		const VectorDr pos = _markerPositions[i];
@@ -97,12 +97,12 @@ void ParticleInCellLiquid<Dim>::transferFromGridsToParticles()
 }
 
 template <int Dim>
-void ParticleInCellLiquid<Dim>::transferFromParticlesToGrids()
+void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid()
 {
 	StaggeredGridBasedData<Dim> weightSum(_velocity.staggeredGrid());
 	_velocity.setZero();
 
-	transferFromParticlesToGrids(weightSum);
+	transferFromParticlesToGrid(weightSum);
 
 	_velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (weightSum[axis][face])
@@ -113,7 +113,7 @@ void ParticleInCellLiquid<Dim>::transferFromParticlesToGrids()
 }
 
 template <int Dim>
-void ParticleInCellLiquid<Dim>::transferFromParticlesToGrids(StaggeredGridBasedData<Dim> &weightSum)
+void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum)
 {
 	_markerVelocities.forEach([&](const int i) {
 		const VectorDr pos = _markerPositions[i];

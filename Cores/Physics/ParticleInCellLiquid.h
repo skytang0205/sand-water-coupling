@@ -54,10 +54,10 @@ protected:
 
 	virtual void advectFields(const real dt) override;
 	virtual void applyMarkerForces(const real dt) { }
-	virtual void transferFromGridsToParticles();
-	virtual void transferFromParticlesToGrids();
+	virtual void transferFromGridToParticles();
+	virtual void transferFromParticlesToGrid();
 
-	virtual void transferFromParticlesToGrids(StaggeredGridBasedData<Dim> &weightSum);
+	virtual void transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum);
 	virtual void maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum);
 	virtual void reinitializeLevelSet() override;
 	virtual void reinitializeMarkers();

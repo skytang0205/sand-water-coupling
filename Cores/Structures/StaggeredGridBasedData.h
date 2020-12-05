@@ -18,12 +18,12 @@ protected:
 
 public:
 
-	StaggeredGridBasedData(const StaggeredGrid<Dim> *const grid, const Type &value = Type()) { resize(grid, value); }
+	StaggeredGridBasedData(const StaggeredGrid<Dim> *const grid, const Type &value = Zero<Type>()) { resize(grid, value); }
 
 	StaggeredGridBasedData() = default;
 	virtual ~StaggeredGridBasedData() = default;
 
-	void resize(const StaggeredGrid<Dim> *const grid, const Type &value = Type())
+	void resize(const StaggeredGrid<Dim> *const grid, const Type &value = Zero<Type>())
 	{
 		_grid = grid;
 		for (int axis = 0; axis < Dim; axis++)
@@ -45,7 +45,7 @@ public:
 	const GridBasedData<Dim, Type> &operator[](const int axis) const { return _components[axis]; }
 
 	void setConstant(const Type &value) { for (int axis = 0; axis < Dim; axis++) _components[axis].setConstant(value); }
-	void setZero() { setConstant(Type(0)); }
+	void setZero() { setConstant(Zero<Type>()); }
 
 	template <typename AccType>
 	AccType sum() const

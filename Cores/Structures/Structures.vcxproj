@@ -16,7 +16,11 @@
     <ClInclude Include="Field.h" />
     <ClInclude Include="GridBasedScalarField.h" />
     <ClInclude Include="GridBasedVectorField.h" />
+    <ClInclude Include="Particles.h" />
     <ClInclude Include="ParticlesAttribute.h" />
+    <ClInclude Include="ParticlesBasedData.h" />
+    <ClInclude Include="SmoothedParticles.h" />
+    <ClInclude Include="SmoothedParticlesBasedScalarField.h" />
     <ClInclude Include="StaggeredGrid.h" />
     <ClInclude Include="StaggeredGridBasedData.h" />
     <ClInclude Include="StaggeredGridBasedVectorField.h" />

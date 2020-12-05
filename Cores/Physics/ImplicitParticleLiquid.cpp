@@ -40,7 +40,7 @@ void ImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
 }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::transferFromGridsToParticles()
+void ImplicitParticleLiquid<Dim>::transferFromGridToParticles()
 {
 	_deltaVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		_deltaVelocity[axis][face] = _velocity[axis][face] - _deltaVelocity[axis][face];

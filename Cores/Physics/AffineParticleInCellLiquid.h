@@ -30,8 +30,8 @@ public:
 
 protected:
 
-	virtual void transferFromGridsToParticles() override;
-	virtual void transferFromParticlesToGrids(StaggeredGridBasedData<Dim> &weightSum) override;
+	virtual void transferFromGridToParticles() override;
+	virtual void transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum) override;
 
 	virtual void reinitializeMarkers() override;
 };
