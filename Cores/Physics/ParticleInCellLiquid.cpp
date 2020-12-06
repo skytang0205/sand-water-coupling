@@ -5,18 +5,18 @@
 namespace PhysX {
 
 template <int Dim>
-ParticleInCellLiquid<Dim>::ParticleInCellLiquid(const StaggeredGrid<Dim> &grid, const int markersCntPerSubcell) :
+ParticleInCellLiquid<Dim>::ParticleInCellLiquid(const StaggeredGrid<Dim> &grid, const int particlesCntPerSubcell) :
 	LevelSetLiquid<Dim>(grid),
-	_markersCntPerSubCell(markersCntPerSubcell)
+	_particlesCntPerSubCell(particlesCntPerSubcell)
 { }
 
 template <int Dim>
 void ParticleInCellLiquid<Dim>::writeDescription(YAML::Node &root) const
 {
 	LevelSetLiquid<Dim>::writeDescription(root);
-	if constexpr (Dim == 2) { // Description of markers.
+	if constexpr (Dim == 2) { // Description of particles.
 		YAML::Node node;
-		node["name"] = "markers";
+		node["name"] = "particles";
 		node["data_mode"] = "dynamic";
 		node["primitive_type"] = "point_list";
 		node["material"]["diffuse_albedo"] = Vector4f(0, 0, 0, 1);
@@ -29,11 +29,11 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
 {
 	LevelSetLiquid<Dim>::writeFrame(frameDir, staticDraw);
-	if constexpr (Dim == 2) { // Write Markers.
-		std::ofstream fout(frameDir + "/markers.mesh", std::ios::binary);
-		IO::writeValue(fout, uint(_markerPositions.size()));
-		_markerPositions.forEach([&](const int i) {
-			IO::writeValue(fout, _markerPositions[i].template cast<float>().eval());
+	if constexpr (Dim == 2) { // Write particles.
+		std::ofstream fout(frameDir + "/particles.mesh", std::ios::binary);
+		IO::writeValue(fout, uint(_particles.size()));
+		_particles.forEach([&](const int i) {
+			IO::writeValue(fout, _particles.positions[i].template cast<float>().eval());
 		});
 	}
 }
@@ -42,9 +42,9 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
 	LevelSetLiquid<Dim>::saveFrame(frameDir);
-	{ // Save markerPositions.
-		std::ofstream fout(frameDir + "/markerPositions.sav", std::ios::binary);
-		_markerPositions.save(fout);
+	{ // Save particlePositions.
+		std::ofstream fout(frameDir + "/particlePositions.sav", std::ios::binary);
+		_particles.positions.save(fout);
 	}
 }
 
@@ -52,17 +52,17 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
 	LevelSetLiquid<Dim>::loadFrame(frameDir);
-	reinitializeMarkers();
-	{ // Load markerPositions.
-		std::ifstream fin(frameDir + "/markerPositions.sav", std::ios::binary);
-		_markerPositions.load(fin);
+	reinitializeParticles();
+	{ // Load particlePositions.
+		std::ifstream fin(frameDir + "/particlePositions.sav", std::ios::binary);
+		_particles.positions.load(fin);
 	}
 }
 
 template <int Dim>
 void ParticleInCellLiquid<Dim>::initialize()
 {
-	reinitializeMarkers();
+	reinitializeParticles();
 	LevelSetLiquid<Dim>::initialize();
 }
 
@@ -73,7 +73,7 @@ void ParticleInCellLiquid<Dim>::advance(const real dt)
 
 	transferFromGridToParticles();
 	advectFields(dt);
-	applyMarkerForces(dt);
+	applyParticleForces(dt);
 	transferFromParticlesToGrid();
 
 	applyBodyForces(dt);
@@ -83,23 +83,23 @@ void ParticleInCellLiquid<Dim>::advance(const real dt)
 template <int Dim>
 void ParticleInCellLiquid<Dim>::advectFields(const real dt)
 {
-	_advector->advect(_markerPositions, _velocity, dt);
-	_boundaryHelper->enforce(_markerPositions, _markerVelocities);
+	_advector->advect(_particles, _velocity, dt);
+	_boundaryHelper->enforce(_particles, _particleVelocities);
 }
 
 template <int Dim>
 void ParticleInCellLiquid<Dim>::transferFromGridToParticles()
 {
-	_markerVelocities.parallelForEach([&](const int i) {
-		const VectorDr pos = _markerPositions[i];
-		_markerVelocities[i] = _velocity(pos);
+	_particles.parallelForEach([&](const int i) {
+		const VectorDr pos = _particles.positions[i];
+		_particleVelocities[i] = _velocity(pos);
 	});
 }
 
 template <int Dim>
 void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid()
 {
-	StaggeredGridBasedData<Dim> weightSum(_velocity.staggeredGrid());
+	StaggeredGridBasedScalarData<Dim> weightSum(_velocity.staggeredGrid());
 	_velocity.setZero();
 
 	transferFromParticlesToGrid(weightSum);
@@ -109,15 +109,15 @@ void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid()
 			_velocity[axis][face] /= weightSum[axis][face];
 	});
 
-	maintainGridsBasedData(weightSum);
+	maintainGridBasedData(weightSum);
 }
 
 template <int Dim>
-void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum)
+void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedScalarData<Dim> &weightSum)
 {
-	_markerVelocities.forEach([&](const int i) {
-		const VectorDr pos = _markerPositions[i];
-		const VectorDr vel = _markerVelocities[i];
+	_particles.forEach([&](const int i) {
+		const VectorDr pos = _particles.positions[i];
+		const VectorDr vel = _particleVelocities[i];
 		for (int axis = 0; axis < Dim; axis++) {
 			for (const auto [face, weight] : _velocity[axis].grid()->linearIntrplDataPoints(pos)) {
 				_velocity[axis][face] += vel[axis] * weight;
@@ -128,7 +128,7 @@ void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedDa
 }
 
 template <int Dim>
-void ParticleInCellLiquid<Dim>::maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum)
+void ParticleInCellLiquid<Dim>::maintainGridBasedData(StaggeredGridBasedScalarData<Dim> &weightSum)
 {
 	reinitializeLevelSet();
 	_boundaryHelper->extrapolate(_velocity, _levelSet, weightSum, _kExtrapMaxSteps);
@@ -142,8 +142,8 @@ void ParticleInCellLiquid<Dim>::reinitializeLevelSet()
 	auto &liquidSdf = _levelSet.signedDistanceField();
 	const real radius = liquidSdf.spacing() * real(1.1) / real(std::numbers::sqrt2);
 
-	_markerPositions.forEach([&](const int i) {
-		const VectorDr pos = _markerPositions[i];
+	_particles.forEach([&](const int i) {
+		const VectorDr pos = _particles.positions[i];
 		const ImplicitSphere<Dim> sphere(pos, radius);
 		for (const auto &cell : liquidSdf.grid()->cubicNearbyDataPoints(pos)) {
 			if (liquidSdf.isValid(cell))
@@ -155,23 +155,23 @@ void ParticleInCellLiquid<Dim>::reinitializeLevelSet()
 }
 
 template <int Dim>
-void ParticleInCellLiquid<Dim>::reinitializeMarkers()
+void ParticleInCellLiquid<Dim>::reinitializeParticles()
 {
-	_markerPositions.clear();
+	_particles.clear();
 
 	auto &liquidSdf = _levelSet.signedDistanceField();
 	const real dx = liquidSdf.spacing();
 	const real radius = dx * real(1.1) / real(std::numbers::sqrt2);
 	liquidSdf.forEach([&](const VectorDi &cell) {
 		const VectorDr centerPos = liquidSdf.position(cell);
-		for (int i = 0; i < (1 << Dim) * _markersCntPerSubCell; i++) {
+		for (int i = 0; i < (1 << Dim) * _particlesCntPerSubCell; i++) {
 			const VectorDr pos = centerPos + VectorDr::Random() * dx * real(0.5);
 			if (_levelSet.signedDistance(pos) <= -radius)
-				_markerPositions.add(pos);
+				_particles.add(pos);
 		}
 	});
-	_markerVelocities.resize(_markerPositions.size());
-	_markerVelocities.setZero();
+	_particleVelocities.resize(&_particles);
+	_particleVelocities.setZero();
 }
 
 template class ParticleInCellLiquid<2>;

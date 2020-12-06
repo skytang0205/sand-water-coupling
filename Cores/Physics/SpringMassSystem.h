@@ -2,7 +2,7 @@
 
 #include "Physics/Simulation.h"
 #include "Solvers/SparseSolver.h"
-#include "Structures/ParticlesAttribute.h"
+#include "Structures/ParticlesBasedData.h"
 
 namespace PhysX {
 
@@ -26,12 +26,11 @@ public:
 
 protected:
 
-	ParticlesVectorAttribute<Dim> _masses;
-	ParticlesVectorAttribute<Dim> _invMasses;
-	ParticlesVectorAttribute<Dim> _invSqrtMasses;
-	ParticlesVectorAttribute<Dim> _positions;
-	ParticlesVectorAttribute<Dim> _velocities;
-	ParticlesVectorAttribute<Dim> _accelerations;
+	Particles<Dim> _particles;
+	ParticlesBasedScalarData<Dim> _invMasses;
+	ParticlesBasedScalarData<Dim> _invSqrtMasses;
+	ParticlesBasedVectorData<Dim> _velocities;
+	ParticlesBasedVectorData<Dim> _accelerations;
 	std::vector<Spring> _springs;
 
 	std::vector<Tripletr> _coeffBackwardEuler;
@@ -64,7 +63,7 @@ public:
 protected:
 
 	void calculateAccelarations();
-	void reinitializeAttributes();
+	void reinitializeParticlesBasedData();
 	void buildAndSolveLinearSystem(const real dt);
 
 	virtual void applyElasticForces();

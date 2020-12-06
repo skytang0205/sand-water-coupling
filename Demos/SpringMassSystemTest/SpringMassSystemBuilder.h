@@ -29,15 +29,12 @@ protected:
 	{
 		DECLARE_DIM_TYPES(Dim)
 		auto smSystem = std::make_unique<SpringMassSystem<Dim>>();
-		smSystem->_enableGravity = true;
+		smSystem->_enableGravity = false;
 
-		smSystem->_masses.add(VectorDr::Ones() * std::numeric_limits<real>::infinity());
-		smSystem->_positions.add(VectorDr::Zero());
-		smSystem->_velocities.add(VectorDr::Zero());
+		smSystem->_particles.add(VectorDr::Zero(), std::numeric_limits<real>::infinity());
+		smSystem->_particles.add(VectorDr::Unit(0), 1);
 
-		smSystem->_masses.add(VectorDr::Ones());
-		smSystem->_positions.add(VectorDr::Unit(0));
-		smSystem->_velocities.add(VectorDr::Zero());
+		smSystem->_velocities.resize(&smSystem->_particles);
 
 		smSystem->_springs.push_back({ 0, 1, real(.5), 100, 0 });
 
@@ -49,16 +46,15 @@ protected:
 	{
 		DECLARE_DIM_TYPES(Dim)
 		auto smSystem = std::make_unique<SpringMassSystem<Dim>>();
-		for (int i = 0; i < 10; i++) {
-			if (i)
-				smSystem->_masses.add(VectorDr::Ones());
-			else
-				smSystem->_masses.add(VectorDr::Ones() * std::numeric_limits<real>::infinity());
-			smSystem->_positions.add(VectorDr::Unit(0) * i / 4);
-			smSystem->_velocities.add(VectorDr::Zero());
-		}
+
+		for (int i = 0; i < 10; i++) 
+			smSystem->_particles.add(VectorDr::Unit(0) * i / 4, i ? real(1) : std::numeric_limits<real>::infinity());
+
+		smSystem->_velocities.resize(&smSystem->_particles);
+
 		for (int i = 0; i < 9; i++)
 			smSystem->_springs.push_back({ i, i + 1, real(.25), 1000, 0 });
+
 		return smSystem;
 	}
 

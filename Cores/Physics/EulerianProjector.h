@@ -34,10 +34,10 @@ public:
 
 	void project(
 		StaggeredGridBasedVectorField<Dim> &velocity,
-		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity);
 	void project(StaggeredGridBasedVectorField<Dim> &velocity,
-		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
 		const LevelSet<Dim> &liquidLevelSet,
 		const real surfaceTensionMultiplier = 0);
@@ -48,20 +48,20 @@ protected:
 
 	void buildLinearSystem(
 		StaggeredGridBasedVectorField<Dim> &velocity,
-		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity);
 	void applyPressureGradient(
 		StaggeredGridBasedVectorField<Dim> &velocity,
-		const StaggeredGridBasedData<Dim> &boundaryFraction) const;
+		const StaggeredGridBasedScalarData<Dim> &boundaryFraction) const;
 
 	void buildLinearSystem(StaggeredGridBasedVectorField<Dim> &velocity,
-		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 		const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
 		const LevelSet<Dim> &liquidLevelSet,
 		const real surfaceTensionMultiplier);
 	void applyPressureGradient(
 		StaggeredGridBasedVectorField<Dim> &velocity,
-		const StaggeredGridBasedData<Dim> &boundaryFraction,
+		const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 		const LevelSet<Dim> &liquidLevelSet,
 		const real surfaceTensionMultiplier) const;
 

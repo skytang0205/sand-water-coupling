@@ -31,7 +31,7 @@ class FastMarchingReinitializer final : public LevelSetReinitializer<Dim>
 
 protected:
 
-	GridBasedData<Dim> _tent; // tentative signed distance
+	GridBasedScalarData<Dim> _tent; // tentative signed distance
 	GridBasedData<Dim, uchar> _visited;
 
 	std::vector<int> _intfIndices;

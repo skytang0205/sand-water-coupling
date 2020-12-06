@@ -2,7 +2,7 @@
 
 #include "Structures/GridBasedScalarField.h"
 #include "Structures/GridBasedVectorField.h"
-#include "Structures/ParticlesAttribute.h"
+#include "Structures/Particles.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
 
 namespace PhysX {
@@ -21,7 +21,7 @@ public:
 
 	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) = 0;
 	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) = 0;
-	virtual void advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt) = 0;
+	virtual void advect(Particles<Dim> &particles, const VectorField<Dim> &flow, const real dt) = 0;
 };
 
 template <int Dim, int RungeKuttaOrder = 2>
@@ -40,7 +40,7 @@ public:
 
 	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
 	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
-	virtual void advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt) override;
+	virtual void advect(Particles<Dim> &particles, const VectorField<Dim> &flow, const real dt) override;
 
 protected:
 
@@ -66,7 +66,7 @@ public:
 
 	virtual void advect(GridBasedScalarField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
 	virtual void advect(StaggeredGridBasedVectorField<Dim> &field, const VectorField<Dim> &flow, const real dt) override;
-	virtual void advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt) override;
+	virtual void advect(Particles<Dim> &particles, const VectorField<Dim> &flow, const real dt) override;
 
 protected:
 

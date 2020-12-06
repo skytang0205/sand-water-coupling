@@ -61,11 +61,11 @@ void EulerianBoundaryHelper<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fl
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::enforce(ParticlesVectorAttribute<Dim> &markerPositions, ParticlesVectorAttribute<Dim> &markerVelocities) const
+void EulerianBoundaryHelper<Dim>::enforce(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &particleVelocities) const
 {
-	markerPositions.parallelForEach([&](const int i) {
-		VectorDr &pos = markerPositions[i];
-		VectorDr &vel = markerVelocities[i];
+	particles.parallelForEach([&](const int i) {
+		VectorDr &pos = particles.positions[i];
+		VectorDr &vel = particleVelocities[i];
 		if (!_domainBox.isInside(pos) || _surface.isInside(pos)) {
 			const VectorDr n = _normal(pos).normalized();
 			if (n.any())
@@ -150,7 +150,7 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, StaggeredGridBasedData<Dim> &weightSum, const int maxSteps) const
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, StaggeredGridBasedScalarData<Dim> &weightSum, const int maxSteps) const
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {

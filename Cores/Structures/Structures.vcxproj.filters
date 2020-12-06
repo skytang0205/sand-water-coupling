@@ -51,7 +51,7 @@
     <ClInclude Include="SmoothedParticles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SmoothedParticlesBasedScalarField.h">
+    <ClInclude Include="ParticlesBasedScalarField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

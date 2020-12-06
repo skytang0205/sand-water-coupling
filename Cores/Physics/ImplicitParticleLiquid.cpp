@@ -15,9 +15,9 @@ template <int Dim>
 void ImplicitParticleLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
 	ParticleInCellLiquid<Dim>::saveFrame(frameDir);
-	{ // Save markerVelocities.
-		std::ofstream fout(frameDir + "/markerVelocities.sav", std::ios::binary);
-		_markerVelocities.save(fout);
+	{ // Save particleVelocities.
+		std::ofstream fout(frameDir + "/particleVelocities.sav", std::ios::binary);
+		_particleVelocities.save(fout);
 	}
 	{ // Save delteVelocity.
 		std::ofstream fout(frameDir + "/delteVelocity.sav", std::ios::binary);
@@ -29,9 +29,9 @@ template <int Dim>
 void ImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
 	ParticleInCellLiquid<Dim>::loadFrame(frameDir);
-	{ // Load markerVelocities.
-		std::ifstream fin(frameDir + "/markerVelocities.sav", std::ios::binary);
-		_markerVelocities.load(fin);
+	{ // Load particleVelocities.
+		std::ifstream fin(frameDir + "/particleVelocities.sav", std::ios::binary);
+		_particleVelocities.load(fin);
 	}
 	{ // Load delteVelocity.
 		std::ifstream fin(frameDir + "/delteVelocity.sav", std::ios::binary);
@@ -45,17 +45,17 @@ void ImplicitParticleLiquid<Dim>::transferFromGridToParticles()
 	_deltaVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		_deltaVelocity[axis][face] = _velocity[axis][face] - _deltaVelocity[axis][face];
 	});
-	_markerVelocities.parallelForEach([&](const int i) {
-		const VectorDr pos = _markerPositions[i];
-		_markerVelocities[i] = _propOfPic * _velocity(pos) + (1 - _propOfPic) * (_markerVelocities[i] + _deltaVelocity(pos));
+	_particles.parallelForEach([&](const int i) {
+		const VectorDr pos = _particles.positions[i];
+		_particleVelocities[i] = _propOfPic * _velocity(pos) + (1 - _propOfPic) * (_particleVelocities[i] + _deltaVelocity(pos));
 	});
 }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum)
+void ImplicitParticleLiquid<Dim>::maintainGridBasedData(StaggeredGridBasedScalarData<Dim> &weightSum)
 {
 	_deltaVelocity = _velocity;
-	ParticleInCellLiquid<Dim>::maintainGridsBasedData(weightSum);
+	ParticleInCellLiquid<Dim>::maintainGridBasedData(weightSum);
 }
 
 template class ImplicitParticleLiquid<2>;

@@ -6,7 +6,7 @@
 
 namespace PhysX {
 
-template <int Dim, typename Type = real>
+template <int Dim, typename Type>
 class StaggeredGridBasedData
 {
 	DECLARE_DIM_TYPES(Dim)
@@ -78,5 +78,8 @@ public:
 	void load(std::istream &in) { for (int axis = 0; axis < Dim; axis++) _components[axis].load(in); }
 	void save(std::ostream &out) const { for (int axis = 0; axis < Dim; axis++) _components[axis].save(out); }
 };
+
+template <int Dim> using StaggeredGridBasedScalarData = StaggeredGridBasedData<Dim, real>;
+template <int Dim> using StaggeredGridBasedVectorData = StaggeredGridBasedData<Dim, Vector<Dim, real>>;
 
 }

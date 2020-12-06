@@ -14,8 +14,8 @@ protected:
 
 	using EulerianFluid<Dim>::_grid;
 	using EulerianFluid<Dim>::_velocity;
-	using ParticleInCellLiquid<Dim>::_markerPositions;
-	using ParticleInCellLiquid<Dim>::_markerVelocities;
+	using ParticleInCellLiquid<Dim>::_particles;
+	using ParticleInCellLiquid<Dim>::_particleVelocities;
 
 	const real _propOfPic;
 	StaggeredGridBasedVectorField<Dim> _deltaVelocity;
@@ -35,7 +35,7 @@ protected:
 
 	virtual void transferFromGridToParticles() override;
 
-	virtual void maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum) override;
+	virtual void maintainGridBasedData(StaggeredGridBasedScalarData<Dim> &weightSum) override;
 };
 
 }

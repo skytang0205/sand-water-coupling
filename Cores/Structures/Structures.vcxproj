@@ -20,7 +20,7 @@
     <ClInclude Include="ParticlesAttribute.h" />
     <ClInclude Include="ParticlesBasedData.h" />
     <ClInclude Include="SmoothedParticles.h" />
-    <ClInclude Include="SmoothedParticlesBasedScalarField.h" />
+    <ClInclude Include="ParticlesBasedScalarField.h" />
     <ClInclude Include="StaggeredGrid.h" />
     <ClInclude Include="StaggeredGridBasedData.h" />
     <ClInclude Include="StaggeredGridBasedVectorField.h" />

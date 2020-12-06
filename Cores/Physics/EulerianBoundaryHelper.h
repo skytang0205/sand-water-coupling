@@ -4,7 +4,7 @@
 #include "Geometries/LevelSet.h"
 #include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
-#include "Structures/ParticlesAttribute.h"
+#include "Structures/ParticlesBasedData.h"
 
 #include <functional>
 #include <memory>
@@ -20,7 +20,7 @@ protected:
 
 	ImplicitBox<Dim> _domainBox;
 	LevelSet<Dim> _surface;
-	StaggeredGridBasedData<Dim> _fraction;
+	StaggeredGridBasedScalarData<Dim> _fraction;
 	StaggeredGridBasedVectorField<Dim> _velocity;
 	StaggeredGridBasedVectorField<Dim> _normal;
 
@@ -32,7 +32,7 @@ public:
 	EulerianBoundaryHelper &operator=(const EulerianBoundaryHelper &rhs) = delete;
 	virtual ~EulerianBoundaryHelper() = default;
 
-	const StaggeredGridBasedData<Dim> &fraction() const { return _fraction; }
+	const StaggeredGridBasedScalarData<Dim> &fraction() const { return _fraction; }
 	const StaggeredGridBasedVectorField<Dim> &velocity() const { return _velocity; }
 
 	void reset(
@@ -40,11 +40,11 @@ public:
 		const std::function<real(const int axis, const VectorDi &face)> &domainBoundaryVelocity);
 
 	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity) const;
-	void enforce(ParticlesVectorAttribute<Dim> &markerPositions, ParticlesVectorAttribute<Dim> &markerVelocities) const;
+	void enforce(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &particleVelocities) const;
 
 	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps = -1) const;
 	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps = -1) const;
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, StaggeredGridBasedData<Dim> &weightSum, const int maxSteps = -1) const;
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, StaggeredGridBasedScalarData<Dim> &weightSum, const int maxSteps = -1) const;
 
 protected:
 

@@ -12,25 +12,25 @@ void AffineParticleInCellLiquid<Dim>::transferFromGridToParticles()
 {
 	ParticleInCellLiquid<Dim>::transferFromGridToParticles();
 
-	_markerVelocities.parallelForEach([&](const int i) {
-		const VectorDr pos = _markerPositions[i];
+	_particles.parallelForEach([&](const int i) {
+		const VectorDr pos = _particles.positions[i];
 		for (int axis = 0; axis < Dim; axis++) {
-			_markerVelocityDerivatives[axis][i] = VectorDr::Zero();
+			_particleVelocityDerivatives[axis][i] = VectorDr::Zero();
 			for (const auto [face, gradWeight] : _velocity[axis].grid()->gradientLinearIntrplDataPoints(pos)) {
-				_markerVelocityDerivatives[axis][i] += _velocity[axis][face] * gradWeight;
+				_particleVelocityDerivatives[axis][i] += _velocity[axis][face] * gradWeight;
 			}
 		}
 	});
 }
 
 template <int Dim>
-void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum)
+void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedScalarData<Dim> &weightSum)
 {
-	_markerVelocities.forEach([&](const int i) {
-		const VectorDr pos = _markerPositions[i];
-		const VectorDr vel = _markerVelocities[i];
+	_particles.forEach([&](const int i) {
+		const VectorDr pos = _particles.positions[i];
+		const VectorDr vel = _particleVelocities[i];
 		for (int axis = 0; axis < Dim; axis++) {
-			const VectorDr gradVelAxis = _markerVelocityDerivatives[axis][i];
+			const VectorDr gradVelAxis = _particleVelocityDerivatives[axis][i];
 			for (const auto [face, weight] : _velocity[axis].grid()->linearIntrplDataPoints(pos)) {
 				const VectorDr dPos = _velocity[axis].position(face) - pos;
 				_velocity[axis][face] += (vel[axis] + gradVelAxis.dot(dPos)) * weight;
@@ -41,12 +41,12 @@ void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridB
 }
 
 template <int Dim>
-void AffineParticleInCellLiquid<Dim>::reinitializeMarkers()
+void AffineParticleInCellLiquid<Dim>::reinitializeParticles()
 {
-	ParticleInCellLiquid<Dim>::reinitializeMarkers();
+	ParticleInCellLiquid<Dim>::reinitializeParticles();
 	for (int axis = 0; axis < Dim; axis++) {
-		_markerVelocityDerivatives[axis].resize(_markerPositions.size());
-		_markerVelocityDerivatives[axis].setZero();
+		_particleVelocityDerivatives[axis].resize(&_particles);
+		_particleVelocityDerivatives[axis].setZero();
 	}
 }
 

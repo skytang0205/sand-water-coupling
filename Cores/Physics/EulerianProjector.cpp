@@ -13,7 +13,7 @@ EulerianProjector<Dim>::EulerianProjector(const Grid<Dim> *const grid) :
 template <int Dim>
 void EulerianProjector<Dim>::project(
 	StaggeredGridBasedVectorField<Dim> &velocity,
-	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity)
 {
 	buildLinearSystem(velocity, boundaryFraction, boundaryVelocity);
@@ -24,7 +24,7 @@ void EulerianProjector<Dim>::project(
 template <int Dim>
 void EulerianProjector<Dim>::project(
 	StaggeredGridBasedVectorField<Dim> &velocity,
-	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
 	const LevelSet<Dim> &liquidLevelSet,
 	const real surfaceTensionMultiplier)
@@ -46,7 +46,7 @@ void EulerianProjector<Dim>::solveLinearSystem()
 template <int Dim>
 void EulerianProjector<Dim>::buildLinearSystem(
 	StaggeredGridBasedVectorField<Dim> &velocity,
-	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity)
 {
 	_coefficients.clear();
@@ -78,7 +78,7 @@ void EulerianProjector<Dim>::buildLinearSystem(
 template <int Dim>
 void EulerianProjector<Dim>::applyPressureGradient(
 	StaggeredGridBasedVectorField<Dim> &velocity,
-	const StaggeredGridBasedData<Dim> &boundaryFraction) const
+	const StaggeredGridBasedScalarData<Dim> &boundaryFraction) const
 {
 	velocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		if (boundaryFraction[axis][face] < 1) {
@@ -92,7 +92,7 @@ void EulerianProjector<Dim>::applyPressureGradient(
 template <int Dim>
 void EulerianProjector<Dim>::buildLinearSystem(
 	StaggeredGridBasedVectorField<Dim> &velocity,
-	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 	const StaggeredGridBasedVectorField<Dim> &boundaryVelocity,
 	const LevelSet<Dim> &liquidLevelSet,
 	const real surfaceTensionMultiplier)
@@ -139,7 +139,7 @@ void EulerianProjector<Dim>::buildLinearSystem(
 template <int Dim>
 void EulerianProjector<Dim>::applyPressureGradient(
 	StaggeredGridBasedVectorField<Dim> &velocity,
-	const StaggeredGridBasedData<Dim> &boundaryFraction,
+	const StaggeredGridBasedScalarData<Dim> &boundaryFraction,
 	const LevelSet<Dim> &liquidLevelSet,
 	const real surfaceTensionMultiplier) const
 {

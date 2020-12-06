@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Physics/LevelSetLiquid.h"
-#include "Structures/ParticlesAttribute.h"
+#include "Structures/ParticlesBasedData.h"
 
 namespace PhysX {
 
@@ -25,14 +25,13 @@ protected:
 	using LevelSetLiquid<Dim>::_levelSet;
 	using LevelSetLiquid<Dim>::_levelSetReinitializer;
 
-
-	const int _markersCntPerSubCell;
-	ParticlesVectorAttribute<Dim> _markerPositions;
-	ParticlesVectorAttribute<Dim> _markerVelocities;
+	const int _particlesCntPerSubCell;
+	Particles<Dim> _particles;
+	ParticlesBasedVectorData<Dim> _particleVelocities;
 
 public:
 
-	ParticleInCellLiquid(const StaggeredGrid<Dim> &grid, const int markersCntPerSubcell);
+	ParticleInCellLiquid(const StaggeredGrid<Dim> &grid, const int particlesCntPerSubcell);
 
 	ParticleInCellLiquid(const ParticleInCellLiquid &rhs) = delete;
 	ParticleInCellLiquid &operator=(const ParticleInCellLiquid &rhs) = delete;
@@ -53,14 +52,14 @@ protected:
 	using LevelSetLiquid<Dim>::projectVelocity;
 
 	virtual void advectFields(const real dt) override;
-	virtual void applyMarkerForces(const real dt) { }
+	virtual void applyParticleForces(const real dt) { }
 	virtual void transferFromGridToParticles();
 	virtual void transferFromParticlesToGrid();
 
-	virtual void transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum);
-	virtual void maintainGridsBasedData(StaggeredGridBasedData<Dim> &weightSum);
+	virtual void transferFromParticlesToGrid(StaggeredGridBasedScalarData<Dim> &weightSum);
+	virtual void maintainGridBasedData(StaggeredGridBasedScalarData<Dim> &weightSum);
 	virtual void reinitializeLevelSet() override;
-	virtual void reinitializeMarkers();
+	virtual void reinitializeParticles();
 };
 
 }

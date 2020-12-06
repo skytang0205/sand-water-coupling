@@ -15,10 +15,10 @@ protected:
 	using EulerianFluid<Dim>::_velocity;
 	using EulerianFluid<Dim>::_boundaryHelper;
 	using LevelSetLiquid<Dim>::_levelSet;
-	using ParticleInCellLiquid<Dim>::_markerPositions;
-	using ParticleInCellLiquid<Dim>::_markerVelocities;
+	using ParticleInCellLiquid<Dim>::_particles;
+	using ParticleInCellLiquid<Dim>::_particleVelocities;
 
-	std::array<ParticlesVectorAttribute<Dim>, Dim> _markerVelocityDerivatives;
+	std::array<ParticlesBasedVectorData<Dim>, Dim> _particleVelocityDerivatives;
 
 public:
 
@@ -31,9 +31,9 @@ public:
 protected:
 
 	virtual void transferFromGridToParticles() override;
-	virtual void transferFromParticlesToGrid(StaggeredGridBasedData<Dim> &weightSum) override;
+	virtual void transferFromParticlesToGrid(StaggeredGridBasedScalarData<Dim> &weightSum) override;
 
-	virtual void reinitializeMarkers() override;
+	virtual void reinitializeParticles() override;
 };
 
 }

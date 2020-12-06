@@ -9,7 +9,7 @@
 
 namespace PhysX {
 
-template <int Dim, typename Type = real>
+template <int Dim, typename Type>
 class GridBasedData
 {
 	DECLARE_DIM_TYPES(Dim)
@@ -75,5 +75,8 @@ public:
 	void load(std::istream &in) { IO::readArray(in, _data.data(), _data.size()); }
 	void save(std::ostream &out) const { IO::writeArray(out, _data.data(), _data.size()); }
 };
+
+template <int Dim> using GridBasedScalarData = GridBasedData<Dim, real>;
+template <int Dim> using GridBasedVectorData = GridBasedData<Dim, Vector<Dim, real>>;
 
 }

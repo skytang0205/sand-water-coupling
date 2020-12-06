@@ -37,24 +37,24 @@ void SpringMassSystem<Dim>::writeFrame(const std::string &frameDir, const bool s
 {
 	{ // Write particles.
 		std::ofstream fout(frameDir + "/particles.mesh", std::ios::binary);
-		IO::writeValue(fout, uint(_positions.size()));
-		_positions.forEach([&](const int i) {
-			IO::writeValue(fout, _positions[i].template cast<float>().eval());
+		IO::writeValue(fout, uint(_particles.size()));
+		_particles.forEach([&](const int i) {
+			IO::writeValue(fout, _particles.positions[i].template cast<float>().eval());
 		});
 		if constexpr (Dim == 3) {
-			_positions.forEach([&](const int i) {
+			_particles.forEach([&](const int i) {
 				IO::writeValue(fout, VectorDf::Unit(2).eval());
 			});
 		}
 	}
 	{ // Write springs.
 		std::ofstream fout(frameDir + "/springs.mesh", std::ios::binary);
-		IO::writeValue(fout, uint(_positions.size()));
-		_positions.forEach([&](const int i) {
-			IO::writeValue(fout, _positions[i].template cast<float>().eval());
+		IO::writeValue(fout, uint(_particles.size()));
+		_particles.forEach([&](const int i) {
+			IO::writeValue(fout, _particles.positions[i].template cast<float>().eval());
 		});
 		if constexpr (Dim == 3) {
-			_positions.forEach([&](const int i) {
+			_particles.forEach([&](const int i) {
 				IO::writeValue(fout, VectorDf::Unit(2).eval());
 			});
 		}
@@ -73,7 +73,7 @@ void SpringMassSystem<Dim>::saveFrame(const std::string &frameDir) const
 {
 	{ // Save positions.
 		std::ofstream fout(frameDir + "/positions.sav", std::ios::binary);
-		_positions.save(fout);
+		_particles.positions.save(fout);
 	}
 	{ // Save velocities.
 		std::ofstream fout(frameDir + "/velocities.sav", std::ios::binary);
@@ -86,20 +86,20 @@ void SpringMassSystem<Dim>::loadFrame(const std::string &frameDir)
 {
 	{ // Load positions.
 		std::ifstream fin(frameDir + "/positions.sav", std::ios::binary);
-		_positions.load(fin);
+		_particles.positions.load(fin);
 	}
 	{ // Load velocities.
 		std::ifstream fin(frameDir + "/velocities.sav", std::ios::binary);
 		_velocities.load(fin);
 	}
-	// Reinitialize attributs and reset the sparse matrix.
-	reinitializeAttributes();
+	// Reinitialize particles based data and reset the sparse matrix.
+	reinitializeParticlesBasedData();
 }
 
 template <int Dim>
 void SpringMassSystem<Dim>::initialize()
 {
-	reinitializeAttributes();
+	reinitializeParticlesBasedData();
 }
 
 template <int Dim>
@@ -112,8 +112,8 @@ void SpringMassSystem<Dim>::advance(const real dt)
 	buildAndSolveLinearSystem(dt);
 
 	// Update positions.
-	_positions.parallelForEach([&](const int pid) {
-		_positions[pid] += _velocities[pid] * dt;
+	_particles.parallelForEach([&](const int pid) {
+		_particles.positions[pid] += _velocities[pid] * dt;
 	});
 }
 
@@ -126,46 +126,46 @@ void SpringMassSystem<Dim>::calculateAccelarations()
 }
 
 template <int Dim>
-void SpringMassSystem<Dim>::reinitializeAttributes()
+void SpringMassSystem<Dim>::reinitializeParticlesBasedData()
 {
-	_invMasses.resize(_masses.size());
-	_invSqrtMasses.resize(_masses.size());
-	_accelerations.resize(_masses.size());
+	_invMasses.resize(&_particles);
+	_invSqrtMasses.resize(&_particles);
+	_accelerations.resize(&_particles);
 
-	_masses.parallelForEach([&](const int pid) {
-		_invMasses[pid] = _masses[pid].cwiseInverse();
-		_invSqrtMasses[pid] = _invMasses[pid].cwiseSqrt();
+	_particles.parallelForEach([&](const int pid) {
+		_invMasses[pid] = 1 / _particles.masses[pid];
+		_invSqrtMasses[pid] = std::sqrt(_invMasses[pid]);
 	});
 }
 
 template <int Dim>
 void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 {
-	_matBackwardEuler.resize(_masses.size() * Dim, _masses.size() * Dim);
-	_rhsBackwardEuler.resize(_masses.size() * Dim);
+	_matBackwardEuler.resize(_particles.size() * Dim, _particles.size() * Dim);
+	_rhsBackwardEuler.resize(_particles.size() * Dim);
 	_coeffBackwardEuler.clear();
 
 	const auto addSparseBlockValue = [&](const int pid0, const int pid1, const MatrixDr &block) {
 		const int offset0 = pid0 * Dim;
 		const int offset1 = pid1 * Dim;
-		const MatrixDr reducedBlock = _invSqrtMasses[pid0].asDiagonal() * block * _invSqrtMasses[pid1].asDiagonal();
+		const MatrixDr reducedBlock = block * _invSqrtMasses[pid0] * _invSqrtMasses[pid1];
 		for (int i = 0; i < Dim; i++)
 			for (int j = 0; j < Dim; j++)
 				_coeffBackwardEuler.push_back(Tripletr(offset0 + i, offset1 + j, reducedBlock(i, j)));
 	};
-	const auto asVectorXr = [&](ParticlesVectorAttribute<Dim> &attr) {
-		return Eigen::Map<VectorXr, Eigen::Aligned>(reinterpret_cast<real *>(attr.data()), attr.size() * Dim);
+	const auto asVectorXr = [&](ParticlesBasedVectorData<Dim> &vectorData) {
+		return Eigen::Map<VectorXr, Eigen::Aligned>(reinterpret_cast<real *>(vectorData.data()), vectorData.size() * Dim);
 	};
 
 	// Set diagonal blocks.
-	for (int pid = 0; pid < _positions.size(); pid++)
+	for (int pid = 0; pid < _particles.size(); pid++)
 		addSparseBlockValue(pid, pid, MatrixDr::Identity());
 
 	// Set Jacobian of accelaration to velocity.
 	for (const auto &spring : _springs) {
 		const int pid0 = spring.pid0;
 		const int pid1 = spring.pid1;
-		const VectorDr r01 = _positions[pid1] - _positions[pid0];
+		const VectorDr r01 = _particles.positions[pid1] - _particles.positions[pid0];
 		const VectorDr e01 = r01.normalized();
 		const MatrixDr block = spring.dampingCoeff * e01 * e01.transpose() * dt;
 		addSparseBlockValue(pid0, pid0, -block);
@@ -181,7 +181,7 @@ void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 	for (const auto &spring : _springs) {
 		const int pid0 = spring.pid0;
 		const int pid1 = spring.pid1;
-		const VectorDr r01 = _positions[pid1] - _positions[pid0];
+		const VectorDr r01 = _particles.positions[pid1] - _particles.positions[pid0];
 		const double length = r01.norm();
 		const VectorDr e01 = r01.normalized();
 		const MatrixDr block = spring.stiffnessCoeff * ((spring.restLength / length - 1) * MatrixDr::Identity() - spring.restLength / length * e01 * e01.transpose()) * dt * dt;
@@ -201,13 +201,13 @@ void SpringMassSystem<Dim>::applyElasticForces()
 	for (const auto &spring : _springs) {
 		const int pid0 = spring.pid0;
 		const int pid1 = spring.pid1;
-		const VectorDr r01 = _positions[pid1] - _positions[pid0];
+		const VectorDr r01 = _particles.positions[pid1] - _particles.positions[pid0];
 		const VectorDr v01 = _velocities[pid1] - _velocities[pid0];
 		const real length = r01.norm();
 		const VectorDr e01 = r01.normalized();
 		const VectorDr force = e01 * ((length - spring.restLength) * spring.stiffnessCoeff + e01.dot(v01) * spring.dampingCoeff);
-		_accelerations[pid0] += force.cwiseProduct(_invMasses[pid0]);
-		_accelerations[pid1] -= force.cwiseProduct(_invMasses[pid1]);
+		_accelerations[pid0] += force * _invMasses[pid0];
+		_accelerations[pid1] -= force * _invMasses[pid1];
 	}
 }
 
@@ -216,7 +216,7 @@ void SpringMassSystem<Dim>::applyExternalForces()
 {
 	if (_enableGravity) {
 		_accelerations.parallelForEach([&](const int pid) {
-			if (_invMasses[pid][1]) _accelerations[pid][1] -= kGravity;
+			if (_invMasses[pid]) _accelerations[pid][1] -= kGravity;
 		});
 	}
 }

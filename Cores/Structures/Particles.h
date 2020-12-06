@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Utilities/Types.h"
-#include "Utilities/IO.h"
+#include "Structures/ParticlesAttribute.h"
 
 #include <functional>
 #include <vector>
@@ -13,44 +12,46 @@ class Particles
 {
 	DECLARE_DIM_TYPES(Dim)
 
-protected:
+public:
 
-	std::vector<VectorDr> _positions;
+	ParticlesVectorAttribute<Dim> positions;
+	ParticlesScalarAttribute<Dim> masses;
 
 public:
 
-	Particles(const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero()) { reset(cnt, pos); }
+	Particles(const size_t cnt, const VectorDr &pos = VectorDr::Zero()) { reset(cnt, pos); }
+	Particles(const size_t cnt, const VectorDr &pos, const real mass) { reset(cnt, pos, mass); }
 
+	Particles() = default;
 	virtual ~Particles() = default;
 
-	virtual void reset(const size_t cnt, const VectorDr &pos = VectorDr::Zero()) { _positions.resize(cnt, pos); }
+	void reset(const size_t cnt, const VectorDr &pos = VectorDr::Zero()) { positions._data.resize(cnt, pos); }
 
-	size_t size() const { return _positions.size(); }
-	virtual void clear() { _positions.clear(); }
-	bool empty() const { return _data.empty(); }
-	virtual void add(const VectorDr &pos = VectorDr::Zero()) { _positions.push_back(pos); }
-
-	VectorDr *positionsData() { return _positions.data(); }
-	const VectorDr *positionsData() const { return _positions.data(); }
-
-	VectorDr &position(const size_t index) { return _positions[index]; }
-	const VectorDr &position(const size_t index) const { return _positions[index]; }
-
-	void forEach(const std::function<void(const int)> &func) const
+	void reset(const size_t cnt, const VectorDr &pos, const real mass)
 	{
-		for (int i = 0; i < _positions.size(); i++) func(i);
+		positions._data.resize(cnt, pos);
+		masses._data.resize(cnt, mass);
 	}
 
-	void parallelForEach(const std::function<void(const int)> &func) const
+	void clear()
 	{
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-		for (int i = 0; i < _positions.size(); i++) func(i);
+		positions._data.clear();
+		masses._data.clear();
 	}
 
-	virtual void load(std::istream &in) { IO::readArray(in, _positions.data(), _positions.size()); }
-	virtual void save(std::ostream &out) const { IO::writeArray(out, _positions.data(), _positions.size()); }
+	void add(const VectorDr &pos = VectorDr::Zero()) { positions._data.push_back(pos); }
+
+	void add(const VectorDr &pos, const real mass)
+	{
+		positions._data.push_back(pos);
+		masses._data.push_back(mass);
+	}
+
+	size_t size() const { return positions.size(); }
+	bool empty() const { return positions.empty(); }
+
+	void forEach(const std::function<void(const int)> &func) const { positions.forEach(func); }
+	void parallelForEach(const std::function<void(const int)> &func) const { positions.parallelForEach(func); }
 };
 
 }

@@ -6,19 +6,19 @@
 namespace PhysX {
 
 template <int Dim>
-class GridBasedVectorField final : public VectorField<Dim>, public GridBasedData<Dim, Vector<Dim, real>>
+class GridBasedVectorField final : public VectorField<Dim>, public GridBasedVectorData<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
 protected:
 
-	using GridBasedData<Dim, VectorDr>::_grid;
+	using GridBasedVectorData<Dim>::_grid;
 
 public:
 
-	using GridBasedData<Dim, VectorDr>::at;
+	using GridBasedVectorData<Dim>::at;
 
-	GridBasedVectorField(const Grid<Dim> *const grid, const VectorDr &value = VectorDr::Zero()) : GridBasedData<Dim, VectorDr>(grid, value) { }
+	GridBasedVectorField(const Grid<Dim> *const grid, const VectorDr &value = VectorDr::Zero()) : GridBasedVectorData<Dim>(grid, value) { }
 
 	GridBasedVectorField() = default;
 	virtual ~GridBasedVectorField() = default;
