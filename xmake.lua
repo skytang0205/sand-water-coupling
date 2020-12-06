@@ -2,23 +2,32 @@ set_project("VCL-Physx")
 set_version("0.0")
 set_xmakever("2.3.9")
 
+-- Usage:
+--   <plain>
+--   > xmake && xmake b examples && xmake r LevelSetLiquidTest
+--   > xmake r vcl-viewer
+--   <openmp>
+--   > xmake f --openmp=true && xmake && xmake b examples && xmake r LevelSetLiquidTest
+--   > xmake r vcl-viewer
+--   optional: install to some directory (such as ./dist)
+--   > xmake install -o dist && xmake install -o dist examples
+
 add_requires("eigen", "glfw", "glad", "yaml-cpp", "fmt")
 local pkgs = {"eigen", "glfw", "glad", "yaml-cpp", "fmt"}
 
 add_rules("mode.debug", "mode.release")
 
---[[option("use_blas")
-    set_default(false)
-    set_showmenu(true)
-    set_description("Enable blas support.")
-    add_defines("EIGEN_USE_BLAS")
-option_end()
+-- BLAS is used for only dense matrix operations, which is not useful for this project.
+-- option("use_blas")
+--     set_default(false)
+--     set_showmenu(true)
+--     set_description("Enable blas support.")
+--     add_defines("EIGEN_USE_BLAS")
+-- option_end()
 
-if has_config("use_blas") then
-    add_requires("openblas")
-else
-    add_requires("openblas", {optional = true})
-end]]--
+-- if has_config("use_blas") then
+--     add_requires("openblas")
+-- end
 
 option("openmp")
     set_default(false)
@@ -31,6 +40,7 @@ option("openmp")
     end
     add_defines("_OPENMP")
     add_defines("EIGEN_HAS_OPENMP")
+-- benchmark: plain ~ 132.72s, openmp ~ 178.86s
 
 option("use_float")
     set_default(false)
@@ -46,9 +56,8 @@ target("vcl-physx")
         add_cxxflags("/MT")
     end
     add_options("openmp")
-    add_options("use_blas")
+    -- add_options("use_blas")
     add_packages(unpack(pkgs))
-    --add_packages("openblas", {optional = true})
     add_includedirs(path.join(os.curdir(), "Cores"), {public = true})
     local modules = {"Geometries", "Graphics", "Physics", "Solvers", "Structures", "Utilities"}
     for _, module in ipairs(modules) do
@@ -72,29 +81,25 @@ target("vcl-viewer")
 
 local examples = {"EulerianFluidTest", "LevelSetLiquidTest", "ParticleInCellLiquidTest", "SpringMassSystemTest"}
 for _, example in ipairs(examples) do
-    target(example)
-        set_default(false)
-        set_kind("binary")
-        set_languages("cxx20")
-        if is_plat("windows") then
-            add_cxxflags("/MT")
-        end
-        --add_options("use_blas")
-        add_packages(unpack(pkgs))
-        --add_packages("openblas", {optional = true})
-        add_deps("vcl-physx")
-        add_files(path.join("Demos", example, "*.cpp"))
-        on_run(function (target)
-            os.execv(target:targetfile(), {"-o", os.curdir() .. "/output"})
-        end)
+
+target(example)
+    set_default(false)
+    set_kind("binary")
+    set_languages("cxx20")
+    if is_plat("windows") then
+        add_cxxflags("/MT")
+    end
+    -- add_options("use_blas")
+    add_packages(unpack(pkgs))
+    add_deps("vcl-physx")
+    add_files(path.join("Demos", example, "*.cpp"))
+    on_run(function (target)
+        os.execv(target:targetfile(), {"-o", os.curdir() .. "/output"})
+    end)
+
 end
 
 target("examples")
     set_default(false)
     set_kind("phony")
     add_deps(unpack(examples))
-
-task("view")
-    on_run(function (name)
-        print(os.curdir())
-    end)
