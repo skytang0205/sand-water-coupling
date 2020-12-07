@@ -18,7 +18,7 @@ Vector<Dim, real> GridBasedScalarField<Dim>::gradientAtDataPoint(const VectorDi 
 	for (int i = 0; i < Dim; i++) {
 		acc[i] = at(coord + VectorDi::Unit(i)) - at(coord - VectorDi::Unit(i));
 	}
-	return acc / (2 * _grid->spacing());
+	return acc * real(.5) * _grid->invSpacing();
 }
 
 template <int Dim>
@@ -39,7 +39,7 @@ real GridBasedScalarField<Dim>::laplacianAtDataPoint(const VectorDi &coord) cons
 		acc += at(coord + VectorDi::Unit(i)) - centerVal;
 		acc -= centerVal - at(coord - VectorDi::Unit(i));
 	}
-	return acc / (_grid->spacing() * _grid->spacing());
+	return acc * _grid->invSpacing() * _grid->invSpacing();
 }
 
 template <int Dim>

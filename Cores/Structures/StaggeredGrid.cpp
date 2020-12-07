@@ -5,6 +5,7 @@ namespace PhysX {
 template <>
 StaggeredGrid<2>::StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center) :
 	_spacing(spacing),
+	_invSpacing(1 / _spacing),
 	_resolution(resolution + VectorDi::Ones() * _kBoundaryWidth * 2),
 	_origin(center - _resolution.template cast<real>() * _spacing / 2),
 	_nodeGrid(_spacing, _resolution + VectorDi::Ones(), _origin),
@@ -18,6 +19,7 @@ StaggeredGrid<2>::StaggeredGrid(const real spacing, const VectorDi &resolution, 
 template <>
 StaggeredGrid<3>::StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center) :
 	_spacing(spacing),
+	_invSpacing(1 / _spacing),
 	_resolution(resolution + VectorDi::Ones() * _kBoundaryWidth * 2),
 	_origin(center - _resolution.template cast<real>() * _spacing / 2),
 	_nodeGrid(_spacing, _resolution + VectorDi::Ones(), _origin),

@@ -107,31 +107,30 @@ void SpringMassSystem<Dim>::advance(const real dt)
 {
 	// Advance by the backward Euler method.
 
-	calculateAccelarations();
+	calculateAccelerations();
 	buildAndSolveLinearSystem(dt);
 
 	updatePositions(dt);
 }
 
 template <int Dim>
-void SpringMassSystem<Dim>::calculateAccelarations()
+void SpringMassSystem<Dim>::calculateAccelerations()
 {
 	_accelerations.setZero();
+
 	applyElasticForces();
 	applyExternalForces();
+
+	// Constrain degrees of freedom.
+	for (const int dof : _constrainedDofs) {
+		*(reinterpret_cast<real *>(_accelerations.data()) + dof) = 0;
+	}
 }
 
 template <int Dim>
 void SpringMassSystem<Dim>::reinitializeParticlesBasedData()
 {
-	_invMasses.resize(&_particles);
-	_invSqrtMasses.resize(&_particles);
 	_accelerations.resize(&_particles);
-
-	_particles.parallelForEach([&](const int pid) {
-		_invMasses[pid] = 1 / _particles.masses[pid];
-		_invSqrtMasses[pid] = std::sqrt(_invMasses[pid]);
-	});
 }
 
 template <int Dim>
@@ -144,10 +143,13 @@ void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 	const auto addSparseBlockValue = [&](const int pid0, const int pid1, const MatrixDr &block) {
 		const int offset0 = pid0 * Dim;
 		const int offset1 = pid1 * Dim;
-		const MatrixDr reducedBlock = block * _invSqrtMasses[pid0] * _invSqrtMasses[pid1];
-		for (int i = 0; i < Dim; i++)
-			for (int j = 0; j < Dim; j++)
-				_coeffBackwardEuler.push_back(Tripletr(offset0 + i, offset1 + j, reducedBlock(i, j)));
+		for (int i = 0; i < Dim; i++) {
+			if (_constrainedDofs.contains(offset0 + i)) continue;
+			for (int j = 0; j < Dim; j++) {
+				if (_constrainedDofs.contains(offset1 + j)) continue;
+				_coeffBackwardEuler.push_back(Tripletr(offset0 + i, offset1 + j, block(i, j) * _particles.invMass()));
+			}
+		}
 	};
 	const auto asVectorXr = [&](ParticlesBasedVectorData<Dim> &vectorData) {
 		return Eigen::Map<VectorXr, Eigen::Aligned>(reinterpret_cast<real *>(vectorData.data()), vectorData.size() * Dim);
@@ -155,7 +157,7 @@ void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 
 	// Set diagonal blocks.
 	for (int pid = 0; pid < _particles.size(); pid++)
-		addSparseBlockValue(pid, pid, MatrixDr::Identity());
+		addSparseBlockValue(pid, pid, MatrixDr::Identity() * _particles.mass());
 
 	// Set Jacobian of accelaration to velocity.
 	for (const auto &spring : _springs) {
@@ -215,8 +217,8 @@ void SpringMassSystem<Dim>::applyElasticForces()
 		const real length = r01.norm();
 		const VectorDr e01 = r01.normalized();
 		const VectorDr force = e01 * ((length - spring.restLength) * spring.stiffnessCoeff + e01.dot(v01) * spring.dampingCoeff);
-		_accelerations[pid0] += force * _invMasses[pid0];
-		_accelerations[pid1] -= force * _invMasses[pid1];
+		_accelerations[pid0] += force * _particles.invMass();
+		_accelerations[pid1] -= force * _particles.invMass();
 	}
 }
 
@@ -224,8 +226,8 @@ template <int Dim>
 void SpringMassSystem<Dim>::applyExternalForces()
 {
 	if (_enableGravity) {
-		_accelerations.parallelForEach([&](const int pid) {
-			if (_invMasses[pid]) _accelerations[pid][1] -= kGravity;
+		_particles.parallelForEach([&](const int pid) {
+			_accelerations[pid][1] -= kGravity;
 		});
 	}
 }

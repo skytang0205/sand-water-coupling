@@ -14,6 +14,7 @@ protected:
 	static constexpr int _kBoundaryWidth = 2;
 
 	const real _spacing;
+	const real _invSpacing;
 	const VectorDi _resolution;
 	const VectorDr _origin;
 
@@ -29,6 +30,7 @@ public:
 	virtual ~StaggeredGrid() = default;
 
 	real spacing() const { return _spacing; }
+	real invSpacing() const { return _invSpacing; }
 	VectorDi resolution() const { return _resolution; }
 	VectorDr origin() const { return _origin; }
 

@@ -14,43 +14,23 @@ class Particles
 
 public:
 
+	const real _mass;
+	const real _invMass;
 	ParticlesVectorAttribute<Dim> positions;
-	ParticlesScalarAttribute<Dim> masses;
 
 public:
 
-	Particles(const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero()) { reset(cnt, pos); }
-	Particles(const size_t cnt, const VectorDr &pos, const real mass) { reset(cnt, pos, mass); }
+	Particles(const real mass = 1, const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero()) : _mass(mass), _invMass(1 / _mass) { resize(cnt, pos); }
 
 	Particles &operator=(const Particles &rhs) = delete;
 	virtual ~Particles() = default;
 
-	void reset(const size_t cnt, const VectorDr &pos = VectorDr::Zero())
-	{
-		positions._data.resize(cnt, pos);
-		masses._data.clear();
-	}
+	void resize(const size_t cnt, const VectorDr &pos = VectorDr::Zero()) { positions._data.resize(cnt, pos); }
 
-	void reset(const size_t cnt, const VectorDr &pos, const real mass)
-	{
-		positions._data.resize(cnt, pos);
-		masses._data.resize(cnt, mass);
-	}
-
-	void clear()
-	{
-		positions._data.clear();
-		masses._data.clear();
-	}
-
+	real mass() const { return _mass; }
+	real invMass() const { return _invMass; }
 	void add(const VectorDr &pos = VectorDr::Zero()) { positions._data.push_back(pos); }
-
-	void add(const VectorDr &pos, const real mass)
-	{
-		positions._data.push_back(pos);
-		masses._data.push_back(mass);
-	}
-
+	void clear() { positions._data.clear(); }
 	size_t size() const { return positions.size(); }
 	bool empty() const { return positions.empty(); }
 

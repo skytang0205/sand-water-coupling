@@ -34,6 +34,7 @@ public:
 	bool isBoundary(const int axis, const VectorDi &face) const { return _grid->isBoundaryFace(axis, face); }
 	const StaggeredGrid<Dim> *staggeredGrid() const { return _grid; }
 	real spacing() const { return _grid->spacing(); }
+	real invSpacing() const { return _grid->invSpacing(); }
 
 	size_t count() const
 	{

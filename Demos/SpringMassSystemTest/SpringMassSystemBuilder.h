@@ -32,12 +32,15 @@ protected:
 		auto smSystem = std::make_unique<SpringMassSystem<Dim>>();
 		smSystem->_enableGravity = false;
 
-		smSystem->_particles.add(VectorDr::Zero(), std::numeric_limits<real>::infinity());
-		smSystem->_particles.add(VectorDr::Unit(0), 1);
+		smSystem->_particles.add(VectorDr::Zero());
+		smSystem->_particles.add(VectorDr::Unit(0));
 
 		smSystem->_velocities.resize(&smSystem->_particles);
 
 		smSystem->_springs.push_back({ 0, 1, real(.5), 100, 0 });
+
+		for (int axis = 0; axis < Dim; axis++)
+			smSystem->_constrainedDofs.insert(axis);
 
 		return smSystem;
 	}
@@ -49,7 +52,7 @@ protected:
 		auto smSystem = std::make_unique<SpringMassSystem<Dim>>();
 
 		for (int i = 0; i < 10; i++) 
-			smSystem->_particles.add(VectorDr::Unit(0) * i / 4, i ? real(1) : std::numeric_limits<real>::infinity());
+			smSystem->_particles.add(VectorDr::Unit(0) * i / 4);
 
 		smSystem->_velocities.resize(&smSystem->_particles);
 
@@ -59,6 +62,9 @@ protected:
 		smSystem->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
 				std::make_unique<ImplicitPlane<Dim>>(VectorDr::Zero() - VectorDr::Unit(1) * 2, VectorDr::Unit(1))));
+
+		for (int axis = 0; axis < Dim; axis++)
+			smSystem->_constrainedDofs.insert(axis);
 
 		return smSystem;
 	}

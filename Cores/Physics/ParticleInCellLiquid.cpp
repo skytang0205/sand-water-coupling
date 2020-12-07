@@ -42,8 +42,9 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
 	LevelSetLiquid<Dim>::saveFrame(frameDir);
-	{ // Save particlePositions.
-		std::ofstream fout(frameDir + "/particlePositions.sav", std::ios::binary);
+	{ // Save particles.
+		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
+		IO::writeValue(fout, uint(_particles.size()));
 		_particles.positions.save(fout);
 	}
 }
@@ -52,10 +53,14 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
 	LevelSetLiquid<Dim>::loadFrame(frameDir);
-	reinitializeParticles();
-	{ // Load particlePositions.
-		std::ifstream fin(frameDir + "/particlePositions.sav", std::ios::binary);
+	{ // Load particles.
+		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
+		uint particlesCnt;
+		IO::readValue(fin, particlesCnt);
+		_particles.resize(particlesCnt);
 		_particles.positions.load(fin);
+		_particleVelocities.resize(&_particles);
+		_particleVelocities.setZero();
 	}
 }
 
@@ -165,7 +170,7 @@ void ParticleInCellLiquid<Dim>::reinitializeParticles()
 	liquidSdf.forEach([&](const VectorDi &cell) {
 		const VectorDr centerPos = liquidSdf.position(cell);
 		for (int i = 0; i < (1 << Dim) * _particlesCntPerSubCell; i++) {
-			const VectorDr pos = centerPos + VectorDr::Random() * dx * real(0.5);
+			const VectorDr pos = centerPos + VectorDr::Random() * dx * real(.5);
 			if (_levelSet.signedDistance(pos) <= -radius)
 				_particles.add(pos);
 		}

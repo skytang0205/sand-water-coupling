@@ -23,6 +23,7 @@ protected:
 	static constexpr int _kCntNb3 = MathFunc::pow(4, Dim);
 
 	const real _spacing;
+	const real _invSpacing;
 	const VectorDi _dataSize;
 	const VectorDr _dataOrigin;
 
@@ -30,6 +31,7 @@ public:
 
 	Grid(const real spacing, const VectorDi &dataSize, const VectorDr &dataOrigin) :
 		_spacing(spacing),
+		_invSpacing(1 / _spacing),
 		_dataSize(dataSize),
 		_dataOrigin(dataOrigin)
 	{ }
@@ -41,6 +43,7 @@ public:
 	bool isValid(const VectorDi &coord) const { return isInside(coord, 0); }
 
 	real spacing() const { return _spacing; }
+	real invSpacing() const { return _invSpacing; }
 	VectorDi dataSize() const { return _dataSize; }
 	VectorDr dataOrigin() const { return _dataOrigin; }
 
@@ -63,10 +66,10 @@ public:
 			int(index / _dataSize.x() / _dataSize.y()));
 	}
 
-	VectorDi getLinearLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().template cast<int>().matrix(); }
-	VectorDi getQuadraticLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing - VectorDr::Ones() / 2).array().floor().template cast<int>().matrix(); }
-	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) / _spacing).array().floor().template cast<int>().matrix() - VectorDi::Ones(); }
-	VectorDr getLowerFrac(const VectorDr &pos, const VectorDi &lower) const { return (pos - _dataOrigin - lower.template cast<real>() * _spacing) / _spacing; }
+	VectorDi getLinearLower(const VectorDr &pos) const { return ((pos - _dataOrigin) * _invSpacing).array().floor().template cast<int>().matrix(); }
+	VectorDi getQuadraticLower(const VectorDr &pos) const { return ((pos - _dataOrigin) * _invSpacing - VectorDr::Ones() / 2).array().floor().template cast<int>().matrix(); }
+	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) * _invSpacing).array().floor().template cast<int>().matrix() - VectorDi::Ones(); }
+	VectorDr getLowerFrac(const VectorDr &pos, const VectorDi &lower) const { return (pos - _dataOrigin - lower.template cast<real>() * _spacing) * _invSpacing; }
 
 	std::array<VectorDi, _kCntNb1> linearNearbyDataPoints(const VectorDr &pos) const;
 	std::array<VectorDi, _kCntNb3> cubicNearbyDataPoints(const VectorDr &pos) const;

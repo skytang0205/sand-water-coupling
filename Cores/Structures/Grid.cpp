@@ -80,7 +80,6 @@ auto Grid<Dim>::gradientLinearIntrplDataPoints(const VectorDr &pos) const->std::
 {
 	const VectorDi lower = getLinearLower(pos);
 	const VectorDr frac = getLowerFrac(pos, lower);
-	const real invDx = 1 / _spacing;
 	const std::array<VectorDr, 2> w = {
 		VectorDr::Ones() - frac,
 		frac
@@ -88,22 +87,22 @@ auto Grid<Dim>::gradientLinearIntrplDataPoints(const VectorDr &pos) const->std::
 
 	if constexpr (Dim == 2) {
 		return {
-			GradientIntrplDataPoint(lower + Vector2i(0, 0), Vector2r(-w[0][1], -w[0][0]) * invDx),
-			GradientIntrplDataPoint(lower + Vector2i(1, 0), Vector2r( w[0][1], -w[1][0]) * invDx),
-			GradientIntrplDataPoint(lower + Vector2i(0, 1), Vector2r(-w[1][1],  w[0][0]) * invDx),
-			GradientIntrplDataPoint(lower + Vector2i(1, 1), Vector2r( w[1][1],  w[1][0]) * invDx)
+			GradientIntrplDataPoint(lower + Vector2i(0, 0), Vector2r(-w[0][1], -w[0][0]) *_invSpacing),
+			GradientIntrplDataPoint(lower + Vector2i(1, 0), Vector2r( w[0][1], -w[1][0]) *_invSpacing),
+			GradientIntrplDataPoint(lower + Vector2i(0, 1), Vector2r(-w[1][1],  w[0][0]) *_invSpacing),
+			GradientIntrplDataPoint(lower + Vector2i(1, 1), Vector2r( w[1][1],  w[1][0]) *_invSpacing)
 		};
 	}
 	else {
 		return {
-			GradientIntrplDataPoint(lower + Vector3i(0, 0, 0), Vector3r(-w[0][1] * w[0][2], -w[0][0] * w[0][2], -w[0][0] * w[0][1]) * invDx),
-			GradientIntrplDataPoint(lower + Vector3i(1, 0, 0), Vector3r( w[0][1] * w[0][2], -w[1][0] * w[0][2], -w[1][0] * w[0][1]) * invDx),
-			GradientIntrplDataPoint(lower + Vector3i(0, 1, 0), Vector3r(-w[1][1] * w[0][2],  w[0][0] * w[0][2], -w[0][0] * w[1][1]) * invDx),
-			GradientIntrplDataPoint(lower + Vector3i(1, 1, 0), Vector3r( w[1][1] * w[0][2],  w[1][0] * w[0][2], -w[1][0] * w[1][1]) * invDx),
-			GradientIntrplDataPoint(lower + Vector3i(0, 0, 1), Vector3r(-w[0][1] * w[1][2], -w[0][0] * w[1][2],  w[0][0] * w[0][1]) * invDx),
-			GradientIntrplDataPoint(lower + Vector3i(1, 0, 1), Vector3r( w[0][1] * w[1][2], -w[1][0] * w[1][2],  w[1][0] * w[0][1]) * invDx),
-			GradientIntrplDataPoint(lower + Vector3i(0, 1, 1), Vector3r(-w[1][1] * w[1][2],  w[0][0] * w[1][2],  w[0][0] * w[1][1]) * invDx),
-			GradientIntrplDataPoint(lower + Vector3i(1, 1, 1), Vector3r( w[1][1] * w[1][2],  w[1][0] * w[1][2],  w[1][0] * w[1][1]) * invDx)
+			GradientIntrplDataPoint(lower + Vector3i(0, 0, 0), Vector3r(-w[0][1] * w[0][2], -w[0][0] * w[0][2], -w[0][0] * w[0][1]) * _invSpacing),
+			GradientIntrplDataPoint(lower + Vector3i(1, 0, 0), Vector3r( w[0][1] * w[0][2], -w[1][0] * w[0][2], -w[1][0] * w[0][1]) * _invSpacing),
+			GradientIntrplDataPoint(lower + Vector3i(0, 1, 0), Vector3r(-w[1][1] * w[0][2],  w[0][0] * w[0][2], -w[0][0] * w[1][1]) * _invSpacing),
+			GradientIntrplDataPoint(lower + Vector3i(1, 1, 0), Vector3r( w[1][1] * w[0][2],  w[1][0] * w[0][2], -w[1][0] * w[1][1]) * _invSpacing),
+			GradientIntrplDataPoint(lower + Vector3i(0, 0, 1), Vector3r(-w[0][1] * w[1][2], -w[0][0] * w[1][2],  w[0][0] * w[0][1]) * _invSpacing),
+			GradientIntrplDataPoint(lower + Vector3i(1, 0, 1), Vector3r( w[0][1] * w[1][2], -w[1][0] * w[1][2],  w[1][0] * w[0][1]) * _invSpacing),
+			GradientIntrplDataPoint(lower + Vector3i(0, 1, 1), Vector3r(-w[1][1] * w[1][2],  w[0][0] * w[1][2],  w[0][0] * w[1][1]) * _invSpacing),
+			GradientIntrplDataPoint(lower + Vector3i(1, 1, 1), Vector3r( w[1][1] * w[1][2],  w[1][0] * w[1][2],  w[1][0] * w[1][1]) * _invSpacing)
 		};
 	}
 }

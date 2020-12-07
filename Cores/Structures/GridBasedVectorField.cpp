@@ -18,7 +18,7 @@ real GridBasedVectorField<Dim>::divergenceAtDataPoint(const VectorDi &coord) con
 	for (int i = 0; i < Dim; i++) {
 		acc += at(coord + VectorDi::Unit(i))[i] - at(coord - VectorDi::Unit(i))[i];
 	}
-	return acc / (2 * _grid->spacing());
+	return acc * real(.5) * _grid->invSpacing();
 }
 
 template <int Dim>

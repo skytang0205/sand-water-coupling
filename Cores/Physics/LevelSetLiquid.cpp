@@ -105,7 +105,7 @@ template <int Dim>
 void LevelSetLiquid<Dim>::projectVelocity(const real dt)
 {
 	if (_enableSurfaceTension && dt)
-		_projector->project(_velocity, _boundaryHelper->fraction(), _boundaryHelper->velocity(), _levelSet, _surfaceTensionCoefficient * dt / _density / _velocity.spacing());
+		_projector->project(_velocity, _boundaryHelper->fraction(), _boundaryHelper->velocity(), _levelSet, _surfaceTensionCoefficient * dt / _density * _velocity.invSpacing());
 	else
 		_projector->project(_velocity, _boundaryHelper->fraction(), _boundaryHelper->velocity(), _levelSet);
 

@@ -15,8 +15,8 @@ protected:
 
 public:
 
-	SmoothedParticles(const real radius, const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero()) :
-		Particles<Dim>(cnt, pos),
+	SmoothedParticles(const real mass, const real radius, const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero()) :
+		Particles<Dim>(mass, cnt, pos),
 		_radius(radius)
 	{ }
 

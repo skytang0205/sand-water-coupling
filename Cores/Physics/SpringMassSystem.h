@@ -5,6 +5,8 @@
 #include "Solvers/SparseSolver.h"
 #include "Structures/ParticlesBasedData.h"
 
+#include <unordered_set>
+
 namespace PhysX {
 
 template <int Dim>
@@ -28,11 +30,10 @@ public:
 protected:
 
 	Particles<Dim> _particles;
-	ParticlesBasedScalarData<Dim> _invMasses;
-	ParticlesBasedScalarData<Dim> _invSqrtMasses;
 	ParticlesBasedVectorData<Dim> _velocities;
 	ParticlesBasedVectorData<Dim> _accelerations;
 	std::vector<Spring> _springs;
+	std::unordered_set<int> _constrainedDofs;
 
 	std::vector<Tripletr> _coeffBackwardEuler;
 	SparseMatrixr _matBackwardEuler;
@@ -65,7 +66,7 @@ public:
 
 protected:
 
-	void calculateAccelarations();
+	void calculateAccelerations();
 	void reinitializeParticlesBasedData();
 	void buildAndSolveLinearSystem(const real dt);
 	void updatePositions(const real dt);
