@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Geometries/ImplicitSurface.h"
 #include "Physics/SpringMassSystem.h"
 
 namespace PhysX {
@@ -54,6 +55,10 @@ protected:
 
 		for (int i = 0; i < 9; i++)
 			smSystem->_springs.push_back({ i, i + 1, real(.25), 1000, 0 });
+
+		smSystem->_colliders.push_back(
+			std::make_unique<StaticCollider<Dim>>(
+				std::make_unique<ImplicitPlane<Dim>>(VectorDr::Zero() - VectorDr::Unit(1) * 2, VectorDr::Unit(1))));
 
 		return smSystem;
 	}

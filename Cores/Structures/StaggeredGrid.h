@@ -25,6 +25,7 @@ public:
 
 	StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center = VectorDr::Zero());
 
+	StaggeredGrid &operator=(const StaggeredGrid &rhs) = delete;
 	virtual ~StaggeredGrid() = default;
 
 	real spacing() const { return _spacing; }

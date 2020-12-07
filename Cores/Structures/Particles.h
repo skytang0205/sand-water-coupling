@@ -19,13 +19,17 @@ public:
 
 public:
 
-	Particles(const size_t cnt, const VectorDr &pos = VectorDr::Zero()) { reset(cnt, pos); }
+	Particles(const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero()) { reset(cnt, pos); }
 	Particles(const size_t cnt, const VectorDr &pos, const real mass) { reset(cnt, pos, mass); }
 
-	Particles() = default;
+	Particles &operator=(const Particles &rhs) = delete;
 	virtual ~Particles() = default;
 
-	void reset(const size_t cnt, const VectorDr &pos = VectorDr::Zero()) { positions._data.resize(cnt, pos); }
+	void reset(const size_t cnt, const VectorDr &pos = VectorDr::Zero())
+	{
+		positions._data.resize(cnt, pos);
+		masses._data.clear();
+	}
 
 	void reset(const size_t cnt, const VectorDr &pos, const real mass)
 	{

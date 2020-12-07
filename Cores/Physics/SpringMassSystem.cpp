@@ -108,13 +108,9 @@ void SpringMassSystem<Dim>::advance(const real dt)
 	// Advance by the backward Euler method.
 
 	calculateAccelarations();
-
 	buildAndSolveLinearSystem(dt);
 
-	// Update positions.
-	_particles.parallelForEach([&](const int pid) {
-		_particles.positions[pid] += _velocities[pid] * dt;
-	});
+	updatePositions(dt);
 }
 
 template <int Dim>
@@ -193,6 +189,19 @@ void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 
 	_matBackwardEuler.setFromTriplets(_coeffBackwardEuler.begin(), _coeffBackwardEuler.end());
 	_solver->solve(_matBackwardEuler, asVectorXr(_velocities), _rhsBackwardEuler);
+}
+
+template <int Dim>
+void SpringMassSystem<Dim>::updatePositions(const real dt)
+{
+	_particles.parallelForEach([&](const int pid) {
+		_particles.positions[pid] += _velocities[pid] * dt;
+	});
+
+	// Resolve collisions.
+	for (const auto &collider : _colliders) {
+		collider->collide(_particles, _velocities);
+	}
 }
 
 template <int Dim>

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Geometries/Surface.h"
+#include "Structures/ParticlesBasedData.h"
+#include "Structures/SmoothedParticles.h"
 
 #include <memory>
 
@@ -33,6 +35,10 @@ public:
 	virtual VectorDr velocityAt(const VectorDr &pos) const = 0;
 	real restitutionCoefficient() const { return _restitutionCoefficient; }
 	real frictionCoefficient() const { return _frictionCoefficient; }
+
+	void collide(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities);
+	void collide(SmoothedParticles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities);
+	void collide(VectorDr &pos, VectorDr &vel, const real radius);
 };
 
 template <int Dim>

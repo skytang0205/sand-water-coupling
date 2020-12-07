@@ -34,6 +34,7 @@ public:
 		_dataOrigin(dataOrigin)
 	{ }
 
+	Grid &operator=(const Grid &rhs) = delete;
 	virtual ~Grid() = default;
 
 	bool isInside(const VectorDi &coord, const int offset) const { return (coord.array() >= offset).all() && (coord.array() < _dataSize.array() - offset).all(); }

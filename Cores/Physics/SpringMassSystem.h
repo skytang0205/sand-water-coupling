@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Geometries/Collider.h"
 #include "Physics/Simulation.h"
 #include "Solvers/SparseSolver.h"
 #include "Structures/ParticlesBasedData.h"
@@ -37,6 +38,8 @@ protected:
 	SparseMatrixr _matBackwardEuler;
 	VectorXr _rhsBackwardEuler;
 
+	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
+
 	std::unique_ptr<SparseSolver> _solver;
 
 	bool _enableGravity = true;
@@ -65,6 +68,7 @@ protected:
 	void calculateAccelarations();
 	void reinitializeParticlesBasedData();
 	void buildAndSolveLinearSystem(const real dt);
+	void updatePositions(const real dt);
 
 	virtual void applyElasticForces();
 	virtual void applyExternalForces();
