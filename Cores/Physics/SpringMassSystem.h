@@ -71,7 +71,7 @@ protected:
 	void buildAndSolveLinearSystem(const real dt);
 	void updatePositions(const real dt);
 
-	virtual void applyElasticForces();
+	virtual void applyElasticForce();
 	virtual void applyExternalForces();
 };
 

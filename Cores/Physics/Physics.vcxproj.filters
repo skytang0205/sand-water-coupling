@@ -83,5 +83,8 @@
     <ClCompile Include="FlImplicitParticleLiquid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SmthParticleHydrodLiquid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

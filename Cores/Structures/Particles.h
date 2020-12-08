@@ -14,9 +14,12 @@ class Particles
 
 public:
 
+	ParticlesVectorAttribute<Dim> positions;
+
+protected:
+
 	const real _mass;
 	const real _invMass;
-	ParticlesVectorAttribute<Dim> positions;
 
 public:
 

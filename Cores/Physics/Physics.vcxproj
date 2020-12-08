@@ -34,6 +34,7 @@
     <ClCompile Include="LevelSetLiquid.cpp" />
     <ClCompile Include="ParticleInCellLiquid.cpp" />
     <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="SmthParticleHydrodLiquid.cpp" />
     <ClCompile Include="SpringMassSystem.cpp" />
   </ItemGroup>
   <ItemGroup>

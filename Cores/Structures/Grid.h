@@ -71,6 +71,8 @@ public:
 	VectorDi getCubicLower(const VectorDr &pos) const { return ((pos - _dataOrigin) * _invSpacing).array().floor().template cast<int>().matrix() - VectorDi::Ones(); }
 	VectorDr getLowerFrac(const VectorDr &pos, const VectorDi &lower) const { return (pos - _dataOrigin - lower.template cast<real>() * _spacing) * _invSpacing; }
 
+	// Interpolation helper functions.
+
 	std::array<VectorDi, _kCntNb1> linearNearbyDataPoints(const VectorDr &pos) const;
 	std::array<VectorDi, _kCntNb3> cubicNearbyDataPoints(const VectorDr &pos) const;
 

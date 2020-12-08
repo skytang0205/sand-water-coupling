@@ -54,6 +54,9 @@
     <ClInclude Include="ParticlesBasedScalarField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParticlesNearbySearcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StaggeredGridBasedVectorField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SmoothedParticles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

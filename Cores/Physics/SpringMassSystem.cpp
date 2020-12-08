@@ -118,7 +118,7 @@ void SpringMassSystem<Dim>::calculateAccelerations()
 {
 	_accelerations.setZero();
 
-	applyElasticForces();
+	applyElasticForce();
 	applyExternalForces();
 
 	// Constrain degrees of freedom.
@@ -207,7 +207,7 @@ void SpringMassSystem<Dim>::updatePositions(const real dt)
 }
 
 template <int Dim>
-void SpringMassSystem<Dim>::applyElasticForces()
+void SpringMassSystem<Dim>::applyElasticForce()
 {
 	for (const auto &spring : _springs) {
 		const int pid0 = spring.pid0;
