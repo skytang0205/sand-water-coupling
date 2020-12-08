@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Physics/AffineParticleInCellLiquid.h"
-#include "Physics/ImplicitParticleLiquid.h"
+#include "Physics/FlImplicitParticleLiquid.h"
 #include "Physics/ParticleInCellLiquid.h"
 
 namespace PhysX {
@@ -128,7 +128,7 @@ protected:
 		if (alpha >= 1)
 			return std::make_unique<ParticleInCellLiquid<Dim>>(grid, nppsc);
 		else if (alpha >= 0)
-			return std::make_unique<ImplicitParticleLiquid<Dim>>(grid, nppsc, alpha);
+			return std::make_unique<FlImplicitParticleLiquid<Dim>>(grid, nppsc, alpha);
 		else
 			return std::make_unique<AffineParticleInCellLiquid<Dim>>(grid, nppsc);
 	}

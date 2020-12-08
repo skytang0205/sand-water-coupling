@@ -1,20 +1,20 @@
-#include "ImplicitParticleLiquid.h"
+#include "FlImplicitParticleLiquid.h"
 
 #include <numbers>
 
 namespace PhysX {
 
 template <int Dim>
-ImplicitParticleLiquid<Dim>::ImplicitParticleLiquid(const StaggeredGrid<Dim> &grid, const int markersCntPerSubcell, const real propOfPic) :
+FlImplicitParticleLiquid<Dim>::FlImplicitParticleLiquid(const StaggeredGrid<Dim> &grid, const int markersCntPerSubcell, const real propOfPic) :
 	ParticleInCellLiquid<Dim>(grid, markersCntPerSubcell),
 	_propOfPic(std::clamp(propOfPic, real(0), real(1))),
 	_deltaVelocity(&_grid)
 { }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::saveFrame(const std::string &frameDir) const
+void FlImplicitParticleLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
-	LevelSetLiquid<Dim>::saveFrame(frameDir);
+	EulerianFluid<Dim>::saveFrame(frameDir);
 	{ // Save particles.
 		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
 		IO::writeValue(fout, uint(_particles.size()));
@@ -28,9 +28,9 @@ void ImplicitParticleLiquid<Dim>::saveFrame(const std::string &frameDir) const
 }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
+void FlImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
-	LevelSetLiquid<Dim>::loadFrame(frameDir);
+	EulerianFluid<Dim>::loadFrame(frameDir);
 	{ // Load particles.
 		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
 		uint particlesCnt;
@@ -47,7 +47,7 @@ void ImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
 }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::transferFromGridToParticles()
+void FlImplicitParticleLiquid<Dim>::transferFromGridToParticles()
 {
 	_deltaVelocity.parallelForEach([&](const int axis, const VectorDi &face) {
 		_deltaVelocity[axis][face] = _velocity[axis][face] - _deltaVelocity[axis][face];
@@ -59,13 +59,13 @@ void ImplicitParticleLiquid<Dim>::transferFromGridToParticles()
 }
 
 template <int Dim>
-void ImplicitParticleLiquid<Dim>::maintainGridBasedData(StaggeredGridBasedScalarData<Dim> &weightSum)
+void FlImplicitParticleLiquid<Dim>::maintainGridBasedData(StaggeredGridBasedScalarData<Dim> &weightSum)
 {
 	_deltaVelocity = _velocity;
 	ParticleInCellLiquid<Dim>::maintainGridBasedData(weightSum);
 }
 
-template class ImplicitParticleLiquid<2>;
-template class ImplicitParticleLiquid<3>;
+template class FlImplicitParticleLiquid<2>;
+template class FlImplicitParticleLiquid<3>;
 
 }

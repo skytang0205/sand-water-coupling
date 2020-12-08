@@ -6,7 +6,7 @@
 namespace PhysX {
 
 template <int Dim>
-class ImplicitParticleLiquid : public ParticleInCellLiquid<Dim>
+class FlImplicitParticleLiquid : public ParticleInCellLiquid<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
@@ -22,11 +22,11 @@ protected:
 
 public:
 
-	ImplicitParticleLiquid(const StaggeredGrid<Dim> &grid, const int markersCntPerSubcell, const real propOfPic);
+	FlImplicitParticleLiquid(const StaggeredGrid<Dim> &grid, const int markersCntPerSubcell, const real propOfPic);
 
-	ImplicitParticleLiquid(const ImplicitParticleLiquid &rhs) = delete;
-	ImplicitParticleLiquid &operator=(const ImplicitParticleLiquid &rhs) = delete;
-	virtual ~ImplicitParticleLiquid() = default;
+	FlImplicitParticleLiquid(const FlImplicitParticleLiquid &rhs) = delete;
+	FlImplicitParticleLiquid &operator=(const FlImplicitParticleLiquid &rhs) = delete;
+	virtual ~FlImplicitParticleLiquid() = default;
 
 	virtual void saveFrame(const std::string &frameDir) const override;
 	virtual void loadFrame(const std::string &frameDir) override;

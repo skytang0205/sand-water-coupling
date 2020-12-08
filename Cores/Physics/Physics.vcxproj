@@ -16,11 +16,12 @@
     <ClInclude Include="EulerianBoundaryHelper.h" />
     <ClInclude Include="EulerianFluid.h" />
     <ClInclude Include="EulerianProjector.h" />
-    <ClInclude Include="ImplicitParticleLiquid.h" />
+    <ClInclude Include="FlImplicitParticleLiquid.h" />
     <ClInclude Include="LevelSetLiquid.h" />
     <ClInclude Include="ParticleInCellLiquid.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
+    <ClInclude Include="SmthParticleHydrodLiquid.h" />
     <ClInclude Include="SpringMassSystem.h" />
   </ItemGroup>
   <ItemGroup>
@@ -29,7 +30,7 @@
     <ClCompile Include="EulerianBoundaryHelper.cpp" />
     <ClCompile Include="EulerianFluid.cpp" />
     <ClCompile Include="EulerianProjector.cpp" />
-    <ClCompile Include="ImplicitParticleLiquid.cpp" />
+    <ClCompile Include="FlImplicitParticleLiquid.cpp" />
     <ClCompile Include="LevelSetLiquid.cpp" />
     <ClCompile Include="ParticleInCellLiquid.cpp" />
     <ClCompile Include="Simulator.cpp" />

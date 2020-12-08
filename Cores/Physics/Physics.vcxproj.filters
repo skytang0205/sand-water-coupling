@@ -39,13 +39,16 @@
     <ClInclude Include="ParticleInCellLiquid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImplicitParticleLiquid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AffineParticleInCellLiquid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SpringMassSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FlImplicitParticleLiquid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SmthParticleHydrodLiquid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,13 +74,13 @@
     <ClCompile Include="ParticleInCellLiquid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImplicitParticleLiquid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AffineParticleInCellLiquid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SpringMassSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FlImplicitParticleLiquid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

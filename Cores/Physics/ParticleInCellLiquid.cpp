@@ -41,7 +41,7 @@ void ParticleInCellLiquid<Dim>::writeFrame(const std::string &frameDir, const bo
 template <int Dim>
 void ParticleInCellLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
-	LevelSetLiquid<Dim>::saveFrame(frameDir);
+	EulerianFluid<Dim>::saveFrame(frameDir);
 	{ // Save particles.
 		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
 		IO::writeValue(fout, uint(_particles.size()));
@@ -52,7 +52,7 @@ void ParticleInCellLiquid<Dim>::saveFrame(const std::string &frameDir) const
 template <int Dim>
 void ParticleInCellLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
-	LevelSetLiquid<Dim>::loadFrame(frameDir);
+	EulerianFluid<Dim>::loadFrame(frameDir);
 	{ // Load particles.
 		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
 		uint particlesCnt;
