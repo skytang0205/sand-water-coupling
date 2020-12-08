@@ -32,8 +32,8 @@ void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridB
 		for (int axis = 0; axis < Dim; axis++) {
 			const VectorDr gradVelAxis = _particleVelocityDerivatives[axis][i];
 			for (const auto [face, weight] : _velocity[axis].grid()->linearIntrplDataPoints(pos)) {
-				const VectorDr dPos = _velocity[axis].position(face) - pos;
-				_velocity[axis][face] += (vel[axis] + gradVelAxis.dot(dPos)) * weight;
+				const VectorDr deltaPos = _velocity[axis].position(face) - pos;
+				_velocity[axis][face] += (vel[axis] + gradVelAxis.dot(deltaPos)) * weight;
 				weightSum[axis][face] += weight;
 			}
 		}
