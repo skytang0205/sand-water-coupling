@@ -110,7 +110,7 @@ void SpringMassSystem<Dim>::advance(const real dt)
 	calculateAccelerations();
 	buildAndSolveLinearSystem(dt);
 
-	updatePositions(dt);
+	moveParticles(dt);
 }
 
 template <int Dim>
@@ -194,10 +194,10 @@ void SpringMassSystem<Dim>::buildAndSolveLinearSystem(const real dt)
 }
 
 template <int Dim>
-void SpringMassSystem<Dim>::updatePositions(const real dt)
+void SpringMassSystem<Dim>::moveParticles(const real dt)
 {
-	_particles.parallelForEach([&](const int pid) {
-		_particles.positions[pid] += _velocities[pid] * dt;
+	_particles.parallelForEach([&](const int i) {
+		_particles.positions[i] += _velocities[i] * dt;
 	});
 
 	// Resolve collisions.
@@ -226,8 +226,8 @@ template <int Dim>
 void SpringMassSystem<Dim>::applyExternalForces()
 {
 	if (_enableGravity) {
-		_particles.parallelForEach([&](const int pid) {
-			_accelerations[pid][1] -= kGravity;
+		_particles.parallelForEach([&](const int i) {
+			_accelerations[i][1] -= kGravity;
 		});
 	}
 }

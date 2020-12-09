@@ -37,12 +37,16 @@ protected:
 
 public:
 
+	using Particles<Dim>::parallelForEach;
+
 	SmoothedParticles(const real mass, const real radius, const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero());
 
 	SmoothedParticles &operator=(const SmoothedParticles &rhs) = delete;
 	virtual ~SmoothedParticles() = default;
 
 	real radius() const { return _radius; }
+
+	void computeDensities();
 
 	// Interpolation helper functions.
 
@@ -56,7 +60,7 @@ public:
 	real laplacianStdKernel(const real distance) const
 	{
 		if (const real x = 1 - distance * distance * _invSquaredRadius; x > 0)
-			return _stdKernelNormCoeff2 * x * ((Dim + 4) * x - 4);
+			return _stdKernelNormCoeff2 * x * ((Dim + real(4)) * x - 4);
 		else return 0;
 	}
 
@@ -77,10 +81,10 @@ public:
 	real laplacianSpikyKernel(const VectorDr &deltaPos) const
 	{
 		const real distance = deltaPos.norm();
-		return secondDerivativeSpikyKernel(distance) + firstDerivativeSpikyKernel(distance) * (Dim - 1) / distance;
+		return secondDerivativeSpikyKernel(distance) + firstDerivativeSpikyKernel(distance) * (Dim - real(1)) / distance;
 	}
 
-	void resetNeighborSearcher() { _nearbySearcher->reset(positions); }
+	void resetNearbySearcher() { _nearbySearcher->reset(positions); }
 	void forEachNearby(const VectorDr &pos, const std::function<void(const int, const VectorDr &)> &func) const { _nearbySearcher->forEach(positions, pos, func); }
 
 protected:

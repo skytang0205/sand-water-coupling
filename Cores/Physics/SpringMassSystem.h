@@ -69,7 +69,7 @@ protected:
 	void calculateAccelerations();
 	void reinitializeParticlesBasedData();
 	void buildAndSolveLinearSystem(const real dt);
-	void updatePositions(const real dt);
+	void moveParticles(const real dt);
 
 	virtual void applyElasticForce();
 	virtual void applyExternalForces();

@@ -20,6 +20,20 @@ SmoothedParticles<Dim>::SmoothedParticles(const real mass, const real radius, co
 	_nearbySearcher(std::make_unique<ParticlesNearbySearcher<Dim>>(_radius))
 { }
 
+template <int Dim>
+void SmoothedParticles<Dim>::computeDensities()
+{
+	densities._data.resize(positions.size());
+	parallelForEach([&](const int idx) {
+		const VectorDr pos = positions[idx];
+		densities[idx] = 0;
+		forEachNearby(pos, [&](const int i, const VectorDr &nearbyPos) {
+			densities[idx] += stdKernel(nearbyPos - pos);
+		});
+		densities[idx] *= _mass;
+	});
+}
+
 template class SmoothedParticles<2>;
 template class SmoothedParticles<3>;
 

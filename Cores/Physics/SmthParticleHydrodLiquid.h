@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Physics/Simulation.h"
-#include "Structures/SmoothedParticles.h"
+#include "Structures/ParticlesBasedScalarField.h"
+#include "Structures/ParticlesBasedVectorField.h"
 
 namespace PhysX {
 
@@ -13,6 +14,16 @@ class SmthParticleHydrodLiquid : public Simulation
 protected:
 
 	SmoothedParticles<Dim> _particles;
+	ParticlesBasedVectorField<Dim> _velocities;
+	ParticlesBasedScalarField<Dim> _pressures;
+
+	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
+
+	bool _enableGravity = true;
+
+	real _targetDensity = real(1e3);
+	real _speedOfSound = 1482;
+	real _eosExponent = 7;
 
 public:
 
@@ -34,6 +45,10 @@ public:
 	virtual void advance(const real dt) override;
 
 protected:
+
+	void moveParticles(const real dt);
+	void applyPressureForce(const real dt);
+	void applyExternalForces(const real dt);
 };
 
 }

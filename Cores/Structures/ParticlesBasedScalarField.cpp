@@ -60,4 +60,7 @@ real ParticlesBasedScalarField<Dim>::laplacianAtDataPoint(const int idx) const
 	return lapl * particles->mass();
 }
 
+template class ParticlesBasedScalarField<2>;
+template class ParticlesBasedScalarField<3>;
+
 }
