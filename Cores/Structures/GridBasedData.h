@@ -70,6 +70,18 @@ public:
 		return std::max(std::abs(*minmax.first), std::abs(*minmax.second));
 	}
 
+	real normMax() const
+	{
+		if constexpr (HasSquaredNorm<Type>) {
+			real squaredNormMax = 0;
+			for (const auto &val : _data) {
+				squaredNormMax = std::max(squaredNormMax, val.squaredNorm());
+			}
+			return std::sqrt(squaredNormMax);
+		}
+		else return absoluteMax();
+	}
+
 	void forEach(const std::function<void(const VectorDi &)> &func) const { _grid->forEach(func); }
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const { _grid->parallelForEach(func); }
 

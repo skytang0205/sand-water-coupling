@@ -77,6 +77,12 @@ public:
 		else return std::max({ _components[0].absoluteMax(), _components[1].absoluteMax(), _components[2].absoluteMax() });
 	}
 
+	real normMax() const
+	{
+		if constexpr (Dim == 2) return std::max(_components[0].normMax(), _components[1].normMax());
+		else return std::max({ _components[0].normMax(), _components[1].normMax(), _components[2].normMax() });
+	}
+
 	void forEach(const std::function<void(const int, const VectorDi &)> &func) const { _grid->forEachFace(func); }
 	void parallelForEach(const std::function<void(const int, const VectorDi &)> &func) const { _grid->parallelForEachFace(func); }
 

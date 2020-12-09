@@ -3,11 +3,14 @@
 #include "Utilities/Types.h"
 #include "Utilities/IO.h"
 
+#include <algorithm>
+#include <numeric>
 #include <vector>
 
 namespace PhysX {
 
 template <int Dim> class Particles;
+template <int Dim> class SmoothedParticles;
 
 template <int Dim, typename Type>
 class ParticlesAttribute
@@ -17,6 +20,7 @@ class ParticlesAttribute
 public:
 
 	friend class Particles<Dim>;
+	friend class SmoothedParticles<Dim>;
 
 protected:
 
@@ -38,6 +42,30 @@ public:
 
 	void setConstant(const Type &value) { std::fill(_data.begin(), _data.end(), value); }
 	void setZero() { setConstant(Zero<Type>()); }
+
+	template <typename AccType = Type>
+	AccType sum() const { return std::accumulate(_data.begin(), _data.end(), Zero<AccType>()); }
+
+	Type min() const { return *std::min_element(_data.begin(), _data.end()); }
+	Type max() const { return *std::max_element(_data.begin(), _data.end()); }
+
+	Type absoluteMax() const
+	{
+		auto minmax = std::minmax_element(_data.begin(), _data.end());
+		return std::max(std::abs(*minmax.first), std::abs(*minmax.second));
+	}
+
+	real normMax() const
+	{
+		if constexpr (HasSquaredNorm<Type>) {
+			real squaredNormMax = 0;
+			for (const auto &val : _data) {
+				squaredNormMax = std::max(squaredNormMax, val.squaredNorm());
+			}
+			return std::sqrt(squaredNormMax);
+		}
+		else return absoluteMax();
+	}
 
 	void forEach(const std::function<void(const int)> &func) const
 	{

@@ -64,8 +64,8 @@ void SmthParticleHydrodLiquid<Dim>::applyExternalForces(const real dt)
 {
 	if (_enableGravity) {
 		_particles.parallelForEach([&](const int i) {
-			_velocities[i][1] -= _kGravity * dt;
-		})
+			_velocities[i][1] -= kGravity * dt;
+		});
 	}
 }
 

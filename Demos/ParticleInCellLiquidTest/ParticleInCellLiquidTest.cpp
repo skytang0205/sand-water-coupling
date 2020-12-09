@@ -3,6 +3,8 @@
 #include "Physics/Simulator.h"
 #include "Utilities/ArgsParser.h"
 
+#include <omp.h>
+
 using namespace PhysX;
 
 inline std::unique_ptr<ArgsParser> BuildArgsParser()

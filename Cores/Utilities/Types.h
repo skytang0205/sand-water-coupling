@@ -68,11 +68,10 @@ using	ullong				=	unsigned long long;
 
 using	std::size_t;
 
-template <typename Type>
-inline constexpr Type Zero() { return Type(0); }
+template <typename Type> concept HasZero = requires { Type::Zero(); };
+template <typename Type> concept HasSquaredNorm = requires (Type obj) { obj.squaredNorm(); };
 
-template <typename Type>
-requires requires { Type::Zero(); }
-inline Type Zero() { return Type::Zero(); }
+template <typename Type> inline constexpr Type Zero() { return Type(0); }
+template <HasZero Type> inline Type Zero() { return Type::Zero(); }
 
 } // namespaxe PhysX
