@@ -26,6 +26,7 @@ protected:
 
 	bool _enableGravity = true;
 
+	real _viscosityCoeff = real(1e-2);
 	real _targetDensity = real(1e3);
 	real _speedOfSound = 1482;
 	real _eosExponent = 7;
@@ -53,8 +54,9 @@ protected:
 
 	void reinitializeParticlesBasedData();
 	void moveParticles(const real dt);
-	void applyPressureForce(const real dt);
 	void applyExternalForces(const real dt);
+	void applyViscosityForce(const real dt);
+	void applyPressureForce(const real dt);
 };
 
 }

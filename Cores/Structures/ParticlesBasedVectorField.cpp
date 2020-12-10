@@ -24,6 +24,18 @@ real ParticlesBasedVectorField<Dim>::divergence(const VectorDr &pos) const
 	return div * particles->mass();
 }
 
+template<int Dim>
+Vector<Dim, real> ParticlesBasedVectorField<Dim>::laplacianAtDataPoint(const int idx) const
+{
+	VectorDr lapl = VectorDr::Zero();
+	auto particles = static_cast<const SmoothedParticles<Dim> *>(_particles);
+	const VectorDr pos = particles->positions[idx];
+	particles->forEachNearby(pos, [&](const int i, const VectorDr &nearbyPos) {
+		lapl += (_data[i] - _data[idx]) * particles->laplacianSpikyKernel(nearbyPos - pos) / particles->densities[i];
+	});
+	return lapl * particles->mass();
+}
+
 template class ParticlesBasedVectorField<2>;
 template class ParticlesBasedVectorField<3>;
 

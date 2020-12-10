@@ -32,7 +32,7 @@ protected:
 	static std::unique_ptr<SmthParticleHydrodLiquid<Dim>> buildCase0(int scale)
 	{
 		DECLARE_DIM_TYPES(Dim)
-		if (scale < 0) scale = 15;
+		if (scale < 0) scale = 50;
 		const real length = real(2);
 
 		const real density = 1000;
@@ -40,10 +40,9 @@ protected:
 		const real spacing = liquidLen / scale;
 		const real mass = density * std::pow(liquidLen / (scale + real(1)), Dim);
 		auto liquid = std::make_unique<SmthParticleHydrodLiquid<Dim>>(mass, spacing * 2);
-		liquid->_targetDensity = density / 2;
+		liquid->_targetDensity = density;
 		liquid->_eosExponent = 1;
-		liquid->_speedOfSound = 10;
-		liquid->_enableGravity = false;
+		liquid->_speedOfSound = 33;
 
 		Grid<Dim> grid(spacing, (scale + 1) * VectorDi::Ones(), VectorDr::Zero() - liquidLen / 2 * VectorDr::Ones());
 		grid.forEach([&](const VectorDi &node) {
@@ -52,11 +51,11 @@ protected:
 
 		liquid->_velocities.resize(&liquid->_particles);
 
-/*		liquid->_colliders.push_back(
+		liquid->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
 				std::make_unique<ComplementarySurface<Dim>>(
 					std::make_unique<ImplicitSphere<Dim>>(VectorDr::Zero(), length / 2)),
-				0));*/
+				real(.1)));
 		return liquid;
 	}
 

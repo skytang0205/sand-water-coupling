@@ -80,8 +80,11 @@ public:
 
 	real laplacianSpikyKernel(const VectorDr &deltaPos) const
 	{
+		// This calculation is approximate.
 		const real distance = deltaPos.norm();
-		return secondDerivativeSpikyKernel(distance) + firstDerivativeSpikyKernel(distance) * (Dim - real(1)) / distance;
+		return secondDerivativeSpikyKernel(distance);
+		// Another term is: firstDerivativeSpikyKernel(distance) * (Dim - real(1)) / distance,
+		// which will cause instability.
 	}
 
 	void resetNearbySearcher() { _nearbySearcher->reset(positions); }

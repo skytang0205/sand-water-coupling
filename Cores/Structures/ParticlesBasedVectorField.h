@@ -29,6 +29,8 @@ public:
 
 	virtual VectorDr operator()(const VectorDr & pos) const override;
 	virtual real divergence(const VectorDr & pos) const override;
+
+	VectorDr laplacianAtDataPoint(const int idx) const;
 };
 
 }

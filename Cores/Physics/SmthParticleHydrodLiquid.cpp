@@ -62,8 +62,9 @@ void SmthParticleHydrodLiquid<Dim>::advance(const real dt)
 {
 	moveParticles(dt);
 
-	applyPressureForce(dt);
 	applyExternalForces(dt);
+	applyViscosityForce(dt);
+	applyPressureForce(dt);
 }
 
 template <int Dim>
@@ -89,6 +90,28 @@ void SmthParticleHydrodLiquid<Dim>::moveParticles(const real dt)
 }
 
 template <int Dim>
+void SmthParticleHydrodLiquid<Dim>::applyExternalForces(const real dt)
+{
+	if (_enableGravity) {
+		_particles.parallelForEach([&](const int i) {
+			_velocities[i][1] -= kGravity * dt;
+		});
+	}
+}
+
+template <int Dim>
+void SmthParticleHydrodLiquid<Dim>::applyViscosityForce(const real dt)
+{
+	if (_viscosityCoeff) {
+		auto newVelocities = _velocities;
+		_particles.parallelForEach([&](const int i) {
+			newVelocities[i] += _viscosityCoeff * _velocities.laplacianAtDataPoint(i) * dt;
+		});
+		_velocities = newVelocities;
+	}
+}
+
+template <int Dim>
 void SmthParticleHydrodLiquid<Dim>::applyPressureForce(const real dt)
 {
 	// Compute pressures by the equation of state.
@@ -102,16 +125,6 @@ void SmthParticleHydrodLiquid<Dim>::applyPressureForce(const real dt)
 	_particles.parallelForEach([&](const int i) {
 		_velocities[i] -= _pressures.gradientAtDataPoint(i) / _particles.densities[i] * dt;
 	});
-}
-
-template <int Dim>
-void SmthParticleHydrodLiquid<Dim>::applyExternalForces(const real dt)
-{
-	if (_enableGravity) {
-		_particles.parallelForEach([&](const int i) {
-			_velocities[i][1] -= kGravity * dt;
-		});
-	}
 }
 
 template class SmthParticleHydrodLiquid<2>;
