@@ -71,12 +71,9 @@ void SpringMassSystem<Dim>::writeFrame(const std::string &frameDir, const bool s
 template <int Dim>
 void SpringMassSystem<Dim>::saveFrame(const std::string &frameDir) const
 {
-	{ // Save positions.
-		std::ofstream fout(frameDir + "/positions.sav", std::ios::binary);
+	{ // Save particles.
+		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
 		_particles.positions.save(fout);
-	}
-	{ // Save velocities.
-		std::ofstream fout(frameDir + "/velocities.sav", std::ios::binary);
 		_velocities.save(fout);
 	}
 }
@@ -84,15 +81,11 @@ void SpringMassSystem<Dim>::saveFrame(const std::string &frameDir) const
 template <int Dim>
 void SpringMassSystem<Dim>::loadFrame(const std::string &frameDir)
 {
-	{ // Load positions.
-		std::ifstream fin(frameDir + "/positions.sav", std::ios::binary);
+	{ // Load particles.
+		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
 		_particles.positions.load(fin);
-	}
-	{ // Load velocities.
-		std::ifstream fin(frameDir + "/velocities.sav", std::ios::binary);
 		_velocities.load(fin);
 	}
-	// Reinitialize particles based data and reset the sparse matrix.
 	reinitializeParticlesBasedData();
 }
 

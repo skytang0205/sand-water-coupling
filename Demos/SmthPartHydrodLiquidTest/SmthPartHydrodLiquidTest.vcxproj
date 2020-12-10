@@ -10,22 +10,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="ParticleInCellLiquidTest.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ParticleInCellLiquidBuilder.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Cores\Physics\Physics.vcxproj">
-      <Project>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{3f68c0df-a53e-4829-8434-314572f3a49d}</ProjectGuid>
-    <RootNamespace>ParticleInCellLiquidTest</RootNamespace>
+    <ProjectGuid>{9f777c5e-7490-4f4d-8ef9-f35547b79e10}</ProjectGuid>
+    <RootNamespace>SmthPartHydrodLiquidTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -48,10 +37,12 @@
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Properties\Default.props" />
     <Import Project="..\..\Properties\Debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Properties\Default.props" />
     <Import Project="..\..\Properties\Release.props" />
   </ImportGroup>
@@ -90,6 +81,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="SmthPartHydrodLiquidTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SmthPartHydrodLiquidBuilder.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cores\Physics\Physics.vcxproj">
+      <Project>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

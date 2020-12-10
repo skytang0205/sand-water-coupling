@@ -133,7 +133,11 @@ protected:
 			return std::make_unique<AffineParticleInCellLiquid<Dim>>(grid, nppsc);
 	}
 
-	static void reportError(const std::string &msg);
+	static void reportError(const std::string &msg)
+	{
+		std::cerr << fmt::format("Error: [ParticleInCellLiquidBuilder] encountered {}.\n{}", msg) << std::endl;
+		std::exit(-1);
+	}
 };
 
 }

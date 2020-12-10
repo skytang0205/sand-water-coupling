@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SpringMassSystemBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SpringMassSystemTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

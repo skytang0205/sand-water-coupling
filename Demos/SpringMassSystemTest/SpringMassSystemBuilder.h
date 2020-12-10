@@ -69,7 +69,11 @@ protected:
 		return smSystem;
 	}
 
-	static void reportError(const std::string &msg);
+	static void reportError(const std::string &msg)
+	{
+		std::cerr << fmt::format("Error: [EulerianFluidBuilder] encountered {}.\n{}", msg) << std::endl;
+		std::exit(-1);
+	}
 };
 
 }

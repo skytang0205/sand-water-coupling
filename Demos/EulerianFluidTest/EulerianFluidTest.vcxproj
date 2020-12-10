@@ -19,7 +19,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EulerianFluidBuilder.cpp" />
     <ClCompile Include="EulerianFluidTest.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

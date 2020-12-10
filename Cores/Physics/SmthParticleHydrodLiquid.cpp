@@ -19,15 +19,57 @@ void SmthParticleHydrodLiquid<Dim>::writeDescription(YAML::Node &root) const
 }
 
 template <int Dim>
+void SmthParticleHydrodLiquid<Dim>::writeFrame(const std::string &frameDir, const bool staticDraw) const
+{
+	{ // Write particles.
+		std::ofstream fout(frameDir + "/particles.mesh", std::ios::binary);
+		IO::writeValue(fout, uint(_particles.size()));
+		_particles.forEach([&](const int i) {
+			IO::writeValue(fout, _particles.positions[i].template cast<float>().eval());
+		});
+	}
+}
+
+template <int Dim>
+void SmthParticleHydrodLiquid<Dim>::saveFrame(const std::string &frameDir) const
+{
+	{ // Save particles.
+		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
+		_particles.positions.save(fout);
+		_velocities.save(fout);
+	}
+}
+
+template <int Dim>
+void SmthParticleHydrodLiquid<Dim>::loadFrame(const std::string &frameDir)
+{
+	{ // Load particles.
+		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
+		_particles.positions.load(fin);
+		_velocities.load(fin);
+	}
+	reinitializeParticlesBasedData();
+}
+
+template <int Dim>
+void SmthParticleHydrodLiquid<Dim>::initialize()
+{
+	reinitializeParticlesBasedData();
+}
+
+template <int Dim>
 void SmthParticleHydrodLiquid<Dim>::advance(const real dt)
 {
 	moveParticles(dt);
 
-	_particles.resetNearbySearcher();
-	_particles.computeDensities();
-
 	applyPressureForce(dt);
 	applyExternalForces(dt);
+}
+
+template <int Dim>
+void SmthParticleHydrodLiquid<Dim>::reinitializeParticlesBasedData()
+{
+	_pressures.resize(&_particles);
 }
 
 template <int Dim>
@@ -41,6 +83,9 @@ void SmthParticleHydrodLiquid<Dim>::moveParticles(const real dt)
 	for (const auto &collider : _colliders) {
 		collider->collide(_particles, _velocities);
 	}
+
+	_particles.resetNearbySearcher();
+	_particles.computeDensities();
 }
 
 template <int Dim>

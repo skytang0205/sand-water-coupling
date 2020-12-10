@@ -36,6 +36,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleInCellLiquidTest", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpringMassSystemTest", "Demos\SpringMassSystemTest\SpringMassSystemTest.vcxproj", "{4EA403EF-C84C-4386-AD53-5231DD057316}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmthPartHydrodLiquidTest", "Demos\SmthPartHydrodLiquidTest\SmthPartHydrodLiquidTest.vcxproj", "{9F777C5E-7490-4F4D-8EF9-F35547B79E10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -86,6 +88,10 @@ Global
 		{4EA403EF-C84C-4386-AD53-5231DD057316}.Debug|x64.Build.0 = Debug|x64
 		{4EA403EF-C84C-4386-AD53-5231DD057316}.Release|x64.ActiveCfg = Release|x64
 		{4EA403EF-C84C-4386-AD53-5231DD057316}.Release|x64.Build.0 = Release|x64
+		{9F777C5E-7490-4F4D-8EF9-F35547B79E10}.Debug|x64.ActiveCfg = Debug|x64
+		{9F777C5E-7490-4F4D-8EF9-F35547B79E10}.Debug|x64.Build.0 = Debug|x64
+		{9F777C5E-7490-4F4D-8EF9-F35547B79E10}.Release|x64.ActiveCfg = Release|x64
+		{9F777C5E-7490-4F4D-8EF9-F35547B79E10}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{95D18440-C2B8-4F12-89E3-18C48F64417E} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
 		{3F68C0DF-A53E-4829-8434-314572F3A49D} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
 		{4EA403EF-C84C-4386-AD53-5231DD057316} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
+		{9F777C5E-7490-4F4D-8EF9-F35547B79E10} = {07766B7C-92A3-42FD-BFC1-A5730A6D154E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FF25F6D-05AD-416D-82C1-A2E523A66E8D}

@@ -12,6 +12,10 @@ class SmthParticleHydrodLiquid : public Simulation
 {
 	DECLARE_DIM_TYPES(Dim)
 
+public:
+
+	friend class SmthPartHydrodLiquidBuilder;
+
 protected:
 
 	SmoothedParticles<Dim> _particles;
@@ -28,7 +32,7 @@ protected:
 
 public:
 
-	SmthParticleHydrodLiquid(): _particles(1, 1) { }
+	SmthParticleHydrodLiquid(const real particleMass, const real particleRadius): _particles(particleMass, particleRadius) { }
 
 	SmthParticleHydrodLiquid(const SmthParticleHydrodLiquid &rhs) = delete;
 	SmthParticleHydrodLiquid &operator=(const SmthParticleHydrodLiquid &rhs) = delete;
@@ -47,6 +51,7 @@ public:
 
 protected:
 
+	void reinitializeParticlesBasedData();
 	void moveParticles(const real dt);
 	void applyPressureForce(const real dt);
 	void applyExternalForces(const real dt);

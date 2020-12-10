@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ParticleInCellLiquidBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleInCellLiquidTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
