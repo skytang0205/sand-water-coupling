@@ -39,7 +39,7 @@ protected:
 		const real liquidLen = length / 2;
 		const real spacing = liquidLen / scale;
 		const real mass = density * std::pow(liquidLen / scale, Dim);
-		auto liquid = std::make_unique<SmthParticleHydrodLiquid<Dim>>(mass, spacing * 2);
+		auto liquid = std::make_unique<SmthParticleHydrodLiquid<Dim>>(mass, spacing);
 		liquid->_targetDensity = density;
 		liquid->_eosExponent = 1;
 		liquid->_speedOfSound = 5;

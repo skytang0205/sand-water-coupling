@@ -2,7 +2,6 @@
 
 #include "Geometries/Surface.h"
 #include "Structures/ParticlesBasedData.h"
-#include "Structures/SmoothedParticles.h"
 
 #include <memory>
 
@@ -36,8 +35,7 @@ public:
 	real restitutionCoefficient() const { return _restitutionCoefficient; }
 	real frictionCoefficient() const { return _frictionCoefficient; }
 
-	void collide(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities);
-	void collide(SmoothedParticles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities);
+	void collide(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities, const real radius = 0);
 	void collide(VectorDr &pos, VectorDr &vel, const real radius);
 };
 

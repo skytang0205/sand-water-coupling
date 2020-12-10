@@ -18,6 +18,8 @@ public:
 
 protected:
 
+	const real _particleSpacing;
+
 	SmoothedParticles<Dim> _particles;
 	ParticlesBasedVectorField<Dim> _velocities;
 	ParticlesBasedScalarField<Dim> _pressures;
@@ -34,7 +36,10 @@ protected:
 
 public:
 
-	SmthParticleHydrodLiquid(const real particleMass, const real particleRadius): _particles(particleMass, particleRadius) { }
+	SmthParticleHydrodLiquid(const real particleMass, const real particleSpacing) :
+		_particleSpacing(particleSpacing),
+		_particles(particleMass, _particleSpacing * 2)
+	{ }
 
 	SmthParticleHydrodLiquid(const SmthParticleHydrodLiquid &rhs) = delete;
 	SmthParticleHydrodLiquid &operator=(const SmthParticleHydrodLiquid &rhs) = delete;
