@@ -123,12 +123,6 @@ void SmthParticleHydrodLiquid<Dim>::applyPressureForce(const real dt)
 		if (_pressures[i] < 0) _pressures[i] = 0;
 	});
 
-/*	_particles.forEach([&](const int i) {
-		std::cout << '(' << _particles.positions[i].transpose() << ") "
-			<< _particles.densities[i] << ' ' << _pressures[i] << " ["
-			<< _pressures.gradientAtDataPoint(i).transpose() / _particles.densities[i] << ']' << std::endl;
-	});*/
-
 	// Apply pressure gradient.
 	_particles.parallelForEach([&](const int i) {
 		_velocities[i] -= _pressures.gradientAtDataPoint(i) / _particles.densities[i] * dt;
