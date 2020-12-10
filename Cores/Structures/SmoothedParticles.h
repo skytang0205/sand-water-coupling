@@ -65,7 +65,7 @@ public:
 	}
 
 	real stdKernel(const VectorDr &deltaPos) const { return stdKernel(deltaPos.norm()); }
-	VectorDr gradientStdKernel(const VectorDr &deltaPos) const { return firstDerivativeStdKernel(deltaPos.norm()) * deltaPos.normalized(); }
+	VectorDr gradientStdKernel(const VectorDr &deltaPos) const { return -firstDerivativeStdKernel(deltaPos.norm()) * deltaPos.normalized(); }
 	real laplacianStdKernel(const VectorDr &deltaPos) const { return laplacianStdKernel(deltaPos.norm()); }
 
 	real spikyKernel(const real distance) const
@@ -76,7 +76,7 @@ public:
 	}
 
 	real spikyKernel(const VectorDr &deltaPos) const { return spikyKernel(deltaPos.norm()); }
-	VectorDr gradientSpikyKernel(const VectorDr &deltaPos) const { return firstDerivativeSpikyKernel(deltaPos.norm()) * deltaPos.normalized(); }
+	VectorDr gradientSpikyKernel(const VectorDr &deltaPos) const { return -firstDerivativeSpikyKernel(deltaPos.norm()) * deltaPos.normalized(); }
 
 	real laplacianSpikyKernel(const VectorDr &deltaPos) const
 	{

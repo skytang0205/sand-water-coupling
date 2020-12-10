@@ -28,8 +28,8 @@ public:
 
 	virtual void forEach(const ParticlesVectorAttribute<Dim> &positions, const VectorDr &pos, const std::function<void(const int, const VectorDr &)> &func)
 	{
-		for (int i = 0; i < positions.size(); i++)
-			if ((positions[i] - pos).squaredNorm() < _squaredRadius) func(i, positions[i]);
+		for (int j = 0; j < positions.size(); j++)
+			if ((positions[j] - pos).squaredNorm() < _squaredRadius) func(j, positions[j]);
 	}
 };
 

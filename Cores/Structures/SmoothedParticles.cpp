@@ -27,7 +27,7 @@ void SmoothedParticles<Dim>::computeDensities()
 	parallelForEach([&](const int idx) {
 		const VectorDr pos = positions[idx];
 		densities[idx] = 0;
-		forEachNearby(pos, [&](const int i, const VectorDr &nearbyPos) {
+		forEachNearby(pos, [&](const int j, const VectorDr &nearbyPos) {
 			densities[idx] += stdKernel(nearbyPos - pos);
 		});
 		densities[idx] *= _mass;

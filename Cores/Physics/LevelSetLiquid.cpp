@@ -30,7 +30,7 @@ void LevelSetLiquid<Dim>::writeDescription(YAML::Node &root) const
 		}
 		else {
 			node["primitive_type"] = "triangle_list";
-			node["material"]["diffuse_albedo"] = Vector4f(147 / 255.0f, 213 / 255.0f, 220 / 255.0f, 1); // Qingshui Blue
+			node["material"]["diffuse_albedo"] = (Vector4f(147, 213, 220, 255) / 255).eval(); // Qingshui Blue
 		}
 
 		node["indexed"] = true;
