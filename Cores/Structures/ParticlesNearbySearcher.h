@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Structures/Grid.h"
 #include "Structures/ParticlesAttribute.h"
 
 #include <memory>
@@ -40,13 +41,36 @@ class HashGridSearcher : public ParticlesNearbySearcher<Dim>
 
 protected:
 
+	using ParticlesNearbySearcher<Dim>::_radius;
+	using ParticlesNearbySearcher<Dim>::_squaredRadius;
+
+	static constexpr int _kPrime0 = 73856093;
+	static constexpr int _kPrime1 = 19349663;
+	static constexpr int _kPrime2 = 83492791;
+
+	const Grid<Dim> _grid;
+
+	std::vector<std::vector<int>> _buckets;
+
 public:
 
-	HashGridSearcher(const real radius) : ParticlesNearbySearcher<Dim>(radius) { }
+	HashGridSearcher(const real radius) : ParticlesNearbySearcher<Dim>(radius), _grid(_radius, VectorDi::Zero(), VectorDr::Zero()) { }
 
 	HashGridSearcher(const HashGridSearcher &rhs) = delete;
 	HashGridSearcher &operator=(const HashGridSearcher &rhs) = delete;
 	virtual ~HashGridSearcher() = default;
+
+	virtual void reset(const ParticlesVectorAttribute<Dim> &positions) override;
+
+	virtual void forEach(const ParticlesVectorAttribute<Dim> &positions, const VectorDr &pos, const std::function<void(const int, const VectorDr &)> &func) override;
+
+	int getHashKey(const VectorDr &pos) const { return getHashKey((_grid.getQuadraticLower(pos) + VectorDi::Ones()).eval()); }
+
+	int getHashKey(const VectorDi &coord) const
+	{
+		if constexpr (Dim == 2) return int((_kPrime0 * ullong(coord[0]) | _kPrime1 * ullong(coord[1])) % _buckets.size());
+		else return int((_kPrime0 * ullong(coord[0]) | _kPrime1 * ullong(coord[1]) | _kPrime2 * ullong(coord[2])) % _buckets.size());
+	}
 };
 
 }

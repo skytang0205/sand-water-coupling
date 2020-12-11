@@ -24,6 +24,27 @@ auto Grid<Dim>::linearNearbyDataPoints(const VectorDr &pos) const->std::array<Ve
 }
 
 template <int Dim>
+auto Grid<Dim>::quadraticNearbyDataPoints(const VectorDr &pos) const->std::array<VectorDi, _kCntNb2>
+{
+	const VectorDi lower = getQuadraticLower(pos);
+
+	std::array<VectorDi, _kCntNb2> dataPoints;
+	int idx = 0;
+	if constexpr (Dim == 2) {
+		for (int j = 0; j < 3; j++)
+			for (int i = 0; i < 3; i++)
+				dataPoints[idx++] = lower + Vector2i(i, j);
+	}
+	else {
+		for (int k = 0; k < 3; k++)
+			for (int j = 0; j < 3; j++)
+				for (int i = 0; i < 3; i++)
+					dataPoints[idx++] = lower + Vector3i(i, j, k);
+	}
+	return dataPoints;
+}
+
+template <int Dim>
 auto Grid<Dim>::cubicNearbyDataPoints(const VectorDr &pos) const->std::array<VectorDi, _kCntNb3>
 {
 	const VectorDi lower = getCubicLower(pos);

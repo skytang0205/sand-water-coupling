@@ -17,7 +17,7 @@ SmoothedParticles<Dim>::SmoothedParticles(const real mass, const real radius, co
 	_spikyKernelNormCoeff0((Dim == 2 ? real(10) : 15 * _invRadius) * real(std::numbers::inv_pi) *_invSquaredRadius),
 	_spikyKernelNormCoeff1(-3 * _invRadius * _spikyKernelNormCoeff0),
 	_spikyKernelNormCoeff2(-2 * _invRadius * _spikyKernelNormCoeff1),
-	_nearbySearcher(std::make_unique<ParticlesNearbySearcher<Dim>>(_radius))
+	_nearbySearcher(std::make_unique<HashGridSearcher<Dim>>(_radius))
 { }
 
 template <int Dim>

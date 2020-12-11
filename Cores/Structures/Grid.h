@@ -74,6 +74,7 @@ public:
 	// Interpolation helper functions.
 
 	std::array<VectorDi, _kCntNb1> linearNearbyDataPoints(const VectorDr &pos) const;
+	std::array<VectorDi, _kCntNb2> quadraticNearbyDataPoints(const VectorDr &pos) const;
 	std::array<VectorDi, _kCntNb3> cubicNearbyDataPoints(const VectorDr &pos) const;
 
 	std::array<IntrplDataPoint, _kCntNb1> linearIntrplDataPoints(const VectorDr &pos) const;

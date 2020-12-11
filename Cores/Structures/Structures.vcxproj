@@ -33,6 +33,7 @@
     <ClCompile Include="GridBasedVectorField.cpp" />
     <ClCompile Include="ParticlesBasedScalarField.cpp" />
     <ClCompile Include="ParticlesBasedVectorField.cpp" />
+    <ClCompile Include="ParticlesNearbySearcher.cpp" />
     <ClCompile Include="SmoothedParticles.cpp" />
     <ClCompile Include="StaggeredGrid.cpp" />
     <ClCompile Include="StaggeredGridBasedVectorField.cpp" />
