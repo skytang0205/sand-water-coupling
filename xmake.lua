@@ -13,7 +13,7 @@ set_xmakever("2.3.9")
 --   > xmake install -o dist && xmake install -o dist examples
 
 add_requires("eigen", "glfw", "glad", "yaml-cpp", "fmt")
-local pkgs = {"eigen", "glfw", "glad", "yaml-cpp", "fmt"}
+pkgs = {"eigen", "glfw", "glad", "yaml-cpp", "fmt"}
 
 add_rules("mode.debug", "mode.release")
 
@@ -41,20 +41,28 @@ option("openmp")
     add_defines("_OPENMP")
     add_defines("EIGEN_HAS_OPENMP")
 -- benchmark: plain ~ 132.72s, openmp ~ 178.86s
+option_end()
 
 option("use_float")
     set_default(false)
     set_showmenu(true)
     set_description("Use single-precision floating point numbers instead of double-precision ones.")
     add_defines("USE_FLOAT")
+option_end()
 
-target("vcl-physx")
+option("common")
     set_default(true)
-    set_kind("$(kind)")
+    set_showmenu(false)
     set_languages("cxx20")
     if is_plat("windows") then
         add_cxxflags("/MT")
     end
+option_end()
+
+target("vcl-physx")
+    set_default(true)
+    set_kind("$(kind)")
+    add_options("common")
     add_options("openmp")
     -- add_options("use_blas")
     add_packages(unpack(pkgs))
@@ -64,20 +72,16 @@ target("vcl-physx")
         add_files("Cores/" .. module .. "/*.cpp")
         add_headerfiles("Cores/(" .. module .. "/*.h)")
     end
+target_end()
 
 target("vcl-viewer")
     set_default(true)
     set_kind("binary")
-    set_languages("cxx20")
-    if is_plat("windows") then
-        add_cxxflags("/MT")
-    end
+    add_options("common")
     add_deps("vcl-physx")
     add_packages(unpack(pkgs))
     add_files("Cores/Viewer/*.cpp")
-    on_run(function (target)
-        os.execv(target:targetfile(), {"-o", os.curdir() .. "/output"})
-    end)
+target_end()
 
 local examples = {"EulerianFluidTest", "LevelSetLiquidTest", "ParticleInCellLiquidTest", "SpringMassSystemTest"}
 for _, example in ipairs(examples) do
@@ -85,17 +89,12 @@ for _, example in ipairs(examples) do
 target(example)
     set_default(false)
     set_kind("binary")
-    set_languages("cxx20")
-    if is_plat("windows") then
-        add_cxxflags("/MT")
-    end
+    add_options("common")
     -- add_options("use_blas")
     add_packages(unpack(pkgs))
     add_deps("vcl-physx")
     add_files(path.join("Demos", example, "*.cpp"))
-    on_run(function (target)
-        os.execv(target:targetfile(), {"-o", os.curdir() .. "/output"})
-    end)
+target_end()
 
 end
 
@@ -103,3 +102,6 @@ target("examples")
     set_default(false)
     set_kind("phony")
     add_deps(unpack(examples))
+target_end()
+
+includes("Develop")
