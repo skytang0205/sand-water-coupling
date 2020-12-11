@@ -14,6 +14,7 @@ void SmthParticleHydrodLiquid<Dim>::writeDescription(YAML::Node &root) const
 		node["primitive_type"] = "point_list";
 		node["material"]["diffuse_albedo"] = (Vector4f(52, 108, 156, 255) / 255).eval(); // Haijun Blue
 		node["indexed"] = false;
+		node["color_map"]["enabled"] = true;
 		root["objects"].push_back(node);
 	}
 }
@@ -26,6 +27,14 @@ void SmthParticleHydrodLiquid<Dim>::writeFrame(const std::string &frameDir, cons
 		IO::writeValue(fout, uint(_particles.size()));
 		_particles.forEach([&](const int i) {
 			IO::writeValue(fout, _particles.positions[i].template cast<float>().eval());
+		});
+		if constexpr (Dim == 3) {
+			_particles.forEach([&](const int i) {
+				IO::writeValue(fout, VectorDf::Unit(2).eval());
+			});
+		}
+		_particles.forEach([&](const int i) {
+			IO::writeValue(fout, float(_velocities[i].norm()));
 		});
 	}
 }

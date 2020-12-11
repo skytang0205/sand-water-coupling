@@ -19,6 +19,7 @@
     <ClInclude Include="FlImplicitParticleLiquid.h" />
     <ClInclude Include="LevelSetLiquid.h" />
     <ClInclude Include="ParticleInCellLiquid.h" />
+    <ClInclude Include="PredCorrIncomprSphLiquid.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
     <ClInclude Include="SmthParticleHydrodLiquid.h" />
@@ -33,6 +34,7 @@
     <ClCompile Include="FlImplicitParticleLiquid.cpp" />
     <ClCompile Include="LevelSetLiquid.cpp" />
     <ClCompile Include="ParticleInCellLiquid.cpp" />
+    <ClCompile Include="PredCorrIncomprSphLiquid.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="SmthParticleHydrodLiquid.cpp" />
     <ClCompile Include="SpringMassSystem.cpp" />
