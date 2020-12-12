@@ -88,8 +88,8 @@ void ParticleInCellLiquid<Dim>::advance(const real dt)
 template <int Dim>
 void ParticleInCellLiquid<Dim>::advectFields(const real dt)
 {
-	_advector->advect(_particles, _velocity, dt);
-	_boundaryHelper->enforce(_particles, _particleVelocities);
+	_advector->advect(_particles.positions, _velocity, dt);
+	_boundaryHelper->enforce(_particles.positions, _particleVelocities);
 }
 
 template <int Dim>

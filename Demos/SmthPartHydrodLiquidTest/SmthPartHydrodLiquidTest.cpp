@@ -18,6 +18,7 @@ inline std::unique_ptr<ArgsParser> BuildArgsParser()
 	parser->addArgument<uint>("rate", 'r', "the frame rate (frames per second)", 50);
 	parser->addArgument<real>("cfl", 'c', "the CFL number", real(.4));
 	parser->addArgument<int>("scale", 's', "the scale of grid", -1);
+	parser->addArgument<bool>("pci", 'p', "enable prediction-correction", false);
 	return parser;
 }
 
@@ -38,12 +39,13 @@ int main(int argc, char *argv[])
 	const auto rate = std::any_cast<uint>(parser->getValueByName("rate"));
 	const auto cfl = std::any_cast<real>(parser->getValueByName("cfl"));
 	const auto scale = std::any_cast<int>(parser->getValueByName("scale"));
+	const auto pci = std::any_cast<bool>(parser->getValueByName("pci"));
 
 	std::unique_ptr<Simulation> liquid;
 	if (dim == 2)
-		liquid = SmthPartHydrodLiquidBuilder::build<2>(scale, test);
+		liquid = SmthPartHydrodLiquidBuilder::build<2>(scale, test, pci);
 	else if (dim == 3)
-		liquid = SmthPartHydrodLiquidBuilder::build<3>(scale, test);
+		liquid = SmthPartHydrodLiquidBuilder::build<3>(scale, test, pci);
 	else {
 		std::cerr << "Error: [main] encountered invalid dimension." << std::endl;
 		std::exit(-1);

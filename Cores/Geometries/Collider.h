@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Geometries/Surface.h"
-#include "Structures/ParticlesBasedData.h"
+#include "Structures/ParticlesAttribute.h"
 
 #include <memory>
 
@@ -35,7 +35,7 @@ public:
 	real restitutionCoefficient() const { return _restitutionCoefficient; }
 	real frictionCoefficient() const { return _frictionCoefficient; }
 
-	void collide(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities, const real radius = 0);
+	void collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius = 0);
 	void collide(VectorDr &pos, VectorDr &vel, const real radius);
 };
 

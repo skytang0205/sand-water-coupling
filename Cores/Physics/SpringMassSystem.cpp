@@ -195,7 +195,7 @@ void SpringMassSystem<Dim>::moveParticles(const real dt)
 
 	// Resolve collisions.
 	for (const auto &collider : _colliders) {
-		collider->collide(_particles, _velocities);
+		collider->collide(_particles.positions, _velocities);
 	}
 }
 

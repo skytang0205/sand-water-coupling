@@ -29,7 +29,7 @@ void HashGridSearcher<Dim>::forEach(const ParticlesVectorAttribute<Dim> &positio
 	for (int i = 0; i < keysCnt; i++) {
 		if (i && hashKeys[i] == hashKeys[size_t(i) - 1]) continue;
 		for (const int j : _buckets[hashKeys[i]]) {
-			if ((positions[j] - pos).squaredNorm() < _squaredRadius) func(j, positions[j]);
+			if ((positions[j] - pos).squaredNorm() < _squaredKernelRadius) func(j, positions[j]);
 		}
 	}
 }

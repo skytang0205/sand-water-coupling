@@ -11,7 +11,7 @@ class StaggeredGrid final
 
 protected:
 
-	static constexpr int _kBoundaryWidth = 2;
+	const int _boundaryWidth;
 
 	const real _spacing;
 	const real _invSpacing;
@@ -24,7 +24,7 @@ protected:
 
 public:
 
-	StaggeredGrid(const real spacing, const VectorDi &resolution, const VectorDr &center = VectorDr::Zero());
+	StaggeredGrid(const int boundaryWidth, const real spacing, const VectorDi &resolution, const VectorDr &center = VectorDr::Zero());
 
 	StaggeredGrid &operator=(const StaggeredGrid &rhs) = delete;
 	virtual ~StaggeredGrid() = default;
@@ -34,8 +34,8 @@ public:
 	VectorDi resolution() const { return _resolution; }
 	VectorDr origin() const { return _origin; }
 
-	VectorDr domainOrigin() const { return _origin + VectorDr::Ones() * _kBoundaryWidth * _spacing; }
-	VectorDr domainLengths() const { return (_resolution - VectorDi::Ones() * _kBoundaryWidth * 2).template cast<real>() * _spacing; }
+	VectorDr domainOrigin() const { return _origin + VectorDr::Ones() * _boundaryWidth * _spacing; }
+	VectorDr domainLengths() const { return (_resolution - VectorDi::Ones() * _boundaryWidth * 2).template cast<real>() * _spacing; }
 
 	const Grid<Dim> *nodeGrid() const { return &_nodeGrid; }
 	const Grid<Dim> *cellGrid() const { return &_cellGrid; }
@@ -53,8 +53,8 @@ public:
 	VectorDr cellCenter(const VectorDi &cell) const { return _cellGrid.dataPosition(cell); }
 	VectorDr faceCenter(const int axis, const VectorDi &face) const { return _faceGrids[axis].dataPosition(face); }
 
-	bool isInsideFace(const int axis, const VectorDi &face) const { return _faceGrids[axis].isInside(face, _kBoundaryWidth); }
-	bool isBoundaryFace(const int axis, const VectorDi &face) const { return face[axis] <= _kBoundaryWidth || face[axis] >= _resolution[axis] - _kBoundaryWidth || !isInsideFace(axis, face); }
+	bool isInsideFace(const int axis, const VectorDi &face) const { return _faceGrids[axis].isInside(face, _boundaryWidth); }
+	bool isBoundaryFace(const int axis, const VectorDi &face) const { return face[axis] <= _boundaryWidth || face[axis] >= _resolution[axis] - _boundaryWidth || !isInsideFace(axis, face); }
 
 	void forEachNode(const std::function<void(const VectorDi &)> &func) const { _nodeGrid.forEach(func); }
 	void forEachCell(const std::function<void(const VectorDi &)> &func) const { _cellGrid.forEach(func); }

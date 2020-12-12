@@ -93,7 +93,7 @@ void SmthParticleHydrodLiquid<Dim>::moveParticles(const real dt)
 
 	// Resolve collisions.
 	for (const auto &collider : _colliders) {
-		collider->collide(_particles, _velocities, _particleSpacing / 2);
+		collider->collide(_particles.positions, _velocities, _particles.radius());
 	}
 
 	_particles.resetNearbySearcher();

@@ -61,10 +61,10 @@ void EulerianBoundaryHelper<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fl
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::enforce(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &particleVelocities) const
+void EulerianBoundaryHelper<Dim>::enforce(ParticlesVectorAttribute<Dim> &particlePositions, ParticlesVectorAttribute<Dim> &particleVelocities) const
 {
-	particles.parallelForEach([&](const int i) {
-		VectorDr &pos = particles.positions[i];
+	particlePositions.parallelForEach([&](const int i) {
+		VectorDr &pos = particlePositions[i];
 		VectorDr &vel = particleVelocities[i];
 		if (!_domainBox.isInside(pos) || _surface.isInside(pos)) {
 			const VectorDr n = _normal(pos).normalized();

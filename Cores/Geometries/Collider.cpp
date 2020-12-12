@@ -3,10 +3,10 @@
 namespace PhysX {
 
 template <int Dim>
-void Collider<Dim>::collide(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities, const real radius)
+void Collider<Dim>::collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius)
 {
-	particles.parallelForEach([&](const int i) {
-		collide(particles.positions[i], velocities[i], radius);
+	positions.parallelForEach([&](const int i) {
+		collide(positions[i], velocities[i], radius);
 	});
 }
 

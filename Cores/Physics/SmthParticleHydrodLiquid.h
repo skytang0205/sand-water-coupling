@@ -18,8 +18,6 @@ public:
 
 protected:
 
-	const real _particleSpacing;
-
 	SmoothedParticles<Dim> _particles;
 	ParticlesBasedVectorField<Dim> _velocities;
 	ParticlesBasedScalarField<Dim> _pressures;
@@ -36,10 +34,7 @@ protected:
 
 public:
 
-	SmthParticleHydrodLiquid(const real particleMass, const real particleSpacing) :
-		_particleSpacing(particleSpacing),
-		_particles(particleMass, _particleSpacing * 2)
-	{ }
+	SmthParticleHydrodLiquid(const real particleRadius) : _particles(particleRadius) { }
 
 	SmthParticleHydrodLiquid(const SmthParticleHydrodLiquid &rhs) = delete;
 	SmthParticleHydrodLiquid &operator=(const SmthParticleHydrodLiquid &rhs) = delete;
@@ -58,12 +53,12 @@ public:
 
 protected:
 
-	void reinitializeParticlesBasedData();
-	void moveParticles(const real dt);
-	void applyExternalForces(const real dt);
-	void applyViscosityForce(const real dt);
-	void applyPressureForce(const real dt);
-	void applyPseudoViscosity(const real dt);
+	virtual void reinitializeParticlesBasedData();
+	virtual void moveParticles(const real dt);
+	virtual void applyExternalForces(const real dt);
+	virtual void applyViscosityForce(const real dt);
+	virtual void applyPressureForce(const real dt);
+	virtual void applyPseudoViscosity(const real dt);
 };
 
 }

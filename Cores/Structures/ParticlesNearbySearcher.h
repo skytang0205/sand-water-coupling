@@ -14,12 +14,12 @@ class ParticlesNearbySearcher
 
 protected:
 
-	const real _radius;
-	const real _squaredRadius;
+	const real _kernelRadius;
+	const real _squaredKernelRadius;
 
 public:
 
-	ParticlesNearbySearcher(const real radius) : _radius(radius), _squaredRadius(_radius * _radius) { }
+	ParticlesNearbySearcher(const real kernelRadius) : _kernelRadius(kernelRadius), _squaredKernelRadius(_kernelRadius * _kernelRadius) { }
 
 	ParticlesNearbySearcher(const ParticlesNearbySearcher &rhs) = delete;
 	ParticlesNearbySearcher &operator=(const ParticlesNearbySearcher &rhs) = delete;
@@ -30,7 +30,7 @@ public:
 	virtual void forEach(const ParticlesVectorAttribute<Dim> &positions, const VectorDr &pos, const std::function<void(const int, const VectorDr &)> &func)
 	{
 		for (int j = 0; j < positions.size(); j++)
-			if ((positions[j] - pos).squaredNorm() < _squaredRadius) func(j, positions[j]);
+			if ((positions[j] - pos).squaredNorm() < _squaredKernelRadius) func(j, positions[j]);
 	}
 };
 
@@ -41,8 +41,8 @@ class HashGridSearcher : public ParticlesNearbySearcher<Dim>
 
 protected:
 
-	using ParticlesNearbySearcher<Dim>::_radius;
-	using ParticlesNearbySearcher<Dim>::_squaredRadius;
+	using ParticlesNearbySearcher<Dim>::_kernelRadius;
+	using ParticlesNearbySearcher<Dim>::_squaredKernelRadius;
 
 	static constexpr int _kPrime0 = 73856093;
 	static constexpr int _kPrime1 = 19349663;
@@ -54,7 +54,7 @@ protected:
 
 public:
 
-	HashGridSearcher(const real radius) : ParticlesNearbySearcher<Dim>(radius), _grid(_radius, VectorDi::Zero(), VectorDr::Zero()) { }
+	HashGridSearcher(const real kernelRadius) : ParticlesNearbySearcher<Dim>(kernelRadius), _grid(_kernelRadius, VectorDi::Zero(), VectorDr::Zero()) { }
 
 	HashGridSearcher(const HashGridSearcher &rhs) = delete;
 	HashGridSearcher &operator=(const HashGridSearcher &rhs) = delete;
