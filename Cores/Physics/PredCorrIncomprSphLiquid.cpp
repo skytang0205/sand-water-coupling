@@ -41,6 +41,7 @@ void PredCorrIncomprSphLiquid<Dim>::applyPressureForce(const real dt)
 			real pressure = delta * densityError;
 			if (pressure < 0) pressure = 0, densityError = 0;
 
+			_particles.densities[i] = density;
 			_pressures[i] += pressure;
 			_densityErrors[i] = densityError;
 		});
@@ -59,7 +60,18 @@ void PredCorrIncomprSphLiquid<Dim>::applyPressureForce(const real dt)
 template <int Dim>
 real PredCorrIncomprSphLiquid<Dim>::computeDelta(const real dt) const
 {
-	return 0;
+	const auto square = [](const real x)->real { return x * x; };
+	real delta = square(_targetDensity / dt / _particles.mass()) / 2;
+	if constexpr (Dim == 2) {
+		delta /= square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2)) * 6
+			+ square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 6;
+	}
+	else {
+		delta /= square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2)) * 12
+			+ square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2 * std::numbers::sqrt2)) * 6
+			+ square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 24;
+	}
+	return delta;
 }
 
 template class PredCorrIncomprSphLiquid<2>;

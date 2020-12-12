@@ -17,8 +17,8 @@ protected:
 	using SmthParticleHydrodLiquid<Dim>::_colliders;
 	using SmthParticleHydrodLiquid<Dim>::_targetDensity;
 
-	static constexpr real _kPredCorrErrorRatio = real(.01);
 	static constexpr int _kPredCorrMaxIters = 5;
+	static constexpr real _kPredCorrErrorRatio = real(.01);
 
 	ParticlesBasedVectorData<Dim> _predPositions;
 	ParticlesBasedVectorField<Dim> _predVelocities;

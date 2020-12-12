@@ -45,7 +45,7 @@ public:
 	EulerianFluid &operator=(const EulerianFluid &rhs) = delete;
 	virtual ~EulerianFluid() = default;
 
-	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return std::min(real(1) / frameRate, stepRate * _grid.spacing() / _velocity.absoluteMax()); }
+	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return stepRate * _grid.spacing() / _velocity.absoluteMax(); }
 
 	virtual int dimension() const override { return Dim; }
 	virtual void writeDescription(YAML::Node &root) const override;

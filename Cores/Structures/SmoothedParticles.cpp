@@ -45,17 +45,17 @@ real SmoothedParticles<Dim>::getPackedStdKernelSum() const
 	if constexpr (Dim == 2)
 		return stdKernel(0) + stdKernel(_radius * 2) * 6 + stdKernel(_radius * 2 * std::numbers::sqrt3) * 6;
 	else
-		return 0;
+		return stdKernel(0) + stdKernel(_radius * 2) * 12 + stdKernel(_radius * 2 * std::numbers::sqrt2) * 6 + stdKernel(_radius * 2 * std::numbers::sqrt3) * 24;
 }
 
 template <int Dim>
 void SmoothedParticles<Dim>::generateBoxPacked(const VectorDr &center, const VectorDr &halfLengths)
 {
-	const real spacing = _radius * 2;
 	if constexpr (Dim == 2) {
+		const real spacing = _radius * 2;
 		const int xScale = int(std::round(halfLengths[0] * 2 / spacing));
 		const int yScale = int(std::round((halfLengths[1] * 2 / spacing - 1) * 2 * real(std::numbers::inv_sqrt3) + 1));
-		const VectorDr origin = -VectorDr(xScale - 1, (yScale - real(1)) * real(std::numbers::sqrt3) / 2) * spacing / 2;
+		const VectorDr origin = center - VectorDr(xScale - 1, (yScale - real(1)) * real(std::numbers::sqrt3) / 2) * spacing / 2;
 		for (int j = 0; j < yScale; j++) {
 			const VectorDr yOrigin = origin + VectorDr(j & 1 ? real(.5) : real(0), j * real(std::numbers::sqrt3) / 2) * spacing;
 			for (int i = 0; i < xScale - (j & 1); i++)
@@ -63,6 +63,15 @@ void SmoothedParticles<Dim>::generateBoxPacked(const VectorDr &center, const Vec
 		}
 	}
 	else {
+		const real spacing = 2 * real(std::numbers::sqrt2) * _radius;
+		const VectorDi resolution = ((halfLengths - VectorDr::Ones() * _radius) * 2 / spacing).array().round().template cast<int>().matrix();
+		StaggeredGrid<Dim> grid(0, spacing, resolution, center);
+		grid.forEachFace([&](const int axis, const VectorDi &face) {
+			positions._data.push_back(grid.faceCenter(axis, face));
+		});
+		grid.forEachNode([&](const VectorDi &node) {
+			positions._data.push_back(grid.nodeCenter(node));
+		});
 	}
 }
 

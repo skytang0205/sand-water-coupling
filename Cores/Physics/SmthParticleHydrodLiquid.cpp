@@ -75,7 +75,6 @@ void SmthParticleHydrodLiquid<Dim>::advance(const real dt)
 	applyViscosityForce(dt);
 	applyPressureForce(dt);
 
-	applyPseudoViscosity(dt);
 }
 
 template <int Dim>
@@ -126,38 +125,14 @@ template <int Dim>
 void SmthParticleHydrodLiquid<Dim>::applyPressureForce(const real dt)
 {
 	// Compute pressures by the equation of state.
-	const real eosScale = _targetDensity * _speedOfSound * _speedOfSound / _eosExponent;
 	_particles.parallelForEach([&](const int i) {
-		_pressures[i] = eosScale * (std::pow(_particles.densities[i] / _targetDensity, _eosExponent) - 1);
+		_pressures[i] = _eosMultiplier * (_particles.densities[i] - _targetDensity);
 		if (_pressures[i] < 0) _pressures[i] = 0;
 	});
 
 	// Apply pressure gradient.
 	_particles.parallelForEach([&](const int i) {
 		_velocities[i] -= _pressures.gradientAtDataPoint(i) / _particles.densities[i] * dt;
-	});
-}
-
-template <int Dim>
-void SmthParticleHydrodLiquid<Dim>::applyPseudoViscosity(const real dt)
-{
-	auto smoothedVelocities = _velocities;
-	_particles.parallelForEach([&](const int i) {
-		const VectorDr pos = _particles.positions[i];
-		real weightSum = 0;
-		VectorDr smoothedVelocity = VectorDr::Zero();
-		_particles.forEachNearby(pos, [&](const int j, const VectorDr &nearbyPos) {
-			const real weight = _particles.stdKernel(nearbyPos - pos) / _particles.densities[j];
-			weightSum += weight;
-			smoothedVelocity += weight * _velocities[j];
-		});
-		if (weightSum > 0) smoothedVelocity /= weightSum;
-		smoothedVelocities[i] = smoothedVelocity;
-	});
-
-	const real factor = std::clamp(dt * _pseudoViscosityCoeff, real(0), real(1));
-	_particles.parallelForEach([&](const int i) {
-		_velocities[i] = (1 - factor) * _velocities[i] + factor * smoothedVelocities[i];
 	});
 }
 

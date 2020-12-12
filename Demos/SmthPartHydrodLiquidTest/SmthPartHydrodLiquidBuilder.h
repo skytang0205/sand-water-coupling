@@ -42,8 +42,6 @@ protected:
 		liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
 		liquid->_particles.setMass(density / liquid->_particles.getPackedStdKernelSum());
 		liquid->_targetDensity = density;
-		liquid->_eosExponent = 1;
-		liquid->_speedOfSound = 5;
 
 		liquid->_velocities.resize(&liquid->_particles);
 

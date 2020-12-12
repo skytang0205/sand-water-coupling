@@ -98,8 +98,6 @@ public:
 
 	void generateBoxPacked(const VectorDr &center, const VectorDr &halfLengths);
 
-protected:
-
 	real firstDerivativeStdKernel(const real distance) const
 	{
 		if (const real x = 1 - distance * distance * _invSquaredKernelRadius; x > 0)
