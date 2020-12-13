@@ -54,7 +54,6 @@ void PredCorrIncomprSphLiquid<Dim>::applyPressureForce(const real dt)
 			real pressure = delta * densityError;
 			if (pressure < 0) pressure = 0, densityError = 0;
 
-			_particles.densities[i] = density;
 			_pressures[i] += pressure;
 			_densityErrors[i] = densityError;
 		});
