@@ -16,9 +16,7 @@ template <int Dim>
 void PredCorrIncomprSphLiquid<Dim>::reinitializeParticlesBasedData()
 {
 	SmthParticleHydrodLiquid<Dim>::reinitializeParticlesBasedData();
-	_predPositions.resize(&_particles);
-	_predVelocities.resize(&_particles);
-	_densityErrors.resize(&_particles);
+	_predDensities.resize(&_particles);
 
 	_particles.resetNearbySearcher();
 	_particles.computeDensities();
@@ -28,46 +26,24 @@ template <int Dim>
 void PredCorrIncomprSphLiquid<Dim>::applyPressureForce(const real dt)
 {
 	const real delta = computeDelta(dt);
-	_pressures.setZero();
-	_predVelocities = _velocities;
 
-	for (int iter = 0; iter < _kPredCorrMaxIters; iter++) {
-		// Predict positions.
+	do {
+		// Predict densities.
 		_particles.parallelForEach([&](const int i) {
-			_predPositions[i] = _particles.positions[i] + _predVelocities[i] * dt;
-		});
-
-		// Resolve collisions.
-		for (const auto &collider : _colliders) {
-			collider->collide(_predPositions, _predVelocities, _particles.radius());
-		}
-
-		// Compute pressure from density error.
-		_particles.parallelForEach([&](const int i) {
-			real density = 0;
-			_particles.forEachNearby(_particles.positions[i], [&](const int j, const VectorDr &nearbyPos) {
-				density += _particles.kernel(_predPositions[j] - _predPositions[i]);
+			const VectorDr pos = _particles.positions[i];
+			_predDensities[i] = _particles.densities[i];
+			_particles.forEachNearby(pos, [&](const int j, const VectorDr &nearbyPos) {
+				_predDensities[i] += (_velocities[i] - _velocities[j]).dot(_particles.gradientKernel(nearbyPos - pos)) * _particles.mass() * dt;
 			});
-			density *= _particles.mass();
-
-			real densityError = density - _targetDensity;
-			real pressure = delta * densityError;
-			if (pressure < 0) pressure = 0, densityError = 0;
-
-			_particles.densities[i] = density;
-			_pressures[i] += pressure;
-			_densityErrors[i] = densityError;
+			_pressures[i] = delta * (_predDensities[i] - _targetDensity);
+			if (_pressures[i] < 0) _predDensities[i] = 0, _pressures[i] = 0;
 		});
 
-		// Predict velocities.
+		// Correct velocities.
 		_particles.parallelForEach([&](const int i) {
-			_predVelocities[i] = _velocities[i] - _pressures.symmetricGradientAtDataPoint(i) / _particles.densities[i] * dt;
+			_velocities[i] -= _pressures.symmetricGradientAtDataPoint(i) / _particles.densities[i] * dt;
 		});
-
-		if (_densityErrors.absoluteMax() < _kPredCorrErrorRatio * _targetDensity) break;
-	}
-
-	_velocities = _predVelocities;
+	} while (_predDensities.absoluteMax() / _targetDensity - 1 >= _kPredCorrErrorRatio);
 }
 
 template <int Dim>
