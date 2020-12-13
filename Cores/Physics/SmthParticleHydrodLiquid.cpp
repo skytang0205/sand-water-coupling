@@ -74,7 +74,6 @@ void SmthParticleHydrodLiquid<Dim>::advance(const real dt)
 	applyExternalForces(dt);
 	applyViscosityForce(dt);
 	applyPressureForce(dt);
-
 }
 
 template <int Dim>
@@ -115,7 +114,7 @@ void SmthParticleHydrodLiquid<Dim>::applyViscosityForce(const real dt)
 	if (_viscosityCoeff) {
 		auto newVelocities = _velocities;
 		_particles.parallelForEach([&](const int i) {
-			newVelocities[i] += _viscosityCoeff * _velocities.laplacianAtDataPoint(i) * dt;
+			newVelocities[i] += _viscosityCoeff * _velocities.divFreeLaplacianAtDataPoint(i) * dt;
 		});
 		_velocities = newVelocities;
 	}
@@ -132,7 +131,7 @@ void SmthParticleHydrodLiquid<Dim>::applyPressureForce(const real dt)
 
 	// Apply pressure gradient.
 	_particles.parallelForEach([&](const int i) {
-		_velocities[i] -= _pressures.gradientAtDataPoint(i) / _particles.densities[i] * dt;
+		_velocities[i] -= _pressures.symmetricGradientAtDataPoint(i) / _particles.densities[i] * dt;
 	});
 }
 

@@ -32,7 +32,13 @@ public:
 	PredCorrIncomprSphLiquid &operator=(const PredCorrIncomprSphLiquid &rhs) = delete;
 	virtual ~PredCorrIncomprSphLiquid() = default;
 
+	virtual void advance(const real dt) override;
+
 protected:
+
+	using SmthParticleHydrodLiquid<Dim>::moveParticles;
+	using SmthParticleHydrodLiquid<Dim>::applyExternalForces;
+	using SmthParticleHydrodLiquid<Dim>::applyViscosityForce;
 
 	virtual void reinitializeParticlesBasedData() override;
 	virtual void applyPressureForce(const real dt) override;

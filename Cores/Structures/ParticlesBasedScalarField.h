@@ -31,7 +31,8 @@ public:
 	virtual VectorDr gradient(const VectorDr &pos) const override;
 	virtual real laplacian(const VectorDr &pos) const override;
 
-	VectorDr gradientAtDataPoint(const int idx) const;
+	VectorDr differenceGradientAtDataPoint(const int idx) const;
+	VectorDr symmetricGradientAtDataPoint(const int idx) const;
 	real laplacianAtDataPoint(const int idx) const;
 };
 

@@ -27,13 +27,9 @@ protected:
 	const real _invKernelRadius;
 	const real _invSquaredKernelRadius;
 
-	const real _stdKernelNormCoeff0;
-	const real _stdKernelNormCoeff1;
-	const real _stdKernelNormCoeff2;
-
-	const real _spikyKernelNormCoeff0;
-	const real _spikyKernelNormCoeff1;
-	const real _spikyKernelNormCoeff2;
+	const real _kernelNormCoeff0;
+	const real _kernelNormCoeff1;
+	const real _kernelNormCoeff2;
 
 	std::unique_ptr<ParticlesNearbySearcher<Dim>> _nearbySearcher;
 
@@ -53,78 +49,59 @@ public:
 
 	void computeDensities();
 
-	// Interpolation helper functions.
+	// Interpolation helper functions, using the cubic spline kernel
 
-	real stdKernel(const real distance) const
+	real kernel(const real distance) const
 	{
-		if (const real x = 1 - distance * distance * _invSquaredKernelRadius; x > 0)
-			return _stdKernelNormCoeff0 * x * x * x;
+		const real x = distance * _invKernelRadius;
+		if (x < real(.5)) return _kernelNormCoeff0 * (6 * x * x * (x - 1) + 1);
+		else if (x < 1) return _kernelNormCoeff0 * 2 * (1 - x) * (1 - x) * (1 - x);
 		else return 0;
 	}
 
-	real laplacianStdKernel(const real distance) const
+	real firstDerivativeKernel(const real distance) const
 	{
-		if (const real x = 1 - distance * distance * _invSquaredKernelRadius; x > 0)
-			return _stdKernelNormCoeff2 * x * ((Dim + real(4)) * x - 4);
+		const real x = distance * _invKernelRadius;
+		if (x < real(.5)) return _kernelNormCoeff1 * x * (3 * x - 2);
+		else if (x < 1) return _kernelNormCoeff1 * (1 - x) * (x - 1);
 		else return 0;
 	}
 
-	real stdKernel(const VectorDr &deltaPos) const { return stdKernel(deltaPos.norm()); }
-	VectorDr gradientStdKernel(const VectorDr &deltaPos) const { return -firstDerivativeStdKernel(deltaPos.norm()) * deltaPos.normalized(); }
-	real laplacianStdKernel(const VectorDr &deltaPos) const { return laplacianStdKernel(deltaPos.norm()); }
-	real getPackedStdKernelSum() const;
-
-	real spikyKernel(const real distance) const
+	real secondDerivativeKernel(const real distance) const
 	{
-		if (const real x = 1 - distance * _invKernelRadius; x > 0)
-			return _spikyKernelNormCoeff0 * x * x * x;
+		const real x = distance * _invKernelRadius;
+		if (x < real(.5)) return _kernelNormCoeff2 * (3 * x - 1);
+		else if (x < 1) return _kernelNormCoeff2 * (1 - x);
 		else return 0;
 	}
 
-	real spikyKernel(const VectorDr &deltaPos) const { return spikyKernel(deltaPos.norm()); }
-	VectorDr gradientSpikyKernel(const VectorDr &deltaPos) const { return -firstDerivativeSpikyKernel(deltaPos.norm()) * deltaPos.normalized(); }
-
-	real laplacianSpikyKernel(const VectorDr &deltaPos) const
+	real laplacianKernel(const real distance) const
 	{
-		// This calculation is approximate.
-		const real distance = deltaPos.norm();
-		return secondDerivativeSpikyKernel(distance);
-		// Another term is: firstDerivativeSpikyKernel(distance) * (Dim - real(1)) / distance,
-		// which will cause instability.
+		const real x = distance * _invKernelRadius;
+		if (x < real(.5)) return _kernelNormCoeff2 * ((3 * x - 1) + (Dim - real(1)) / 2 * (3 * x - 2));
+		else if (x < 1) return _kernelNormCoeff2 * ((1 - x) + (Dim - real(1)) / 2 / x * (1 - x) * (x - 1));
+		else return 0;
 	}
+
+	real improvedLaplacianKernel(const real distance) const
+	{
+		const real x = distance * _invKernelRadius;
+		if (x < real(.5)) return _kernelNormCoeff2 * (2 - 3 * x);
+		else if (x < 1) return _kernelNormCoeff2 * (1 - x) * (1 - x) / x;
+		else return 0;
+	}
+
+	real kernel(const VectorDr &deltaPos) const { return kernel(deltaPos.norm()); }
+	VectorDr gradientKernel(const VectorDr &deltaPos) const { return -firstDerivativeKernel(deltaPos.norm()) * deltaPos.normalized(); }
+	real laplacianKernel(const VectorDr &deltaPos) const { return laplacianKernel(deltaPos.norm()); }
+	real improvedLaplacianKernel(const VectorDr &deltaPos) const { return improvedLaplacianKernel(deltaPos.norm()); }
+
+	real getPackedKernelSum() const;
 
 	void resetNearbySearcher() { _nearbySearcher->reset(positions); }
 	void forEachNearby(const VectorDr &pos, const std::function<void(const int, const VectorDr &)> &func) const { _nearbySearcher->forEach(positions, pos, func); }
 
 	void generateBoxPacked(const VectorDr &center, const VectorDr &halfLengths);
-
-	real firstDerivativeStdKernel(const real distance) const
-	{
-		if (const real x = 1 - distance * distance * _invSquaredKernelRadius; x > 0)
-			return _stdKernelNormCoeff1 * x * x * distance;
-		else return 0;
-	}
-
-	real secondDerivativeStdKernel(const real distance) const
-	{
-		if (const real x = 1 - distance * distance * _invSquaredKernelRadius; x > 0)
-			return _stdKernelNormCoeff2 * x * (5 * x - 4);
-		else return 0;
-	}
-
-	real firstDerivativeSpikyKernel(const real distance) const
-	{
-		if (const real x = 1 - distance * _invKernelRadius; x > 0)
-			return _spikyKernelNormCoeff1 * x * x;
-		else return 0;
-	}
-
-	real secondDerivativeSpikyKernel(const real distance) const
-	{
-		if (const real x = 1 - distance * _invKernelRadius; x > 0)
-			return _spikyKernelNormCoeff2 * x;
-		else return 0;
-	}
 };
 
 }

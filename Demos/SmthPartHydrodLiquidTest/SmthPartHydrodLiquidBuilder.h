@@ -40,7 +40,7 @@ protected:
 		const real radius = length / 2 / scale / 2;
 		auto liquid = makeLiquid<Dim>(radius, pci);
 		liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
-		liquid->_particles.setMass(density / liquid->_particles.getPackedStdKernelSum());
+		liquid->_particles.setMass(density / liquid->_particles.getPackedKernelSum());
 		liquid->_targetDensity = density;
 
 		liquid->_velocities.resize(&liquid->_particles);

@@ -16,12 +16,9 @@ SmoothedParticles<Dim>::SmoothedParticles(const real radius, const size_t cnt, c
 	_squaredKernelRadius(_kernelRadius *_kernelRadius),
 	_invKernelRadius(1 / _kernelRadius),
 	_invSquaredKernelRadius(1 / _squaredKernelRadius),
-	_stdKernelNormCoeff0((Dim == 2 ? real(4) : 315 * _invKernelRadius / 64) * real(std::numbers::inv_pi) * _invSquaredKernelRadius),
-	_stdKernelNormCoeff1(-6 * _invSquaredKernelRadius * _stdKernelNormCoeff0),
-	_stdKernelNormCoeff2(_stdKernelNormCoeff1),
-	_spikyKernelNormCoeff0((Dim == 2 ? real(10) : 15 * _invKernelRadius) * real(std::numbers::inv_pi) *_invSquaredKernelRadius),
-	_spikyKernelNormCoeff1(-3 * _invKernelRadius * _spikyKernelNormCoeff0),
-	_spikyKernelNormCoeff2(-2 * _invKernelRadius * _spikyKernelNormCoeff1),
+	_kernelNormCoeff0(real(std::numbers::inv_pi) * _invSquaredKernelRadius * (Dim == 2 ? real(40) / 7 : 8 * _invKernelRadius)),
+	_kernelNormCoeff1(6 * _invKernelRadius * _kernelNormCoeff0),
+	_kernelNormCoeff2(2 * _invKernelRadius * _kernelNormCoeff1),
 	_nearbySearcher(std::make_unique<HashGridSearcher<Dim>>(_kernelRadius))
 { }
 
@@ -33,19 +30,19 @@ void SmoothedParticles<Dim>::computeDensities()
 		const VectorDr pos = positions[idx];
 		densities[idx] = 0;
 		forEachNearby(pos, [&](const int j, const VectorDr &nearbyPos) {
-			densities[idx] += stdKernel(nearbyPos - pos);
+			densities[idx] += kernel(nearbyPos - pos);
 		});
 		densities[idx] *= _mass;
 	});
 }
 
 template <int Dim>
-real SmoothedParticles<Dim>::getPackedStdKernelSum() const
+real SmoothedParticles<Dim>::getPackedKernelSum() const
 {
 	if constexpr (Dim == 2)
-		return stdKernel(0) + stdKernel(_radius * 2) * 6 + stdKernel(_radius * 2 * std::numbers::sqrt3) * 6;
+		return kernel(0) + kernel(_radius * 2) * 6 + kernel(_radius * 2 * std::numbers::sqrt3) * 6;
 	else
-		return stdKernel(0) + stdKernel(_radius * 2) * 12 + stdKernel(_radius * 2 * std::numbers::sqrt2) * 6 + stdKernel(_radius * 2 * std::numbers::sqrt3) * 24;
+		return kernel(0) + kernel(_radius * 2) * 12 + kernel(_radius * 2 * std::numbers::sqrt2) * 6 + kernel(_radius * 2 * std::numbers::sqrt3) * 24;
 }
 
 template <int Dim>

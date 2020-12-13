@@ -30,7 +30,10 @@ public:
 	virtual VectorDr operator()(const VectorDr & pos) const override;
 	virtual real divergence(const VectorDr & pos) const override;
 
+	real differenceDivergenceAtDataPoint(const int idx) const;
+	real symmetricDivergenceAtDataPoint(const int idx) const;
 	VectorDr laplacianAtDataPoint(const int idx) const;
+	VectorDr divFreeLaplacianAtDataPoint(const int idx) const;
 };
 
 }

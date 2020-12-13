@@ -3,12 +3,25 @@
 namespace PhysX {
 
 template <int Dim>
+void PredCorrIncomprSphLiquid<Dim>::advance(const real dt)
+{
+	applyPressureForce(dt);
+	moveParticles(dt);
+
+	applyExternalForces(dt);
+	applyViscosityForce(dt);
+}
+
+template <int Dim>
 void PredCorrIncomprSphLiquid<Dim>::reinitializeParticlesBasedData()
 {
 	SmthParticleHydrodLiquid<Dim>::reinitializeParticlesBasedData();
 	_predPositions.resize(&_particles);
 	_predVelocities.resize(&_particles);
 	_densityErrors.resize(&_particles);
+
+	_particles.resetNearbySearcher();
+	_particles.computeDensities();
 }
 
 template <int Dim>
@@ -33,7 +46,7 @@ void PredCorrIncomprSphLiquid<Dim>::applyPressureForce(const real dt)
 		_particles.parallelForEach([&](const int i) {
 			real density = 0;
 			_particles.forEachNearby(_particles.positions[i], [&](const int j, const VectorDr &nearbyPos) {
-				density += _particles.stdKernel(_predPositions[j] - _predPositions[i]);
+				density += _particles.kernel(_predPositions[j] - _predPositions[i]);
 			});
 			density *= _particles.mass();
 
@@ -48,7 +61,7 @@ void PredCorrIncomprSphLiquid<Dim>::applyPressureForce(const real dt)
 
 		// Predict velocities.
 		_particles.parallelForEach([&](const int i) {
-			_predVelocities[i] = _velocities[i] - _pressures.gradientAtDataPoint(i) / _particles.densities[i] * dt;
+			_predVelocities[i] = _velocities[i] - _pressures.symmetricGradientAtDataPoint(i) / _particles.densities[i] * dt;
 		});
 
 		if (_densityErrors.absoluteMax() < _kPredCorrErrorRatio * _targetDensity) break;
@@ -63,13 +76,13 @@ real PredCorrIncomprSphLiquid<Dim>::computeDelta(const real dt) const
 	const auto square = [](const real x)->real { return x * x; };
 	real delta = square(_targetDensity / dt / _particles.mass()) / 2;
 	if constexpr (Dim == 2) {
-		delta /= square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2)) * 6
-			+ square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 6;
+		delta /= square(_particles.firstDerivativeKernel(_particles.radius() * 2)) * 6
+			+ square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 6;
 	}
 	else {
-		delta /= square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2)) * 12
-			+ square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2 * std::numbers::sqrt2)) * 6
-			+ square(_particles.firstDerivativeSpikyKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 24;
+		delta /= square(_particles.firstDerivativeKernel(_particles.radius() * 2)) * 12
+			+ square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt2)) * 6
+			+ square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 24;
 	}
 	return delta;
 }
