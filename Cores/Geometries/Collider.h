@@ -36,7 +36,7 @@ public:
 	real frictionCoefficient() const { return _frictionCoefficient; }
 
 	void collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius = 0);
-	void collide(VectorDr &pos, VectorDr &vel, const real radius);
+	void collide(VectorDr &pos, VectorDr &vel, const real radius = 0);
 };
 
 template <int Dim>

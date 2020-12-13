@@ -15,13 +15,20 @@ class MaterialPointSubstances : public Simulation
 
 public:
 
+	friend class MatPointSubstancesBuilder;
+
 	struct Substance
 	{
 		Particles<Dim> particles;
 		ParticlesBasedVectorData<Dim> velocities;
 		ParticlesBasedData<Dim, MatrixDr> velocityDerivatives;
 		ParticlesBasedData<Dim, MatrixDr> deformationGradients;
-		ParticlesBasedScalarData<Dim> volumeRatios;
+		ParticlesBasedScalarData<Dim> plasticJacobians;
+
+		real density;
+		real lameLambda;
+		real lameMu;
+		real hardeningCoeff;
 
 		Vector4f color;
 	};
@@ -29,10 +36,15 @@ public:
 protected:
 
 	std::vector<Substance> _substances;
+
+	const StaggeredGrid<Dim> _grid;
+
 	GridBasedVectorData<Dim> _velocity;
 	GridBasedScalarData<Dim> _mass;
 
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
+
+	bool _enableGravity = true;
 
 public:
 
@@ -54,9 +66,11 @@ public:
 protected:
 
 	virtual void advect(const real dt);
+	virtual void applyLagrangianForces(const real dt);
+	virtual void applyEulerianForces(const real dt);
 
-	virtual void transferFromGridToParticles();
-	virtual void transferFromParticlesToGrid();
+	virtual void transferFromGridToParticles(const real dt);
+	virtual void transferFromParticlesToGrid(const real dt);
 };
 
 }
