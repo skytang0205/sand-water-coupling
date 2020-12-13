@@ -18,6 +18,7 @@
     <ClInclude Include="EulerianProjector.h" />
     <ClInclude Include="FlImplicitParticleLiquid.h" />
     <ClInclude Include="LevelSetLiquid.h" />
+    <ClInclude Include="MaterialPointSubstances.h" />
     <ClInclude Include="ParticleInCellLiquid.h" />
     <ClInclude Include="PredCorrIncomprSphLiquid.h" />
     <ClInclude Include="Simulation.h" />
@@ -33,6 +34,7 @@
     <ClCompile Include="EulerianProjector.cpp" />
     <ClCompile Include="FlImplicitParticleLiquid.cpp" />
     <ClCompile Include="LevelSetLiquid.cpp" />
+    <ClCompile Include="MaterialPointSubstances.cpp" />
     <ClCompile Include="ParticleInCellLiquid.cpp" />
     <ClCompile Include="PredCorrIncomprSphLiquid.cpp" />
     <ClCompile Include="Simulator.cpp" />

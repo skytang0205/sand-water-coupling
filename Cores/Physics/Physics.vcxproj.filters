@@ -54,6 +54,9 @@
     <ClInclude Include="PredCorrIncomprSphLiquid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MaterialPointSubstances.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Simulator.cpp">
@@ -90,6 +93,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PredCorrIncomprSphLiquid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialPointSubstances.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
