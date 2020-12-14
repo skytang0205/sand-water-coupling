@@ -33,7 +33,7 @@ protected:
 	static std::unique_ptr<SmthParticleHydrodLiquid<Dim>> buildCase0(int scale, const bool pci)
 	{
 		DECLARE_DIM_TYPES(Dim)
-		if (scale < 0) scale = 15;
+		if (scale < 0) scale = 30;
 		const real length = real(2);
 
 		const real density = 1000;
@@ -48,8 +48,7 @@ protected:
 		liquid->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
 				std::make_unique<ComplementarySurface<Dim>>(
-					std::make_unique<ImplicitBox<Dim>>(-length / 2 * VectorDr::Ones(), length * VectorDr::Ones())),
-				0));
+					std::make_unique<ImplicitBox<Dim>>(-length / 2 * VectorDr::Ones(), length * VectorDr::Ones()))));
 		return liquid;
 	}
 

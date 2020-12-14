@@ -3,7 +3,7 @@
 namespace PhysX {
 
 template <int Dim>
-void Collider<Dim>::collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius)
+void Collider<Dim>::collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius) const
 {
 	positions.parallelForEach([&](const int i) {
 		collide(positions[i], velocities[i], radius);
@@ -11,11 +11,10 @@ void Collider<Dim>::collide(ParticlesVectorAttribute<Dim> &positions, ParticlesV
 }
 
 template<int Dim>
-void Collider<Dim>::collide(VectorDr &pos, VectorDr &vel, const real radius)
+void Collider<Dim>::collide(VectorDr &pos, VectorDr &vel, const real radius) const
 {
 	if (surface()->isInside(surface()->signedDistance(pos) - radius)) {
 		const VectorDr normal = surface()->closestNormal(pos);
-		pos = surface()->closestPosition(pos) + radius * normal; // geometric fix
 
 		const VectorDr colliderVel = velocityAt(pos);
 		const VectorDr relativeVel = vel - colliderVel;
@@ -34,6 +33,8 @@ void Collider<Dim>::collide(VectorDr &pos, VectorDr &vel, const real radius)
 			// Reassemble the components.
 			vel = relativeVelN + relativeVelT + colliderVel;
 		}
+
+		pos = surface()->closestPosition(pos) + radius * normal; // geometric fix
 	}
 }
 

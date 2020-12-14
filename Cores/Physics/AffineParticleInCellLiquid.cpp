@@ -41,9 +41,9 @@ void AffineParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridB
 }
 
 template <int Dim>
-void AffineParticleInCellLiquid<Dim>::reinitializeParticles()
+void AffineParticleInCellLiquid<Dim>::reinitializeParticlesBasedData()
 {
-	ParticleInCellLiquid<Dim>::reinitializeParticles();
+	ParticleInCellLiquid<Dim>::reinitializeParticlesBasedData();
 	for (int axis = 0; axis < Dim; axis++) {
 		_particleVelocityDerivatives[axis].resize(&_particles);
 		_particleVelocityDerivatives[axis].setZero();

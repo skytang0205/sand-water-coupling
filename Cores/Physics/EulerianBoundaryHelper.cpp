@@ -61,23 +61,15 @@ void EulerianBoundaryHelper<Dim>::enforce(StaggeredGridBasedVectorField<Dim> &fl
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::enforce(ParticlesVectorAttribute<Dim> &particlePositions, ParticlesVectorAttribute<Dim> &particleVelocities) const
+void EulerianBoundaryHelper<Dim>::enforce(ParticlesVectorAttribute<Dim> &particlePositions) const
 {
+	// Avoid to correct velocity in case of instability.
 	particlePositions.parallelForEach([&](const int i) {
 		VectorDr &pos = particlePositions[i];
-		VectorDr &vel = particleVelocities[i];
-		if (!_domainBox.isInside(pos) || _surface.isInside(pos)) {
-			const VectorDr n = _normal(pos).normalized();
-			if (n.any())
-				vel -= (vel - _velocity(pos)).dot(n) * n;
-			else
-				vel = _velocity(pos);
-
-			if (!_domainBox.isInside(pos))
-				pos = _domainBox.closestPosition(pos);
-			else
-				pos = _surface.closestPosition(pos);
-		}
+		if (!_domainBox.isInside(pos))
+			pos = _domainBox.closestPosition(pos);
+		else if (_surface.isInside(pos))
+			pos = _surface.closestPosition(pos);
 	});
 }
 
@@ -117,7 +109,7 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps) const
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const LevelSet<Dim> &liquidLevelSet, const int maxSteps) const
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {
@@ -150,7 +142,7 @@ void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim>
 }
 
 template <int Dim>
-void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, StaggeredGridBasedScalarData<Dim> &weightSum, const int maxSteps) const
+void EulerianBoundaryHelper<Dim>::extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const LevelSet<Dim> &liquidLevelSet, const StaggeredGridBasedScalarData<Dim> &weightSum, const int maxSteps) const
 {
 	const auto &liquidSdf = liquidLevelSet.signedDistanceField();
 	const auto isLiquidFace = [&](const int axis, const VectorDi &face)->bool {

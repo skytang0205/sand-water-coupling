@@ -19,7 +19,7 @@ protected:
 
 public:
 
-	Collider(const real restitutionCoefficient = 1, const real frictionCoefficient = 0) :
+	Collider(const real restitutionCoefficient = 0, const real frictionCoefficient = 0) :
 		_restitutionCoefficient(restitutionCoefficient),
 		_frictionCoefficient(frictionCoefficient)
 	{ }
@@ -35,8 +35,8 @@ public:
 	real restitutionCoefficient() const { return _restitutionCoefficient; }
 	real frictionCoefficient() const { return _frictionCoefficient; }
 
-	void collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius = 0);
-	void collide(VectorDr &pos, VectorDr &vel, const real radius = 0);
+	void collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius = 0) const;
+	void collide(VectorDr &pos, VectorDr &vel, const real radius = 0) const;
 };
 
 template <int Dim>
@@ -50,7 +50,7 @@ protected:
 
 public:
 
-	StaticCollider(std::unique_ptr<Surface<Dim>> surface, const real restitutionCoefficient = 1, const real frictionCoefficient = 0) :
+	StaticCollider(std::unique_ptr<Surface<Dim>> surface, const real restitutionCoefficient = 0, const real frictionCoefficient = 0) :
 		Collider<Dim>(restitutionCoefficient, frictionCoefficient),
 		_surface(std::move(surface))
 	{ }

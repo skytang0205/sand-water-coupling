@@ -74,6 +74,9 @@ void SpringMassSystem<Dim>::saveFrame(const std::string &frameDir) const
 	{ // Save particles.
 		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
 		_particles.positions.save(fout);
+	}
+	{ // Save velocities.
+		std::ofstream fout(frameDir + "/velocities.sav", std::ios::binary);
 		_velocities.save(fout);
 	}
 }
@@ -84,9 +87,12 @@ void SpringMassSystem<Dim>::loadFrame(const std::string &frameDir)
 	{ // Load particles.
 		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
 		_particles.positions.load(fin);
-		_velocities.load(fin);
 	}
 	reinitializeParticlesBasedData();
+	{ // Load velocities.
+		std::ifstream fin(frameDir + "/velocities.sav", std::ios::binary);
+		_velocities.load(fin);
+	}
 }
 
 template <int Dim>

@@ -6,6 +6,8 @@
 #include "Structures/ParticlesBasedData.h"
 #include "Structures/StaggeredGrid.h"
 
+#include <string>
+
 namespace PhysX {
 
 template <int Dim>
@@ -17,20 +19,51 @@ public:
 
 	friend class MatPointSubstancesBuilder;
 
-	struct Substance
+	class Substance
 	{
+	public:
+
 		Particles<Dim> particles;
 		ParticlesBasedVectorData<Dim> velocities;
 		ParticlesBasedData<Dim, MatrixDr> velocityDerivatives;
 		ParticlesBasedData<Dim, MatrixDr> deformationGradients;
 		ParticlesBasedScalarData<Dim> plasticJacobians;
 
-		real density;
-		real lameLambda;
-		real lameMu;
-		real hardeningCoeff;
+	protected:
 
-		Vector4f color;
+		const std::string _name;
+		const Vector4f _color;
+
+		const real _density;
+		const real _lameLambda;
+		const real _lameMu;
+
+		const real _plasticLowerBound;
+		const real _plasticUpperBound;
+		const real _hardeningCoeff;
+
+	public:
+
+		Substance(const std::string &name, const Vector4f &color, const real density, const real lambda, const real mu, const real thetaC = -1, const real thetaS = -1, const real hardeningCoeff = 0) :
+			_name(name),
+			_color(color),
+			_density(density),
+			_lameLambda(lambda),
+			_lameMu(mu),
+			_plasticLowerBound(1 - thetaC),
+			_plasticUpperBound(1 + thetaS),
+			_hardeningCoeff(hardeningCoeff)
+		{ }
+
+		virtual ~Substance() = default;
+
+		const std::string &name() const { return _name; }
+		const Vector4f &color() const { return _color; }
+		real density() const { return _density; }
+		bool plastic() const { return _plasticLowerBound <= _plasticUpperBound; }
+
+		MatrixDr computeCauchyStressTensor(const int idx);
+		void reinitialize();
 	};
 
 protected:
@@ -54,6 +87,8 @@ public:
 	MaterialPointSubstances &operator=(const MaterialPointSubstances &rhs) = delete;
 	virtual ~MaterialPointSubstances() = default;
 
+	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return stepRate * _grid.spacing() / _velocity.normMax(); }
+
 	virtual int dimension() const override { return Dim; }
 	virtual void writeDescription(YAML::Node &root) const override;
 	virtual void writeFrame(const std::string &frameDir, const bool staticDraw) const override;
@@ -65,12 +100,13 @@ public:
 
 protected:
 
-	virtual void advect(const real dt);
-	virtual void applyLagrangianForces(const real dt);
+	virtual void applyLagrangianForces(const real dt) { }
 	virtual void applyEulerianForces(const real dt);
 
 	virtual void transferFromGridToParticles(const real dt);
 	virtual void transferFromParticlesToGrid(const real dt);
+
+	void sampleParticlesInsideSurface(Substance &substance, const Surface<Dim> &surface, const int particlesCntPerSubcell);
 };
 
 }
