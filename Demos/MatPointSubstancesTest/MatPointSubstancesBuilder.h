@@ -37,6 +37,7 @@ protected:
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(3, length / scale, resolution);
 		auto substances = std::make_unique<MaterialPointSubstances<Dim>>(grid);
+//		substances->_enableGravity = false;
 
 		auto liquid = MaterialPointSubstances<Dim>::Substance("liquid", Vector4f(0, 0, 1, 1), 1000, 250, 0);
 		substances->sampleParticlesInsideSurface(liquid, ImplicitSphere<Dim>(VectorDr::Zero(), length / 3), nppsc);

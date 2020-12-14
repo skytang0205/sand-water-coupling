@@ -69,7 +69,9 @@ void MaterialPointSubstances<Dim>::Substance::reinitialize()
 
 template <int Dim>
 MaterialPointSubstances<Dim>::MaterialPointSubstances(const StaggeredGrid<Dim> &grid) :
-	_grid(grid)
+	_grid(grid),
+	_velocity(_grid.nodeGrid()),
+	_mass(_grid.nodeGrid())
 {
 	_colliders.push_back(
 		std::make_unique<StaticCollider<Dim>>(
@@ -91,6 +93,15 @@ void MaterialPointSubstances<Dim>::writeDescription(YAML::Node &root) const
 		node["indexed"] = false;
 		root["objects"].push_back(node);
 	}
+	if constexpr (Dim == 2) { // Description of velocity.
+		YAML::Node node;
+		node["name"] = "velocity";
+		node["data_mode"] = "dynamic";
+		node["primitive_type"] = "line_list";
+		node["indexed"] = false;
+		node["color_map"]["enabled"] = true;
+		root["objects"].push_back(node);
+	}
 }
 
 template <int Dim>
@@ -107,6 +118,21 @@ void MaterialPointSubstances<Dim>::writeFrame(const std::string &frameDir, const
 				IO::writeValue(fout, VectorDr::Unit(2).eval());
 			});
 		}
+	}
+	if constexpr (Dim == 2) { // Write velocity.
+		std::ofstream fout(frameDir + "/velocity.mesh", std::ios::binary);
+		IO::writeValue(fout, uint(2 * _grid.nodeCount()));
+		_grid.forEachNode([&](const VectorDi &node) {
+			const VectorDr pos = _grid.nodeCenter(node);
+			const VectorDr dir = _velocity[node].normalized() * _grid.spacing() * std::sqrt(real(Dim)) / 2;
+			IO::writeValue(fout, pos.template cast<float>().eval());
+			IO::writeValue(fout, (pos + dir).template cast<float>().eval());
+		});
+		_grid.forEachNode([&](const VectorDi &node) {
+			const float vel = float(_velocity[node].norm());
+			IO::writeValue(fout, vel);
+			IO::writeValue(fout, vel);
+		});
 	}
 }
 
@@ -198,7 +224,7 @@ void MaterialPointSubstances<Dim>::transferFromGridToParticles(const real dt)
 			// Transfer into velocities and velocity derivatives.
 			for (const auto [node, weight] : _velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
 				const VectorDr deltaPos = _velocity.position(node) - pos;
-				vel += weight * _velocity[node];
+				vel += _velocity[node] * weight;
 				velDrv += _velocity[node] * deltaPos.transpose() * 4 * _velocity.invSpacing() * weight;
 			}
 			// Advect particles.
@@ -216,7 +242,7 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 
 	for (auto &substance : _substances) {
 		const real mass = substance.particles.mass();
-		const real stressCoeff = dt * 4 * _velocity.invSpacing() * _velocity.invSpacing() * mass / substance.density();
+		const real stressCoeff = -dt * 4 * _velocity.invSpacing() * _velocity.invSpacing() * mass / substance.density();
 
 		substance.particles.forEach([&](const int i) {
 			const VectorDr pos = substance.particles.positions[i];
@@ -227,7 +253,7 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 			for (const auto [node, weight] : _velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
 				const VectorDr deltaPos = _velocity.position(node) - pos;
 				_velocity[node] += (vel * mass + (velDrv * mass + stress) * deltaPos) * weight;
-				_mass[node] += substance.particles.mass() * weight;
+				_mass[node] += mass * weight;
 			}
 		});
 	}

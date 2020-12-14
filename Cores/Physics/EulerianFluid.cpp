@@ -70,12 +70,6 @@ void EulerianFluid<Dim>::writeFrame(const std::string &frameDir, const bool stat
 			IO::writeValue(fout, pos.template cast<float>().eval());
 			IO::writeValue(fout, (pos + dir).template cast<float>().eval());
 		});
-		if constexpr (Dim == 3) {
-			_grid.forEachCell([&](const VectorDi &cell) {
-				IO::writeValue(fout, VectorDf::Unit(2).eval());
-				IO::writeValue(fout, VectorDf::Unit(2).eval());
-			});
-		}
 		_grid.forEachCell([&](const VectorDi &cell) {
 			const VectorDr pos = _grid.cellCenter(cell);
 			const float vel = float(_velocity(pos).norm());
