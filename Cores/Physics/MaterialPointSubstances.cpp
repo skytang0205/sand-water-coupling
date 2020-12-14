@@ -36,7 +36,6 @@ Matrix<Dim, real> MaterialPointSubstances<Dim>::Substance::computeStressTensor(i
 
 	if (plastic()) {
 		plasticJacobians[idx] /= jacobian;
-		plasticJacobians[idx] = std::clamp(plasticJacobians[idx], real(.6), real(20));
 		matF = svdU * svdS.asDiagonal() * svdV.transpose();
 	}
 
@@ -97,8 +96,8 @@ void MaterialPointSubstances<Dim>::writeDescription(YAML::Node &root) const
 		node["name"] = substance.name();
 		node["data_mode"] = "dynamic";
 		node["primitive_type"] = "point_list";
-		node["material"]["diffuse_albedo"] = substance.color();
 		node["indexed"] = false;
+		node["material"]["diffuse_albedo"] = substance.color();
 		root["objects"].push_back(node);
 	}
 }
@@ -129,7 +128,7 @@ void MaterialPointSubstances<Dim>::writeFrame(const std::string &frameDir, const
 		});
 		if constexpr (Dim == 3) {
 			substance.particles.forEach([&](const int i) {
-				IO::writeValue(fout, VectorDr::Unit(2).eval());
+				IO::writeValue(fout, VectorDf::Unit(2).eval());
 			});
 		}
 	}
@@ -138,13 +137,15 @@ void MaterialPointSubstances<Dim>::writeFrame(const std::string &frameDir, const
 template <int Dim>
 void MaterialPointSubstances<Dim>::saveFrame(const std::string &frameDir) const
 {
+	{ // Save velocity.
+		std::ofstream fout(frameDir + "/velocity.sav", std::ios::binary);
+		_velocity.save(fout);
+	}
 	// Save substances.
 	for (const auto &substance : _substances) {
 		std::ofstream fout(fmt::format("{}/{}.sav", frameDir, substance.name()), std::ios::binary);
 		IO::writeValue(fout, uint(substance.particles.size()));
 		substance.particles.positions.save(fout);
-		substance.velocities.save(fout);
-		substance.velocityDerivatives.save(fout);
 		substance.deformationGradients.save(fout);
 		if (substance.plastic())
 			substance.plasticJacobians.save(fout);
@@ -154,6 +155,10 @@ void MaterialPointSubstances<Dim>::saveFrame(const std::string &frameDir) const
 template <int Dim>
 void MaterialPointSubstances<Dim>::loadFrame(const std::string &frameDir)
 {
+	{ // Load velocity.
+		std::ifstream fin(frameDir + "/velocity.sav", std::ios::binary);
+		_velocity.load(fin);
+	}
 	// Load substances.
 	for (auto &substance : _substances) {
 		std::ifstream fin(fmt::format("{}/{}.sav", frameDir, substance.name()), std::ios::binary);
@@ -164,8 +169,6 @@ void MaterialPointSubstances<Dim>::loadFrame(const std::string &frameDir)
 
 		substance.reinitialize();
 
-		substance.velocities.load(fin);
-		substance.velocityDerivatives.load(fin);
 		substance.deformationGradients.load(fin);
 		if (substance.plastic())
 			substance.plasticJacobians.load(fin);
@@ -182,10 +185,10 @@ void MaterialPointSubstances<Dim>::initialize()
 template <int Dim>
 void MaterialPointSubstances<Dim>::advance(const real dt)
 {
+	transferFromGridToParticles(dt);
 	applyLagrangianForces(dt);
 	transferFromParticlesToGrid(dt);
 	applyEulerianForces(dt);
-	transferFromGridToParticles(dt);
 }
 
 template <int Dim>
@@ -208,6 +211,36 @@ void MaterialPointSubstances<Dim>::applyEulerianForces(const real dt)
 }
 
 template <int Dim>
+void MaterialPointSubstances<Dim>::transferFromGridToParticles(const real dt)
+{
+	const real gradCoeff = 4 * _velocity.invSpacing() * _velocity.invSpacing();
+	for (auto &substance : _substances) {
+		// Clear particle attributes.
+		substance.velocities.setZero();
+		substance.velocityDerivatives.setZero();
+
+		substance.particles.parallelForEach([&](const int i) {
+			VectorDr &pos = substance.particles.positions[i];
+			VectorDr &vel = substance.velocities[i];
+			MatrixDr &velDrv = substance.velocityDerivatives[i];
+			MatrixDr &defmGrad = substance.deformationGradients[i];
+			// Transfer into velocities and velocity derivatives.
+			for (const auto [node, weight] : _velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
+				const VectorDr deltaPos = _velocity.position(node) - pos;
+				vel += _velocity[node] * weight;
+				velDrv += _velocity[node] * deltaPos.transpose() * gradCoeff * weight;
+			}
+			// Advect particles.
+			pos += vel * dt;
+			defmGrad = (MatrixDr::Identity() + velDrv * dt) * defmGrad;
+			// Resolve collisions.
+			_domainBoundary.collide(pos);
+			for (const auto &collider : _colliders) collider->collide(pos);
+		});
+	}
+}
+
+template <int Dim>
 void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 {
 	_velocity.setZero();
@@ -221,8 +254,6 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 			const VectorDr pos = substance.particles.positions[i];
 			const VectorDr vel = substance.velocities[i];
 			const MatrixDr velDrv = substance.velocityDerivatives[i];
-			MatrixDr &defmGrad = substance.deformationGradients[i];
-			defmGrad = (MatrixDr::Identity() + velDrv * dt) * defmGrad;
 
 			const MatrixDr stress = substance.computeStressTensor(i) * stressCoeff;
 			// Transfer into velocity.
@@ -238,34 +269,6 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 		if (_mass[node])
 			_velocity[node] /= _mass[node];
 	});
-}
-
-template <int Dim>
-void MaterialPointSubstances<Dim>::transferFromGridToParticles(const real dt)
-{
-	const real gradCoeff = 4 * _velocity.invSpacing() * _velocity.invSpacing();
-	for (auto &substance : _substances) {
-		// Clear particle attributes.
-		substance.velocities.setZero();
-		substance.velocityDerivatives.setZero();
-
-		substance.particles.parallelForEach([&](const int i) {
-			VectorDr &pos = substance.particles.positions[i];
-			VectorDr &vel = substance.velocities[i];
-			MatrixDr &velDrv = substance.velocityDerivatives[i];
-			// Transfer into velocities and velocity derivatives.
-			for (const auto [node, weight] : _velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
-				const VectorDr deltaPos = _velocity.position(node) - pos;
-				vel += _velocity[node] * weight;
-				velDrv += _velocity[node] * deltaPos.transpose() * gradCoeff * weight;
-			}
-			// Advect particles.
-			pos += vel * dt;
-			// Resolve collisions.
-			_domainBoundary.collide(pos);
-			for (const auto &collider : _colliders) collider->collide(pos);
-		});
-	}
 }
 
 template <int Dim>

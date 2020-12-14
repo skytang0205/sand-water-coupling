@@ -88,7 +88,7 @@ public:
 	MaterialPointSubstances &operator=(const MaterialPointSubstances &rhs) = delete;
 	virtual ~MaterialPointSubstances() = default;
 
-	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return real(1) / frameRate / stepRate; }
+	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return stepRate * _grid.spacing() / _velocity.normMax(); }
 
 	virtual int dimension() const override { return Dim; }
 	virtual void writeDescription(YAML::Node &root) const override;
@@ -104,8 +104,8 @@ protected:
 	virtual void applyLagrangianForces(const real dt) { }
 	virtual void applyEulerianForces(const real dt);
 
-	virtual void transferFromParticlesToGrid(const real dt);
 	virtual void transferFromGridToParticles(const real dt);
+	virtual void transferFromParticlesToGrid(const real dt);
 
 	void sampleParticlesInsideSurface(Substance &substance, const Surface<Dim> &surface, const int particlesCntPerSubcell);
 };

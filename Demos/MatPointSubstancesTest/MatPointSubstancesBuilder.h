@@ -34,7 +34,7 @@ protected:
 	static std::unique_ptr<MaterialPointSubstances<Dim>> buildCase0(int scale, const int nppsc)
 	{
 		DECLARE_DIM_TYPES(Dim)
-		if (scale < 0) scale = 200;
+		if (scale < 0) scale = 64;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
 		StaggeredGrid<Dim> grid(3, length / scale, resolution);
@@ -51,7 +51,7 @@ protected:
 	static std::unique_ptr<MaterialPointSubstances<Dim>> buildCase1(int scale, const int nppsc)
 	{
 		DECLARE_DIM_TYPES(Dim)
-		if (scale < 0) scale = 10;
+		if (scale < 0) scale = 5;
 		const real length = real(1);
 		const VectorDi resolution = scale * (VectorDi::Ones() * 9 + VectorDi::Unit(0) * 7);
 		StaggeredGrid<Dim> grid(3, length / scale / 8, resolution);
