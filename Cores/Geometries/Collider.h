@@ -35,8 +35,15 @@ public:
 	real restitutionCoefficient() const { return _restitutionCoefficient; }
 	real frictionCoefficient() const { return _frictionCoefficient; }
 
+	void collide(ParticlesVectorAttribute<Dim> &positions, const real radius = 0) const;
 	void collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius = 0) const;
+	void collide(VectorDr &pos, const real radius = 0) const;
 	void collide(VectorDr &pos, VectorDr &vel, const real radius = 0) const;
+
+	void resolve(const VectorDr &pos, VectorDr &vel) const;
+	void resolve(const VectorDr &pos, const VectorDr &normal, VectorDr &vel) const;
+
+	bool detect(const VectorDr &pos, const real radius = 0) const { return Surface<Dim>::isInside(surface()->signedDistance(pos) - radius); }
 };
 
 template <int Dim>

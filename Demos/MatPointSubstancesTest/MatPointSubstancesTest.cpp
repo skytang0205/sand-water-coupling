@@ -16,7 +16,7 @@ inline std::unique_ptr<ArgsParser> BuildArgsParser()
 	parser->addArgument<uint>("begin", 'b', "the begin frame (including)", 0);
 	parser->addArgument<uint>("end", 'e', "the end frame (excluding)", 200);
 	parser->addArgument<uint>("rate", 'r', "the frame rate (frames per second)", 50);
-	parser->addArgument<real>("cfl", 'c', "the CFL number", 1);
+	parser->addArgument<real>("step", 'p', "the number of steps per frame", 20);
 	parser->addArgument<int>("scale", 's', "the scale of grid", -1);
 	parser->addArgument<int>("nppsc", 'n', "the number of particles per sub-cell", 1);
 	return parser;
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	const auto begin = std::any_cast<uint>(parser->getValueByName("begin"));
 	const auto end = std::any_cast<uint>(parser->getValueByName("end"));
 	const auto rate = std::any_cast<uint>(parser->getValueByName("rate"));
-	const auto cfl = std::any_cast<real>(parser->getValueByName("cfl"));
+	const auto step = std::any_cast<real>(parser->getValueByName("step"));
 	const auto scale = std::any_cast<int>(parser->getValueByName("scale"));
 	const auto nppsc = std::any_cast<int>(parser->getValueByName("nppsc"));
 
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 		std::cerr << "Error: [main] encountered invalid dimension." << std::endl;
 		std::exit(-1);
 	}
-	auto simulator = std::make_unique<Simulator>(output, begin, end, rate, cfl, substances.get());
+	auto simulator = std::make_unique<Simulator>(output, begin, end, rate, step, substances.get());
 	simulator->Simulate();
 
 	return 0;

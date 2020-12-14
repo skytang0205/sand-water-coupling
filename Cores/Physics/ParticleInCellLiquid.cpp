@@ -170,7 +170,7 @@ void ParticleInCellLiquid<Dim>::reinitializeParticles()
 		const VectorDr centerPos = liquidSdf.position(cell);
 		for (int i = 0; i < (1 << Dim) * _particlesCntPerSubCell; i++) {
 			const VectorDr pos = centerPos + VectorDr::Random() * dx / 2;
-			if (_levelSet.signedDistance(pos) <= -radius)
+			if (Surface<Dim>::isInside(_levelSet.signedDistance(pos) + radius))
 				_particles.add(pos);
 		}
 	});

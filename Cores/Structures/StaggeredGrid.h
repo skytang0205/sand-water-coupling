@@ -53,6 +53,10 @@ public:
 	VectorDr cellCenter(const VectorDi &cell) const { return _cellGrid.dataPosition(cell); }
 	VectorDr faceCenter(const int axis, const VectorDi &face) const { return _faceGrids[axis].dataPosition(face); }
 
+	bool isInsideNode(const VectorDi &node) const { return _nodeGrid.isInside(node, _boundaryWidth); }
+	bool isBoundaryNode(const VectorDi &node) const { return !_nodeGrid.isInside(node, _boundaryWidth + 1); }
+	bool isInsideCell(const VectorDi &cell) const { return _cellGrid.isInside(cell, _boundaryWidth); }
+	bool isBoundaryCell(const VectorDi &cell) const { return !isInsideCell(cell); }
 	bool isInsideFace(const int axis, const VectorDi &face) const { return _faceGrids[axis].isInside(face, _boundaryWidth); }
 	bool isBoundaryFace(const int axis, const VectorDi &face) const { return face[axis] <= _boundaryWidth || face[axis] >= _resolution[axis] - _boundaryWidth || !isInsideFace(axis, face); }
 

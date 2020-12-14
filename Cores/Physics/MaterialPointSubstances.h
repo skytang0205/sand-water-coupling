@@ -62,7 +62,7 @@ public:
 		real density() const { return _density; }
 		bool plastic() const { return _plasticLowerBound <= _plasticUpperBound; }
 
-		MatrixDr computeCauchyStressTensor(const int idx);
+		MatrixDr computeStressTensor(const int idx);
 		void reinitialize();
 	};
 
@@ -75,6 +75,7 @@ protected:
 	GridBasedVectorData<Dim> _velocity;
 	GridBasedScalarData<Dim> _mass;
 
+	const StaticCollider<Dim> _domainBoundary;
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 
 	bool _enableGravity = true;
@@ -87,7 +88,7 @@ public:
 	MaterialPointSubstances &operator=(const MaterialPointSubstances &rhs) = delete;
 	virtual ~MaterialPointSubstances() = default;
 
-	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return stepRate * _grid.spacing() / _velocity.normMax(); }
+	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return real(1) / frameRate / stepRate; }
 
 	virtual int dimension() const override { return Dim; }
 	virtual void writeDescription(YAML::Node &root) const override;
@@ -103,8 +104,8 @@ protected:
 	virtual void applyLagrangianForces(const real dt) { }
 	virtual void applyEulerianForces(const real dt);
 
-	virtual void transferFromGridToParticles(const real dt);
 	virtual void transferFromParticlesToGrid(const real dt);
+	virtual void transferFromGridToParticles(const real dt);
 
 	void sampleParticlesInsideSurface(Substance &substance, const Surface<Dim> &surface, const int particlesCntPerSubcell);
 };
