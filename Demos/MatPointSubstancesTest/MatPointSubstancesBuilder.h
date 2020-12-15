@@ -40,7 +40,7 @@ protected:
 		StaggeredGrid<Dim> grid(3, length / scale, resolution);
 		auto substances = std::make_unique<MaterialPointSubstances<Dim>>(grid);
 
-		auto liquid = MaterialPointSubstances<Dim>::Substance("liquid", Vector4f(6, 133, 135, 255) / 255, real(1e3), real(2.5e4), 0);
+		auto liquid = MaterialPointSubstances<Dim>::Substance("liquid", Vector4f(6, 133, 135, 255) / 255, real(1e3), real(1e5), 0);
 		substances->sampleParticlesInsideSurface(liquid, ImplicitSphere<Dim>(VectorDr::Zero(), length * real(.4)), nppsc);
 
 		substances->_substances.emplace_back(liquid);
