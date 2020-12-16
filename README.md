@@ -95,12 +95,12 @@ Viewer 使用下列键位及鼠标操作：
 2. Robert Bridson. 2015. *Fluid simulation for computer graphics* (2nd ed.). AK Peters/CRC Press, Boca Raton, FL, USA.
 3. Dan Koschier, Jan Bender, Barbara Solenthaler, Matthias Teschner. 2019. *Smoothed Particle Hydrodynamics for Physically-Based Simulation of Fluids and Solids*. Eurographics 2019 Tutorial.
 4. Stanley Osher and Ronald P Fedkiw. 2005. *Level set methods and dynamic implicit surfaces*. Springer, New York, NY, USA.  
-   快速行进法（Fast marching method）重整化水平集，参见 [`Geometries\LevelSetReinitializer`](Cores\Geometries\LevelSetReinitializer.h)。  
-   移动立方体法（Marching cubes method）的等值面提取，参见 [`Geometries\LevelSetContourer`](Cores\Geometries\LevelSetContourer.h)。
+   快速行进法（Fast marching method）重整化水平集，参见 [`Geometries/LevelSetReinitializer`](Cores/Geometries/LevelSetReinitializer.h)。  
+   移动立方体法（Marching cubes method）的等值面提取，参见 [`Geometries/LevelSetContourer`](Cores/Geometries/LevelSetContourer.h)。
 5. Yen Ting Ng, Chohong Min, Frédéric Gibou. 2009. An efficient fluid–solid coupling algorithm for single-phase flows. *J. Comput. Phys*. 228, 23 (2009), 8807-8829.  
-   欧拉网格流体中更精确的固体边界条件处理，参见 [`Physics\EulerianBoundaryHelper`](Cores\Physics\EulerianBoundaryHelper.h)。
+   欧拉网格流体中更精确的固体边界条件处理，参见 [`Physics/EulerianBoundaryHelper`](Cores/Physics/EulerianBoundaryHelper.h)。
 6. Yongning Zhu and Robert Bridson. 2005. Animating sand as a fluid. *ACM Trans. Graph*. 24, 3 (July 2005), 965–972.  
-   PIC/FLIP 方法对流液体速度场，参见 [`Physics\ParticleInCellLiquid`](Cores\Physics\ParticleInCellLiquid.h) 和 [`Physics\FlImplicitParticleLiquid`](Cores\Physics\FlImplicitParticleLiquid.h)。
+   PIC/FLIP 方法对流液体速度场，参见 [`Physics/ParticleInCellLiquid`](Cores/Physics/ParticleInCellLiquid.h) 和 [`Physics/FlImplicitParticleLiquid`](Cores/Physics/FlImplicitParticleLiquid.h)。
 7. Chenfanfu Jiang, Craig Schroeder, Andrew Selle, Joseph Teran, and Alexey Stomakhin. 2015. The affine particle-in-cell method. ACM Trans. Graph. 34, 4, Article 51 (August 2015), 10 pages.  
-   APIC 方法对流液体速度场，参见 [`Physics\AffineParticleInCellLiquid`](Cores\Physics\AffineParticleInCellLiquid.h)。  
-   APIC 方法对流速度场，并作为物质点法的基础，参见 [`Physics\MaterialPointSubstances`](Cores\Physics\MaterialPointSubstances.h)。
+   APIC 方法对流液体速度场，参见 [`Physics/AffineParticleInCellLiquid`](Cores/Physics/AffineParticleInCellLiquid.h)。  
+   APIC 方法对流速度场，并作为物质点法的基础，参见 [`Physics/MaterialPointSubstances`](Cores/Physics/MaterialPointSubstances.h)。
