@@ -87,6 +87,22 @@ Viewer 使用下列键位及鼠标操作：
 
 ## 代码架构
 
+- `VCL-PhysX`
+  - `Binary`：二进制文件存放目录
+    - `Debug`：调试模式输出目录
+    - `Release`：发行模式输出目录
+  - `Cores`：核心代码库
+    - `Geometries`：几何表示与维护类
+    - `Graphics`：图形渲染引擎
+    - `Physics`：物理模拟引擎
+    - `Solvers`：线性系统解算器
+    - `Structures`：基本数据结构
+    - `Utilities`：通用辅助工具
+    - `Viewer`：模拟结果离线可视化程序
+  - `Demos`：样例模拟程序库
+    - `*Test`：各种数值模拟方法的测试程序
+  - `Properties`：Visual Studio 属性表目录
+
 ## 参考文献
 
 1. Doyub Kim. 2016. *Fluid Engine Development*. AK Peters/CRC Press, Boca Raton, FL, USA.  
@@ -107,8 +123,8 @@ Viewer 使用下列键位及鼠标操作：
    欧拉网格流体中更精确的固体边界条件处理，参见 [`Physics/EulerianBoundaryHelper`](Cores/Physics/EulerianBoundaryHelper.h)。
 8. Yongning Zhu and Robert Bridson. 2005. Animating sand as a fluid. *ACM Trans. Graph*. 24, 3 (July 2005), 965–972.  
    PIC/FLIP 方法对流液体速度场，参见 [`Physics/ParticleInCellLiquid`](Cores/Physics/ParticleInCellLiquid.h) 和 [`Physics/FlImplicitParticleLiquid`](Cores/Physics/FlImplicitParticleLiquid.h)。
-9. Chenfanfu Jiang, Craig Schroeder, Andrew Selle, Joseph Teran, and Alexey Stomakhin. 2015. The affine particle-in-cell method. ACM Trans. Graph. 34, 4, Article 51 (August 2015), 10 pages.  
+9. Chenfanfu Jiang, Craig Schroeder, Andrew Selle, Joseph Teran, and Alexey Stomakhin. 2015. The affine particle-in-cell method. *ACM Trans. Graph*. 34, 4, Article 51 (August 2015), 10 pages.  
    APIC 方法对流液体速度场，参见 [`Physics/AffineParticleInCellLiquid`](Cores/Physics/AffineParticleInCellLiquid.h)。  
    APIC 方法对流速度场，并作为物质点法的基础，参见 [`Physics/MaterialPointSubstances`](Cores/Physics/MaterialPointSubstances.h)。
-10. Yuanming Hu, Yu Fang, Ziheng Ge, Ziyin Qu, Yixin Zhu, Andre Pradhana, and Chenfanfu Jiang. 2018. A moving least squares material point method with displacement discontinuity and two-way rigid body coupling. ACM Trans. Graph. 37, 4, Article 150 (August 2018), 14 pages.  
+10. Yuanming Hu, Yu Fang, Ziheng Ge, Ziyin Qu, Yixin Zhu, Andre Pradhana, and Chenfanfu Jiang. 2018. A moving least squares material point method with displacement discontinuity and two-way rigid body coupling. *ACM Trans. Graph*. 37, 4, Article 150 (August 2018), 14 pages.  
    移动最小二乘物质点法模拟多物理场景，参见 [`Physics/MaterialPointSubstances`](Cores/Physics/MaterialPointSubstances.h)。
