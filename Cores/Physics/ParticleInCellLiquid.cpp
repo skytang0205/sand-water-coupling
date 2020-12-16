@@ -59,9 +59,8 @@ void ParticleInCellLiquid<Dim>::loadFrame(const std::string &frameDir)
 		IO::readValue(fin, particlesCnt);
 		_particles.resize(particlesCnt);
 		_particles.positions.load(fin);
-		_particleVelocities.resize(&_particles);
-		_particleVelocities.setZero();
 	}
+	reinitializeParticlesBasedData();
 }
 
 template <int Dim>
@@ -88,8 +87,8 @@ void ParticleInCellLiquid<Dim>::advance(const real dt)
 template <int Dim>
 void ParticleInCellLiquid<Dim>::advectFields(const real dt)
 {
-	_advector->advect(_particles, _velocity, dt);
-	_boundaryHelper->enforce(_particles, _particleVelocities);
+	_advector->advect(_particles.positions, _velocity, dt);
+	_boundaryHelper->enforce(_particles.positions);
 }
 
 template <int Dim>
@@ -170,11 +169,18 @@ void ParticleInCellLiquid<Dim>::reinitializeParticles()
 	liquidSdf.forEach([&](const VectorDi &cell) {
 		const VectorDr centerPos = liquidSdf.position(cell);
 		for (int i = 0; i < (1 << Dim) * _particlesCntPerSubCell; i++) {
-			const VectorDr pos = centerPos + VectorDr::Random() * dx * real(.5);
-			if (_levelSet.signedDistance(pos) <= -radius)
+			const VectorDr pos = centerPos + VectorDr::Random() * dx / 2;
+			if (Surface<Dim>::isInside(_levelSet.signedDistance(pos) + radius))
 				_particles.add(pos);
 		}
 	});
+
+	reinitializeParticlesBasedData();
+}
+
+template <int Dim>
+void ParticleInCellLiquid<Dim>::reinitializeParticlesBasedData()
+{
 	_particleVelocities.resize(&_particles);
 	_particleVelocities.setZero();
 }

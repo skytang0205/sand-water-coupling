@@ -14,6 +14,7 @@ void SmthParticleHydrodLiquid<Dim>::writeDescription(YAML::Node &root) const
 		node["primitive_type"] = "point_list";
 		node["material"]["diffuse_albedo"] = (Vector4f(52, 108, 156, 255) / 255).eval(); // Haijun Blue
 		node["indexed"] = false;
+		node["color_map"]["enabled"] = true;
 		root["objects"].push_back(node);
 	}
 }
@@ -27,6 +28,14 @@ void SmthParticleHydrodLiquid<Dim>::writeFrame(const std::string &frameDir, cons
 		_particles.forEach([&](const int i) {
 			IO::writeValue(fout, _particles.positions[i].template cast<float>().eval());
 		});
+		if constexpr (Dim == 3) {
+			_particles.forEach([&](const int i) {
+				IO::writeValue(fout, VectorDf::Unit(2).eval());
+			});
+		}
+		_particles.forEach([&](const int i) {
+			IO::writeValue(fout, float(_velocities[i].norm()));
+		});
 	}
 }
 
@@ -36,6 +45,9 @@ void SmthParticleHydrodLiquid<Dim>::saveFrame(const std::string &frameDir) const
 	{ // Save particles.
 		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
 		_particles.positions.save(fout);
+	}
+	{ // save velocities.
+		std::ofstream fout(frameDir + "/velocities.sav", std::ios::binary);
 		_velocities.save(fout);
 	}
 }
@@ -46,9 +58,12 @@ void SmthParticleHydrodLiquid<Dim>::loadFrame(const std::string &frameDir)
 	{ // Load particles.
 		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
 		_particles.positions.load(fin);
-		_velocities.load(fin);
 	}
 	reinitializeParticlesBasedData();
+	{ // Load velocities.
+		std::ifstream fin(frameDir + "/velocities.sav", std::ios::binary);
+		_velocities.load(fin);
+	}
 }
 
 template <int Dim>
@@ -65,8 +80,6 @@ void SmthParticleHydrodLiquid<Dim>::advance(const real dt)
 	applyExternalForces(dt);
 	applyViscosityForce(dt);
 	applyPressureForce(dt);
-
-	applyPseudoViscosity(dt);
 }
 
 template <int Dim>
@@ -84,7 +97,7 @@ void SmthParticleHydrodLiquid<Dim>::moveParticles(const real dt)
 
 	// Resolve collisions.
 	for (const auto &collider : _colliders) {
-		collider->collide(_particles, _velocities, _particleSpacing / 2);
+		collider->collide(_particles.positions, _velocities, _particles.radius());
 	}
 
 	_particles.resetNearbySearcher();
@@ -107,7 +120,7 @@ void SmthParticleHydrodLiquid<Dim>::applyViscosityForce(const real dt)
 	if (_viscosityCoeff) {
 		auto newVelocities = _velocities;
 		_particles.parallelForEach([&](const int i) {
-			newVelocities[i] += _viscosityCoeff * _velocities.laplacianAtDataPoint(i) * dt;
+			newVelocities[i] += _viscosityCoeff * _velocities.divFreeLaplacianAtDataPoint(i) * dt;
 		});
 		_velocities = newVelocities;
 	}
@@ -117,38 +130,14 @@ template <int Dim>
 void SmthParticleHydrodLiquid<Dim>::applyPressureForce(const real dt)
 {
 	// Compute pressures by the equation of state.
-	const real eosScale = _targetDensity * _speedOfSound * _speedOfSound / _eosExponent;
 	_particles.parallelForEach([&](const int i) {
-		_pressures[i] = eosScale * (std::pow(_particles.densities[i] / _targetDensity, _eosExponent) - 1);
+		_pressures[i] = _eosMultiplier * (_particles.densities[i] - _targetDensity);
 		if (_pressures[i] < 0) _pressures[i] = 0;
 	});
 
 	// Apply pressure gradient.
 	_particles.parallelForEach([&](const int i) {
-		_velocities[i] -= _pressures.gradientAtDataPoint(i) / _particles.densities[i] * dt;
-	});
-}
-
-template <int Dim>
-void SmthParticleHydrodLiquid<Dim>::applyPseudoViscosity(const real dt)
-{
-	auto smoothedVelocities = _velocities;
-	_particles.parallelForEach([&](const int i) {
-		const VectorDr pos = _particles.positions[i];
-		real weightSum = 0;
-		VectorDr smoothedVelocity = VectorDr::Zero();
-		_particles.forEachNearby(pos, [&](const int j, const VectorDr &nearbyPos) {
-			const real weight = _particles.stdKernel(nearbyPos - pos) / _particles.densities[j];
-			weightSum += weight;
-			smoothedVelocity += weight * _velocities[j];
-		});
-		if (weightSum > 0) smoothedVelocity /= weightSum;
-		smoothedVelocities[i] = smoothedVelocity;
-	});
-
-	const real factor = std::clamp(dt * _pseudoViscosityCoeff, real(0), real(1));
-	_particles.parallelForEach([&](const int i) {
-		_velocities[i] = (1 - factor) * _velocities[i] + factor * smoothedVelocities[i];
+		_velocities[i] -= _pressures.symmetricGradientAtDataPoint(i) / _particles.densities[i] * dt;
 	});
 }
 

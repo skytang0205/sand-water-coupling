@@ -60,6 +60,7 @@ protected:
 	virtual void maintainGridBasedData(StaggeredGridBasedScalarData<Dim> &weightSum);
 	virtual void reinitializeLevelSet() override;
 	virtual void reinitializeParticles();
+	virtual void reinitializeParticlesBasedData();
 };
 
 }

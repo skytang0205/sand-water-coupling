@@ -14,11 +14,9 @@ FlImplicitParticleLiquid<Dim>::FlImplicitParticleLiquid(const StaggeredGrid<Dim>
 template <int Dim>
 void FlImplicitParticleLiquid<Dim>::saveFrame(const std::string &frameDir) const
 {
-	EulerianFluid<Dim>::saveFrame(frameDir);
-	{ // Save particles.
-		std::ofstream fout(frameDir + "/particles.sav", std::ios::binary);
-		IO::writeValue(fout, uint(_particles.size()));
-		_particles.positions.save(fout);
+	ParticleInCellLiquid<Dim>::saveFrame(frameDir);
+	{ // Save particleVelocities.
+		std::ofstream fout(frameDir + "/particleVelocities.sav", std::ios::binary);
 		_particleVelocities.save(fout);
 	}
 	{ // Save delteVelocity.
@@ -30,14 +28,9 @@ void FlImplicitParticleLiquid<Dim>::saveFrame(const std::string &frameDir) const
 template <int Dim>
 void FlImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
 {
-	EulerianFluid<Dim>::loadFrame(frameDir);
-	{ // Load particles.
-		std::ifstream fin(frameDir + "/particles.sav", std::ios::binary);
-		uint particlesCnt;
-		IO::readValue(fin, particlesCnt);
-		_particles.resize(particlesCnt);
-		_particles.positions.load(fin);
-		_particleVelocities.resize(&_particles);
+	ParticleInCellLiquid<Dim>::loadFrame(frameDir);
+	{ // Load particleVelocities.
+		std::ifstream fin(frameDir + "/particleVelocities.sav", std::ios::binary);
 		_particleVelocities.load(fin);
 	}
 	{ // Load delteVelocity.

@@ -29,7 +29,7 @@ protected:
 		if (scale < 0) scale = 150;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(0, length / scale, resolution);
 		auto fluid = std::make_unique<EulerianFluid<Dim>>(grid);
 
 		fluid->_colliders.push_back(

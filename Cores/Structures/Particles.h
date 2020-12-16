@@ -18,12 +18,16 @@ public:
 
 protected:
 
-	const real _mass;
-	const real _invMass;
+	real _mass;
+	real _invMass;
 
 public:
 
-	Particles(const real mass = 1, const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero()) : _mass(mass), _invMass(1 / _mass) { resize(cnt, pos); }
+	Particles(const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero(), const real mass = 1)
+	{
+		resize(cnt, pos);
+		setMass(mass);
+	}
 
 	Particles &operator=(const Particles &rhs) = delete;
 	virtual ~Particles() = default;
@@ -32,6 +36,8 @@ public:
 
 	real mass() const { return _mass; }
 	real invMass() const { return _invMass; }
+	void setMass(const real mass) { _mass = mass, _invMass = 1 / _mass; }
+
 	void add(const VectorDr &pos = VectorDr::Zero()) { positions._data.push_back(pos); }
 	void clear() { positions._data.clear(); }
 	size_t size() const { return positions.size(); }

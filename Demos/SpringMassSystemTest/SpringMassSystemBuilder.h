@@ -61,7 +61,8 @@ protected:
 
 		smSystem->_colliders.push_back(
 			std::make_unique<StaticCollider<Dim>>(
-				std::make_unique<ImplicitPlane<Dim>>(VectorDr::Zero() - VectorDr::Unit(1) * 2, VectorDr::Unit(1))));
+				std::make_unique<ImplicitPlane<Dim>>(VectorDr::Zero() - VectorDr::Unit(1) * 2, VectorDr::Unit(1)),
+				real(.5)));
 
 		for (int axis = 0; axis < Dim; axis++)
 			smSystem->_constrainedDofs.insert(axis);

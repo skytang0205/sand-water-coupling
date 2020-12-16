@@ -33,13 +33,13 @@ public:
 protected:
 
 	template <int Dim>
-	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase0(int scale, int nppsc, const real alpha)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase0(int scale, const int nppsc, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = makeLiquid<Dim>(grid, nppsc, alpha);
 
 		ImplicitSphere<Dim> sphere(VectorDr::Zero(), length / 4);
@@ -54,13 +54,13 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase1(int scale, int nppsc, const real alpha)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase1(int scale, const int nppsc, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = makeLiquid<Dim>(grid, nppsc, alpha);
 
 		ImplicitSphere<Dim> sphere(VectorDr::Zero(), length / 4);
@@ -73,13 +73,13 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase2(int scale, int nppsc, const real alpha)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase2(int scale, const int nppsc, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = makeLiquid<Dim>(grid, nppsc, alpha);
 
 		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
@@ -89,13 +89,13 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase3(int scale, int nppsc, const real alpha)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase3(int scale, const int nppsc, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = makeLiquid<Dim>(grid, nppsc, alpha);
 
 		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
@@ -107,13 +107,13 @@ protected:
 	}
 
 	template <int Dim>
-	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase4(int scale, int nppsc, const real alpha)
+	static std::unique_ptr<ParticleInCellLiquid<Dim>> buildCase4(int scale, const int nppsc, const real alpha)
 	{
 		DECLARE_DIM_TYPES(Dim)
 		if (scale < 0) scale = 90;
 		const real length = real(2);
 		const VectorDi resolution = scale * (VectorDi::Ones() * 2 + VectorDi::Unit(0));
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = makeLiquid<Dim>(grid, nppsc, alpha);
 
 		ImplicitPlane<Dim> plane(VectorDr::Unit(0) * length / 2, VectorDr::Unit(0));

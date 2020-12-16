@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Geometries/Surface.h"
-#include "Structures/ParticlesBasedData.h"
+#include "Structures/ParticlesAttribute.h"
 
 #include <memory>
 
@@ -19,7 +19,7 @@ protected:
 
 public:
 
-	Collider(const real restitutionCoefficient = 1, const real frictionCoefficient = 0) :
+	Collider(const real restitutionCoefficient = 0, const real frictionCoefficient = 0) :
 		_restitutionCoefficient(restitutionCoefficient),
 		_frictionCoefficient(frictionCoefficient)
 	{ }
@@ -35,8 +35,15 @@ public:
 	real restitutionCoefficient() const { return _restitutionCoefficient; }
 	real frictionCoefficient() const { return _frictionCoefficient; }
 
-	void collide(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &velocities, const real radius = 0);
-	void collide(VectorDr &pos, VectorDr &vel, const real radius);
+	void collide(ParticlesVectorAttribute<Dim> &positions, const real radius = 0) const;
+	void collide(ParticlesVectorAttribute<Dim> &positions, ParticlesVectorAttribute<Dim> &velocities, const real radius = 0) const;
+	void collide(VectorDr &pos, const real radius = 0) const;
+	void collide(VectorDr &pos, VectorDr &vel, const real radius = 0) const;
+
+	void resolve(const VectorDr &pos, VectorDr &vel) const;
+	void resolve(const VectorDr &pos, const VectorDr &normal, VectorDr &vel) const;
+
+	bool detect(const VectorDr &pos, const real radius = 0) const { return Surface<Dim>::isInside(surface()->signedDistance(pos) - radius); }
 };
 
 template <int Dim>
@@ -50,7 +57,7 @@ protected:
 
 public:
 
-	StaticCollider(std::unique_ptr<Surface<Dim>> surface, const real restitutionCoefficient = 1, const real frictionCoefficient = 0) :
+	StaticCollider(std::unique_ptr<Surface<Dim>> surface, const real restitutionCoefficient = 0, const real frictionCoefficient = 0) :
 		Collider<Dim>(restitutionCoefficient, frictionCoefficient),
 		_surface(std::move(surface))
 	{ }

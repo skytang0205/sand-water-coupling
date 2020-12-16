@@ -19,10 +19,10 @@ void SemiLagrangianAdvector<Dim, RungeKuttaOrder>::advect(StaggeredGridBasedVect
 }
 
 template <int Dim, int RungeKuttaOrder>
-void SemiLagrangianAdvector<Dim, RungeKuttaOrder>::advect(Particles<Dim> &particles, const VectorField<Dim> &flow, const real dt)
+void SemiLagrangianAdvector<Dim, RungeKuttaOrder>::advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt)
 {
-	particles.parallelForEach([&](const int i) {
-		VectorDr &pos = particles.positions[i];
+	positions.parallelForEach([&](const int i) {
+		VectorDr &pos = positions[i];
 		pos = trace(pos, flow, dt);
 	});
 }
@@ -94,10 +94,10 @@ void MacCormackAdvector<Dim, RungeKuttaOrder>::advect(StaggeredGridBasedVectorFi
 }
 
 template <int Dim, int RungeKuttaOrder>
-void MacCormackAdvector<Dim, RungeKuttaOrder>::advect(Particles<Dim> &particles, const VectorField<Dim> &flow, const real dt)
+void MacCormackAdvector<Dim, RungeKuttaOrder>::advect(ParticlesVectorAttribute<Dim> &positions, const VectorField<Dim> &flow, const real dt)
 {
-	particles.parallelForEach([&](const int i) {
-		VectorDr &pos = particles.positions[i];
+	positions.parallelForEach([&](const int i) {
+		VectorDr &pos = positions[i];
 		const VectorDr forwardPos = trace(pos, flow, dt);
 		const VectorDr backwardPos = trace(forwardPos, flow, -dt);
 		pos = forwardPos + (pos - backwardPos) * real(0.5);

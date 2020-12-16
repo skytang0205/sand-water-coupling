@@ -18,8 +18,6 @@ public:
 
 protected:
 
-	const real _particleSpacing;
-
 	SmoothedParticles<Dim> _particles;
 	ParticlesBasedVectorField<Dim> _velocities;
 	ParticlesBasedScalarField<Dim> _pressures;
@@ -29,23 +27,18 @@ protected:
 	bool _enableGravity = true;
 
 	real _viscosityCoeff = real(.01);
-	real _pseudoViscosityCoeff = 10;
 	real _targetDensity = real(1e3);
-	real _speedOfSound = 1482;
-	real _eosExponent = 7;
+	real _eosMultiplier = 25;
 
 public:
 
-	SmthParticleHydrodLiquid(const real particleMass, const real particleSpacing) :
-		_particleSpacing(particleSpacing),
-		_particles(particleMass, _particleSpacing * 2)
-	{ }
+	SmthParticleHydrodLiquid(const real particleRadius) : _particles(particleRadius) { }
 
 	SmthParticleHydrodLiquid(const SmthParticleHydrodLiquid &rhs) = delete;
 	SmthParticleHydrodLiquid &operator=(const SmthParticleHydrodLiquid &rhs) = delete;
 	virtual ~SmthParticleHydrodLiquid() = default;
 
-	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return std::min(real(1) / frameRate, stepRate * _particles.radius() / _velocities.normMax()); }
+	virtual real getTimeStep(const uint frameRate, const real stepRate) const override { return stepRate * _particles.radius() * 2 / _velocities.normMax(); }
 
 	virtual int dimension() const override { return Dim; }
 	virtual void writeDescription(YAML::Node &root) const override;
@@ -58,12 +51,11 @@ public:
 
 protected:
 
-	void reinitializeParticlesBasedData();
-	void moveParticles(const real dt);
-	void applyExternalForces(const real dt);
-	void applyViscosityForce(const real dt);
-	void applyPressureForce(const real dt);
-	void applyPseudoViscosity(const real dt);
+	virtual void reinitializeParticlesBasedData();
+	virtual void moveParticles(const real dt);
+	virtual void applyExternalForces(const real dt);
+	virtual void applyViscosityForce(const real dt);
+	virtual void applyPressureForce(const real dt);
 };
 
 }

@@ -4,7 +4,7 @@
 #include "Geometries/LevelSet.h"
 #include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
-#include "Structures/ParticlesBasedData.h"
+#include "Structures/ParticlesAttribute.h"
 
 #include <functional>
 #include <memory>
@@ -40,11 +40,11 @@ public:
 		const std::function<real(const int axis, const VectorDi &face)> &domainBoundaryVelocity);
 
 	void enforce(StaggeredGridBasedVectorField<Dim> &fluidVelocity) const;
-	void enforce(Particles<Dim> &particles, ParticlesBasedVectorData<Dim> &particleVelocities) const;
+	void enforce(ParticlesVectorAttribute<Dim> &particlePositions) const;
 
 	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const int maxSteps = -1) const;
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, const int maxSteps = -1) const;
-	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, LevelSet<Dim> &liquidLevelSet, StaggeredGridBasedScalarData<Dim> &weightSum, const int maxSteps = -1) const;
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const LevelSet<Dim> &liquidLevelSet, const int maxSteps = -1) const;
+	void extrapolate(StaggeredGridBasedVectorField<Dim> &fluidVelocity, const LevelSet<Dim> &liquidLevelSet, const StaggeredGridBasedScalarData<Dim> &weightSum, const int maxSteps = -1) const;
 
 protected:
 

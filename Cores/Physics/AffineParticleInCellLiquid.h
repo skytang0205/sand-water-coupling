@@ -33,7 +33,7 @@ protected:
 	virtual void transferFromGridToParticles() override;
 	virtual void transferFromParticlesToGrid(StaggeredGridBasedScalarData<Dim> &weightSum) override;
 
-	virtual void reinitializeParticles() override;
+	virtual void reinitializeParticlesBasedData() override;
 };
 
 }

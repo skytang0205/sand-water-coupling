@@ -39,7 +39,7 @@ protected:
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
 		ImplicitSphere<Dim> sphere(VectorDr::Zero(), length / 4);
@@ -60,7 +60,7 @@ protected:
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
 		ImplicitSphere<Dim> sphere(VectorDr::Zero(), length / 4);
@@ -79,7 +79,7 @@ protected:
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
 		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
@@ -95,7 +95,7 @@ protected:
 		if (scale < 0) scale = 200;
 		const real length = real(2);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
 		ImplicitPlane<Dim> plane(-VectorDr::Unit(1) * length / 8, VectorDr::Unit(1));
@@ -113,7 +113,7 @@ protected:
 		if (scale < 0) scale = 90;
 		const real length = real(2);
 		const VectorDi resolution = scale * (VectorDi::Ones() * 2 + VectorDi::Unit(0));
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
 		ImplicitPlane<Dim> plane(VectorDr::Unit(0) * length / 2, VectorDr::Unit(0));
@@ -129,7 +129,7 @@ protected:
 		if (scale < 0) scale = 200;
 		const real length = real(0.5);
 		const VectorDi resolution = scale * VectorDi::Ones();
-		StaggeredGrid<Dim> grid(length / scale, resolution);
+		StaggeredGrid<Dim> grid(2, length / scale, resolution);
 		auto liquid = std::make_unique<LevelSetLiquid<Dim>>(grid);
 
 		liquid->_enableGravity = false;

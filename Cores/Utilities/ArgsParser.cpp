@@ -45,7 +45,7 @@ void ArgsParser::parse(const int argc, const char *const argv[])
 			if (argv[i][1] == '-') arg = findArgByName(argv[i] + 2);
 			else arg = findArgByFlag(argv[i][1]);
 			if (arg) {
-				// Handle options without value, assuming default_value == false.
+				// Handle options without value, assuming _defaultValue == false.
 				if (arg->type() == typeid(bool) && !arg->isMandatory()) arg->parseValue("1");
 				else {
 					if (i + 1 == argc) reportError(fmt::format("missing value for option {}", argv[i]));
