@@ -24,6 +24,7 @@
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
     <ClInclude Include="SmthParticleHydrodLiquid.h" />
+    <ClInclude Include="SpringMassSysIntegrator.h" />
     <ClInclude Include="SpringMassSystem.h" />
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +40,7 @@
     <ClCompile Include="PredCorrIncomprSphLiquid.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="SmthParticleHydrodLiquid.cpp" />
+    <ClCompile Include="SpringMassSysIntegrator.cpp" />
     <ClCompile Include="SpringMassSystem.cpp" />
   </ItemGroup>
   <ItemGroup>

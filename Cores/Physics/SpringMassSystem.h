@@ -2,7 +2,7 @@
 
 #include "Geometries/Collider.h"
 #include "Physics/Simulation.h"
-#include "Solvers/SparseSolver.h"
+#include "Physics/SpringMassSysIntegrator.h"
 #include "Structures/ParticlesBasedData.h"
 
 #include <unordered_set>
@@ -18,30 +18,18 @@ public:
 
 	friend class SpringMassSystemBuilder;
 
-	struct Spring
-	{
-		int pid0;
-		int pid1;
-		real restLength;
-		real stiffnessCoeff;
-		real dampingCoeff;
-	};
-
 protected:
 
 	Particles<Dim> _particles;
 	ParticlesBasedVectorData<Dim> _velocities;
-	ParticlesBasedVectorData<Dim> _accelerations;
+	ParticlesBasedVectorData<Dim> _externalForces;
+
 	std::vector<Spring> _springs;
 	std::unordered_set<int> _constrainedDofs;
 
-	std::vector<Tripletr> _coeffBackwardEuler;
-	SparseMatrixr _matBackwardEuler;
-	VectorXr _rhsBackwardEuler;
-
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 
-	std::unique_ptr<SparseSolver> _solver;
+	std::unique_ptr<SpringMassSysIntegrator<Dim>> _integrator;
 
 	bool _enableGravity = true;
 
@@ -66,13 +54,10 @@ public:
 
 protected:
 
-	void calculateAccelerations();
 	void reinitializeParticlesBasedData();
-	void buildAndSolveLinearSystem(const real dt);
 	void moveParticles(const real dt);
 
-	virtual void applyElasticForce();
-	virtual void applyExternalForces();
+	virtual void calculateExternalForces();
 };
 
 }

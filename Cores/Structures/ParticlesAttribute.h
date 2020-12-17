@@ -67,6 +67,9 @@ public:
 		else return absoluteMax();
 	}
 
+	auto asVectorXr() { return Eigen::Map<VectorXr, Eigen::Aligned>(reinterpret_cast<real *>(_data.data()), _data.size() * (sizeof(Type) / sizeof(real))); }
+	auto asVectorXr() const { return Eigen::Map<const VectorXr, Eigen::Aligned>(reinterpret_cast<const real *>(_data.data()), _data.size() * (sizeof(Type) / sizeof(real))); }
+
 	void forEach(const std::function<void(const int)> &func) const
 	{
 		for (int i = 0; i < _data.size(); i++) func(i);
