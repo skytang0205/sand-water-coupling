@@ -78,6 +78,9 @@ void SmsBackwardEulerIntegrator<Dim>::integrate(
 	_particles->forEach([&](const int i) {
 		addSparseBlockValue(i, i, MatrixDr::Identity() * _particles->mass());
 	});
+	for (const int dof : *constrainedDofs) {
+		_coeffBackwardEuler.push_back(Tripletr(dof, dof, 1));
+	}
 
 	// Set Jacobian of accelaration to velocity.
 	for (const auto &spring : *_springs) {

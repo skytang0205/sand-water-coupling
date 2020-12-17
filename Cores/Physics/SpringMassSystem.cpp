@@ -6,7 +6,7 @@ namespace PhysX {
 
 template <int Dim>
 SpringMassSystem<Dim>::SpringMassSystem() :
-	_integrator(std::make_unique<SmsSymplecticEulerIntegrator<Dim>>())
+	_integrator(std::make_unique<SmsBackwardEulerIntegrator<Dim>>())
 { }
 
 template <int Dim>

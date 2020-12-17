@@ -3,6 +3,8 @@
 #include "Geometries/ImplicitSurface.h"
 #include "Physics/SpringMassSystem.h"
 
+#include <numbers>
+
 namespace PhysX {
 
 class SpringMassSystemBuilder final
@@ -17,6 +19,8 @@ public:
 			return buildCase0<Dim>();
 		case 1:
 			return buildCase1<Dim>();
+		case 2:
+			return buildCase2<Dim>();
 		default:
 			reportError("invalid option");
 			return nullptr;
@@ -37,7 +41,7 @@ protected:
 
 		smSystem->_velocities.resize(&smSystem->_particles);
 
-		smSystem->_springs.push_back({ 0, 1, real(.5), 100, 0 });
+		smSystem->_springs.push_back({ 0, 1, real(.5), 100, 1 });
 
 		for (int axis = 0; axis < Dim; axis++)
 			smSystem->_constrainedDofs.insert(axis);
@@ -51,7 +55,7 @@ protected:
 		DECLARE_DIM_TYPES(Dim)
 		auto smSystem = std::make_unique<SpringMassSystem<Dim>>();
 
-		for (int i = 0; i < 10; i++) 
+		for (int i = 0; i < 10; i++)
 			smSystem->_particles.add(VectorDr::Unit(0) * i / 4);
 
 		smSystem->_velocities.resize(&smSystem->_particles);
@@ -70,9 +74,53 @@ protected:
 		return smSystem;
 	}
 
+	template <int Dim>
+	static std::unique_ptr<SpringMassSystem<Dim>> buildCase2()
+	{
+		DECLARE_DIM_TYPES(Dim)
+		auto smSystem = std::make_unique<SpringMassSystem<Dim>>();
+
+		const int xScale = 10;
+		const int yScale = 2;
+		const real length = real(2.5);
+		const real spacing = length / xScale;
+		const real stiffnessCoeff = 10000;
+		const real dampingCoeff = 0.1;
+
+		const auto id = [=](const int i, const int j) { return j * (xScale + 1) + i; };
+
+		for (int j = 0; j <= yScale; j++)
+			for (int i = 0; i <= xScale; i++)
+				smSystem->_particles.add((VectorDr::Unit(0) * i + VectorDr::Unit(1) * j) * spacing);
+
+		smSystem->_velocities.resize(&smSystem->_particles);
+
+		for (int j = 0; j <= yScale; j++)
+			for (int i = 0; i < xScale; i++)
+				smSystem->_springs.push_back({ id(i, j), id(i + 1, j), spacing, stiffnessCoeff, dampingCoeff });
+
+		for (int j = 0; j < yScale; j++)
+			for (int i = 0; i <= xScale; i++)
+				smSystem->_springs.push_back({ id(i, j), id(i, j + 1), spacing, stiffnessCoeff, dampingCoeff });
+
+		for (int j = 0; j < yScale; j++)
+			for (int i = 0; i < xScale; i++)
+				smSystem->_springs.push_back({ id(i, j), id(i + 1, j + 1), spacing * real(std::numbers::sqrt2), stiffnessCoeff, dampingCoeff });
+
+		for (int j = 1; j <= yScale; j++)
+			for (int i = 0; i < xScale; i++)
+				smSystem->_springs.push_back({ id(i, j), id(i + 1, j - 1), spacing * real(std::numbers::sqrt2), stiffnessCoeff, dampingCoeff });
+
+		for (int j = 0; j <= yScale; j++)
+			for (int axis = 0; axis < Dim; axis++)
+				smSystem->_constrainedDofs.insert(id(0, j) * Dim + axis);
+
+		return smSystem;
+	}
+
 	static void reportError(const std::string &msg)
 	{
-		std::cerr << fmt::format("Error: [EulerianFluidBuilder] encountered {}.\n{}", msg) << std::endl;
+		std::cerr << fmt::format("Error: [SpringMassSystemBuilder] encountered {}.\n{}", msg) << std::endl;
 		std::exit(-1);
 	}
 };
