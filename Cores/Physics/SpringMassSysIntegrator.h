@@ -48,10 +48,10 @@ public:
 
 protected:
 
-	void accumulateAccelerations(
+	void accumulateForces(
 		const ParticlesVectorAttribute<Dim> &positions,
 		const ParticlesVectorAttribute<Dim> &velocities,
-		ParticlesVectorAttribute<Dim> &accelerations,
+		ParticlesVectorAttribute<Dim> &forces,
 		const ParticlesVectorAttribute<Dim> *const externalForces = nullptr,
 		const std::unordered_set<int> *const constrainedDofs = nullptr) const;
 };
@@ -66,7 +66,7 @@ protected:
 	using SpringMassSysIntegrator<Dim>::_particles;
 	using SpringMassSysIntegrator<Dim>::_springs;
 
-	ParticlesBasedVectorData<Dim> _accelerations;
+	ParticlesBasedVectorData<Dim> _forces;
 
 public:
 
@@ -78,7 +78,7 @@ public:
 	virtual void reset(const Particles<Dim> *const particles, const std::vector<Spring> *const springs) override
 	{
 		SpringMassSysIntegrator<Dim>::reset(particles, springs);
-		_accelerations.resize(particles);
+		_forces.resize(particles);
 	}
 
 	virtual void integrate(
@@ -90,11 +90,11 @@ public:
 
 protected:
 
-	using SpringMassSysIntegrator<Dim>::accumulateAccelerations;
+	using SpringMassSysIntegrator<Dim>::accumulateForces;
 };
 
 template <int Dim>
-class SmsBackwardEulerIntegrator : public SpringMassSysIntegrator<Dim>
+class SmsSemiImplicitIntegrator : public SpringMassSysIntegrator<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)
 
@@ -103,7 +103,7 @@ protected:
 	using SpringMassSysIntegrator<Dim>::_particles;
 	using SpringMassSysIntegrator<Dim>::_springs;
 
-	ParticlesBasedVectorData<Dim> _accelerations;
+	ParticlesBasedVectorData<Dim> _forces;
 
 	std::vector<Tripletr> _coeffBackwardEuler;
 	SparseMatrixr _matBackwardEuler;
@@ -113,16 +113,16 @@ protected:
 
 public:
 
-	SmsBackwardEulerIntegrator();
+	SmsSemiImplicitIntegrator();
 
-	SmsBackwardEulerIntegrator(const SmsBackwardEulerIntegrator &rhs) = delete;
-	SmsBackwardEulerIntegrator &operator=(const SmsBackwardEulerIntegrator &rhs) = delete;
-	virtual ~SmsBackwardEulerIntegrator() = default;
+	SmsSemiImplicitIntegrator(const SmsSemiImplicitIntegrator &rhs) = delete;
+	SmsSemiImplicitIntegrator &operator=(const SmsSemiImplicitIntegrator &rhs) = delete;
+	virtual ~SmsSemiImplicitIntegrator() = default;
 
 	virtual void reset(const Particles<Dim> *const particles, const std::vector<Spring> *const springs) override
 	{
 		SpringMassSysIntegrator<Dim>::reset(particles, springs);
-		_accelerations.resize(particles);
+		_forces.resize(particles);
 		_matBackwardEuler.resize(particles->size() * Dim, particles->size() * Dim);
 		_rhsBackwardEuler.resize(particles->size() * Dim);
 	}
@@ -136,7 +136,7 @@ public:
 
 protected:
 
-	using SpringMassSysIntegrator<Dim>::accumulateAccelerations;
+	using SpringMassSysIntegrator<Dim>::accumulateForces;
 };
 
 }

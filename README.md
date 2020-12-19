@@ -138,6 +138,7 @@ Viewer 使用下列键位及鼠标操作：
   - `Cores`：核心代码库
     - `Geometries`：几何表示与维护类
     - `Graphics`：图形渲染引擎
+    - `Materials`：材质及材料模型
     - `Physics`：物理模拟引擎
     - `Solvers`：线性系统解算器
     - `Structures`：基本数据结构

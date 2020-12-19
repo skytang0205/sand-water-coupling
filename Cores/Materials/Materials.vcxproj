@@ -10,55 +10,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="AffineParticleInCellLiquid.h" />
-    <ClInclude Include="EulerianAdvector.h" />
-    <ClInclude Include="EulerianBoundaryHelper.h" />
-    <ClInclude Include="EulerianFluid.h" />
-    <ClInclude Include="EulerianProjector.h" />
-    <ClInclude Include="FlImplicitParticleLiquid.h" />
-    <ClInclude Include="LevelSetLiquid.h" />
-    <ClInclude Include="MaterialPointSubstances.h" />
-    <ClInclude Include="ParticleInCellLiquid.h" />
-    <ClInclude Include="PredCorrIncomprSphLiquid.h" />
-    <ClInclude Include="Simulation.h" />
-    <ClInclude Include="Simulator.h" />
-    <ClInclude Include="SmthParticleHydrodLiquid.h" />
-    <ClInclude Include="SpringMassSysIntegrator.h" />
-    <ClInclude Include="SpringMassSystem.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="AffineParticleInCellLiquid.cpp" />
-    <ClCompile Include="EulerianAdvector.cpp" />
-    <ClCompile Include="EulerianBoundaryHelper.cpp" />
-    <ClCompile Include="EulerianFluid.cpp" />
-    <ClCompile Include="EulerianProjector.cpp" />
-    <ClCompile Include="FlImplicitParticleLiquid.cpp" />
-    <ClCompile Include="LevelSetLiquid.cpp" />
-    <ClCompile Include="MaterialPointSubstances.cpp" />
-    <ClCompile Include="ParticleInCellLiquid.cpp" />
-    <ClCompile Include="PredCorrIncomprSphLiquid.cpp" />
-    <ClCompile Include="Simulator.cpp" />
-    <ClCompile Include="SmthParticleHydrodLiquid.cpp" />
-    <ClCompile Include="SpringMassSysIntegrator.cpp" />
-    <ClCompile Include="SpringMassSystem.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Geometries\Geometries.vcxproj">
-      <Project>{c94749bc-3d90-4972-9e0d-d8c5d6d0df60}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Materials\Materials.vcxproj">
-      <Project>{32cff4fd-122f-4eb2-8c4f-a50b2dcf7a77}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Solvers\Solvers.vcxproj">
-      <Project>{0e8fcbbd-e115-45ca-9c7a-5d23bee91033}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{eacf5052-ab16-4fac-bf50-60e7775ecac2}</ProjectGuid>
-    <RootNamespace>Physics</RootNamespace>
+    <ProjectGuid>{32cff4fd-122f-4eb2-8c4f-a50b2dcf7a77}</ProjectGuid>
+    <RootNamespace>Materials</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -81,10 +37,12 @@
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Properties\Default.props" />
     <Import Project="..\..\Properties\Debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Properties\Default.props" />
     <Import Project="..\..\Properties\Release.props" />
   </ImportGroup>
@@ -123,6 +81,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ParticlesBasedSubstance.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ParticlesBasedSubstance.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Geometries\Geometries.vcxproj">
+      <Project>{c94749bc-3d90-4972-9e0d-d8c5d6d0df60}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
