@@ -1,5 +1,6 @@
 #include "SpringMassSystem.h"
 
+#include "Physics/SmsSemiImplicitIntegrator.h"
 #include "Utilities/Constants.h"
 
 namespace PhysX {
@@ -108,7 +109,7 @@ void SpringMassSystem<Dim>::advance(const real dt)
 	moveParticles(dt);
 
 	calculateExternalForces();
-	_integrator->integrate(_particles.positions, _velocities, dt, &_externalForces, &_constrainedDofs);
+	resolveVelocities(dt);
 }
 
 template <int Dim>
@@ -137,6 +138,12 @@ void SpringMassSystem<Dim>::calculateExternalForces()
 			_externalForces[i][1] -= _particles.mass() * kGravity;
 		});
 	}
+}
+
+template <int Dim>
+void SpringMassSystem<Dim>::resolveVelocities(const real dt)
+{
+	_integrator->integrate(_particles.positions, _velocities, dt, &_externalForces, &_constrainedDofs);
 }
 
 template class SpringMassSystem<2>;

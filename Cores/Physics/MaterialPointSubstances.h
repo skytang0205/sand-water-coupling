@@ -58,6 +58,7 @@ protected:
 	virtual void moveParticles(const real dt);
 	virtual void applyLagrangianForces(const real dt) { }
 	virtual void applyEulerianForces(const real dt);
+	virtual void resolveVelocity(const real dt);
 
 	virtual void transferFromGridToParticles(const real dt);
 	virtual void transferFromParticlesToGrid(const real dt);

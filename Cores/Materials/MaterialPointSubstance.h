@@ -33,13 +33,45 @@ public:
 	const Vector4f &color() const { return _color; }
 	real density() const { return _density; }
 
-	void write(std::ofstream &fout) const;
-	virtual void save(std::ofstream &fout) const;
-	virtual void load(std::ifstream &fin);
+	void write(std::ofstream &fout) const
+	{
+		IO::writeValue(fout, uint(particles.size()));
+		particles.forEach([&](const int i) {
+			IO::writeValue(fout, particles.positions[i].template cast<float>().eval());
+		});
+		if constexpr (Dim == 3) {
+			particles.forEach([&](const int i) {
+				IO::writeValue(fout, VectorDf::Unit(2).eval());
+			});
+		}
+	}
 
-	virtual void reinitialize();
+	virtual void save(std::ofstream &fout) const
+	{
+		IO::writeValue(fout, uint(particles.size()));
+		particles.positions.save(fout);
+	}
+
+	virtual void load(std::ifstream &fin)
+	{
+		uint particlesCnt;
+		IO::readValue(fin, particlesCnt);
+		particles.resize(particlesCnt);
+		particles.positions.load(fin);
+		reinitialize();
+	}
+
+	virtual void reinitialize()
+	{
+		velocities.resize(&particles);
+		velocities.setZero();
+
+		velocityDerivatives.resize(&particles);
+		velocityDerivatives.setZero();
+	}
+
 	virtual void update(const real dt) = 0;
-	virtual MatrixDr computeStressTensor(const int idx) = 0;
+	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const = 0;
 };
 
 }

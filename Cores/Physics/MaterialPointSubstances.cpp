@@ -110,6 +110,7 @@ void MaterialPointSubstances<Dim>::advance(const real dt)
 	applyLagrangianForces(dt);
 	transferFromParticlesToGrid(dt);
 	applyEulerianForces(dt);
+	resolveVelocity(dt);
 }
 
 template <int Dim>
@@ -144,6 +145,11 @@ void MaterialPointSubstances<Dim>::applyEulerianForces(const real dt)
 }
 
 template <int Dim>
+void MaterialPointSubstances<Dim>::resolveVelocity(const real dt)
+{
+}
+
+template <int Dim>
 void MaterialPointSubstances<Dim>::transferFromGridToParticles(const real dt)
 {
 	const real gradCoeff = 4 * _velocity.invSpacing() * _velocity.invSpacing();
@@ -174,27 +180,19 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 
 	for (auto &substance : _substances) {
 		const real mass = substance->particles.mass();
-		const real stressCoeff = -dt * 4 * _velocity.invSpacing() * _velocity.invSpacing() * mass / substance->density();
 
 		substance->particles.forEach([&](const int i) {
 			const VectorDr pos = substance->particles.positions[i];
 			const VectorDr vel = substance->velocities[i];
 			const MatrixDr velDrv = substance->velocityDerivatives[i];
-
-			const MatrixDr stress = substance->computeStressTensor(i) * stressCoeff;
-			// Transfer into velocity.
+			// Transfer into velocity (momentum actually) and mass.
 			for (const auto [node, weight] : _velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
 				const VectorDr deltaPos = _velocity.position(node) - pos;
-				_velocity[node] += (vel * mass + (velDrv * mass + stress) * deltaPos) * weight;
+				_velocity[node] += (vel + velDrv * deltaPos) * mass * weight;
 				_mass[node] += mass * weight;
 			}
 		});
 	}
-
-	_velocity.parallelForEach([&](const VectorDi &node) {
-		if (_mass[node])
-			_velocity[node] /= _mass[node];
-	});
 }
 
 template <int Dim>

@@ -18,11 +18,13 @@
     <ClInclude Include="EulerianProjector.h" />
     <ClInclude Include="FlImplicitParticleLiquid.h" />
     <ClInclude Include="LevelSetLiquid.h" />
+    <ClInclude Include="MaterialPointIntegrator.h" />
     <ClInclude Include="MaterialPointSubstances.h" />
     <ClInclude Include="ParticleInCellLiquid.h" />
     <ClInclude Include="PredCorrIncomprSphLiquid.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
+    <ClInclude Include="SmsSemiImplicitIntegrator.h" />
     <ClInclude Include="SmthParticleHydrodLiquid.h" />
     <ClInclude Include="SpringMassSysIntegrator.h" />
     <ClInclude Include="SpringMassSystem.h" />
@@ -35,10 +37,12 @@
     <ClCompile Include="EulerianProjector.cpp" />
     <ClCompile Include="FlImplicitParticleLiquid.cpp" />
     <ClCompile Include="LevelSetLiquid.cpp" />
+    <ClCompile Include="MaterialPointIntegrator.cpp" />
     <ClCompile Include="MaterialPointSubstances.cpp" />
     <ClCompile Include="ParticleInCellLiquid.cpp" />
     <ClCompile Include="PredCorrIncomprSphLiquid.cpp" />
     <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="SmsSemiImplicitIntegrator.cpp" />
     <ClCompile Include="SmthParticleHydrodLiquid.cpp" />
     <ClCompile Include="SpringMassSysIntegrator.cpp" />
     <ClCompile Include="SpringMassSystem.cpp" />

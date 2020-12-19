@@ -24,7 +24,7 @@ protected:
 public:
 
 	MaterialPointLiquid(const std::string &name, const Vector4f &color, const real density, const real bulkModulus) :
-		MaterialPointSubstance<Dim>(name, color, density, bulkModulus),
+		MaterialPointSubstance<Dim>(name, color, density),
 		_bulkModulus(bulkModulus)
 	{ }
 
@@ -45,7 +45,8 @@ public:
 	virtual void reinitialize() override
 	{
 		MaterialPointSubstance<Dim>::reinitialize();
-		_jacobians.resize(&particles, 1);
+		_jacobians.resize(&particles);
+		_jacobians.setConstant(1);
 	}
 
 	virtual void update(const real dt) override
@@ -53,6 +54,14 @@ public:
 		particles.parallelForEach([&](const int i) {
 			particles.positions[i] += velocities[i] * dt;
 			_jacobians[i] *= (1 + velocityDerivatives[i].trace() * dt);
+		});
+	}
+
+	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const override
+	{
+		stresses.resize(&particles);
+		particles.parallelForEach([&](const int i) {
+			stresses[i] = MatrixDr::Identity() * (_jacobians[i] - 1) * _bulkModulus * _jacobians[i];
 		});
 	}
 };
