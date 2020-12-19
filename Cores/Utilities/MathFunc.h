@@ -9,7 +9,11 @@
 namespace PhysX::MathFunc
 {
 
-inline constexpr int pow(int base, uint exp) { return exp ? base * pow(base, exp - 1) : 1; }
+template <typename Scalar>
+inline constexpr Scalar pow(const Scalar base, const uint exp) { return exp ? base * pow(base, exp - 1) : 1; }
+
+template <typename Scalar>
+inline constexpr Scalar square(const Scalar x) { return x * x; }
 
 inline constexpr real dirac(const real x, const real eps)
 {

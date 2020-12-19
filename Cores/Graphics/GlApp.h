@@ -67,7 +67,7 @@ protected:
 
 	bool _paused = false;
 	bool _enableInfo = true;
-	bool _enableSrgb = true;
+	bool _enableSrgb = false;
 	bool _enableMsaa = false;
 	bool _enableWireframe = false;
 

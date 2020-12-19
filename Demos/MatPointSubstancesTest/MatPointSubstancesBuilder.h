@@ -40,10 +40,10 @@ protected:
 		StaggeredGrid<Dim> grid(3, length / scale, resolution);
 		auto substances = std::make_unique<MaterialPointSubstances<Dim>>(grid);
 
-		auto liquid = ParticlesBasedSubstance<Dim>("liquid", Vector4f(6, 133, 135, 255) / 255, real(1e3), real(1e5), 0);
-		substances->sampleParticlesInsideSurface(liquid, ImplicitSphere<Dim>(VectorDr::Zero(), length * real(.4)), nppsc);
+		auto liquid = std::make_unique<MaterialPointSubstance<Dim>>("liquid", Vector4f(6, 133, 135, 255) / 255, real(1e3), real(1e5), 0);
+		substances->sampleParticlesInsideSurface(liquid.get(), ImplicitSphere<Dim>(VectorDr::Zero(), length * real(.4)), nppsc);
 
-		substances->_substances.emplace_back(liquid);
+		substances->_substances.push_back(std::move(liquid));
 		return substances;
 	}
 
@@ -57,14 +57,14 @@ protected:
 		StaggeredGrid<Dim> grid(3, length / scale / 8, resolution);
 		auto substances = std::make_unique<MaterialPointSubstances<Dim>>(grid);
 
-		auto jelly = ParticlesBasedSubstance<Dim>("jelly", Vector4f(237, 85, 59, 255) / 255, real(1e3), real(7.5e3), real(1.2e5));
-		substances->sampleParticlesInsideSurface(jelly, ImplicitSphere<Dim>(VectorDr::Unit(1) * length * (.15) - VectorDr::Unit(0) * length / 2, length * real(.3)), nppsc);
+		auto jelly = std::make_unique<MaterialPointSubstance<Dim>>("jelly", Vector4f(237, 85, 59, 255) / 255, real(1e3), real(7.5e3), real(1.2e5));
+		substances->sampleParticlesInsideSurface(jelly.get(), ImplicitSphere<Dim>(VectorDr::Unit(1) * length * (.15) - VectorDr::Unit(0) * length / 2, length * real(.3)), nppsc);
 
-		auto snow = ParticlesBasedSubstance<Dim>("snow", Vector4f(238, 238, 240, 255) / 255, real(1e3), real(2.5e4), real(4e5), real(2.5e-2), real(4.5e-3), 10);
-		substances->sampleParticlesInsideSurface(snow, ImplicitSphere<Dim>(VectorDr::Unit(1) * length * (.15) + VectorDr::Unit(0) * length / 2, length * real(.3)), nppsc);
+		auto snow = std::make_unique<MaterialPointSubstance<Dim>>("snow", Vector4f(238, 238, 240, 255) / 255, real(1e3), real(2.5e4), real(4e5), real(2.5e-2), real(4.5e-3), 10);
+		substances->sampleParticlesInsideSurface(snow.get(), ImplicitSphere<Dim>(VectorDr::Unit(1) * length * (.15) + VectorDr::Unit(0) * length / 2, length * real(.3)), nppsc);
 
-		substances->_substances.emplace_back(jelly);
-		substances->_substances.emplace_back(snow);
+		substances->_substances.push_back(std::move(jelly));
+		substances->_substances.push_back(std::move(snow));
 		return substances;
 	}
 

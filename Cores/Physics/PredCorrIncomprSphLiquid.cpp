@@ -1,5 +1,7 @@
 #include "PredCorrIncomprSphLiquid.h"
 
+#include "Utilities/MathFunc.h"
+
 namespace PhysX {
 
 template <int Dim>
@@ -72,16 +74,15 @@ void PredCorrIncomprSphLiquid<Dim>::applyPressureForce(const real dt)
 template <int Dim>
 real PredCorrIncomprSphLiquid<Dim>::computeDelta(const real dt) const
 {
-	const auto square = [](const real x)->real { return x * x; };
-	real delta = square(_targetDensity / dt / _particles.mass()) / 2;
+	real delta = MathFunc::square(_targetDensity / dt / _particles.mass()) / 2;
 	if constexpr (Dim == 2) {
-		delta /= square(_particles.firstDerivativeKernel(_particles.radius() * 2)) * 6
-			+ square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 6;
+		delta /= MathFunc::square(_particles.firstDerivativeKernel(_particles.radius() * 2)) * 6
+			+ MathFunc::square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 6;
 	}
 	else {
-		delta /= square(_particles.firstDerivativeKernel(_particles.radius() * 2)) * 12
-			+ square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt2)) * 6
-			+ square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 24;
+		delta /= MathFunc::square(_particles.firstDerivativeKernel(_particles.radius() * 2)) * 12
+			+ MathFunc::square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt2)) * 6
+			+ MathFunc::square(_particles.firstDerivativeKernel(_particles.radius() * 2 * std::numbers::sqrt3)) * 24;
 	}
 	return delta;
 }

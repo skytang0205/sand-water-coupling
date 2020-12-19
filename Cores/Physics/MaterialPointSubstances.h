@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Geometries/Collider.h"
-#include "Materials/ParticlesBasedSubstance.h"
+#include "Materials/MaterialPointSubstance.h"
 #include "Physics/Simulation.h"
 #include "Structures/GridBasedData.h"
 #include "Structures/ParticlesBasedData.h"
@@ -22,7 +22,7 @@ public:
 
 protected:
 
-	std::vector<ParticlesBasedSubstance<Dim>> _substances;
+	std::vector<std::unique_ptr<MaterialPointSubstance<Dim>>> _substances;
 
 	const StaggeredGrid<Dim> _grid;
 
@@ -55,13 +55,14 @@ public:
 
 protected:
 
+	virtual void moveParticles(const real dt);
 	virtual void applyLagrangianForces(const real dt) { }
 	virtual void applyEulerianForces(const real dt);
 
 	virtual void transferFromGridToParticles(const real dt);
 	virtual void transferFromParticlesToGrid(const real dt);
 
-	void sampleParticlesInsideSurface(ParticlesBasedSubstance<Dim> &substance, const Surface<Dim> &surface, const int particlesCntPerSubcell);
+	void sampleParticlesInsideSurface(MaterialPointSubstance<Dim> *const substance, const Surface<Dim> &surface, const int particlesCntPerSubcell);
 };
 
 }

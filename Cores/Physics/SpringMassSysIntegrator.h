@@ -1,20 +1,12 @@
 #pragma once
 
+#include "Materials/Spring.h"
 #include "Solvers/SparseSolver.h"
 #include "Structures/ParticlesBasedData.h"
 
 #include <unordered_set>
 
 namespace PhysX {
-
-struct Spring
-{
-	int pid0;
-	int pid1;
-	real restLength;
-	real stiffnessCoeff;
-	real dampingCoeff;
-};
 
 template <int Dim>
 class SpringMassSysIntegrator
