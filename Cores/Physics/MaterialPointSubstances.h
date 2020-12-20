@@ -28,6 +28,7 @@ protected:
 
 	GridBasedVectorData<Dim> _velocity;
 	GridBasedScalarData<Dim> _mass;
+	GridBasedData<Dim, uchar> _collided;
 
 	const StaticCollider<Dim> _domainBoundary;
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;

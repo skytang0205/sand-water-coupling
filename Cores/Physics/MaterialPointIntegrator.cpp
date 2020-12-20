@@ -12,7 +12,8 @@ void MpSemiImplicitIntegrator<Dim>::integrate(
 	GridBasedVectorData<Dim> &velocity,
 	const GridBasedScalarData<Dim> &mass,
 	const std::vector<std::unique_ptr<MaterialPointSubstance<Dim>>> &substances,
-	const real dt)
+	const real dt,
+	const GridBasedData<Dim, uchar> &collided)
 {
 	// TODO: Impl
 }

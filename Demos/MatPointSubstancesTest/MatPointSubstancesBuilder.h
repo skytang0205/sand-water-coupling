@@ -70,7 +70,6 @@ protected:
 		return substances;
 	}
 
-
 	static void reportError(const std::string &msg)
 	{
 		std::cerr << fmt::format("Error: [MatPointSubstancesBuilder] encountered {}.\n{}", msg) << std::endl;

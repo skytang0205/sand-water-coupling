@@ -22,7 +22,8 @@ public:
 		GridBasedVectorData<Dim> &velocity,
 		const GridBasedScalarData<Dim> &mass,
 		const std::vector<std::unique_ptr<MaterialPointSubstance<Dim>>> &substances,
-		const real dt) = 0;
+		const real dt,
+		const GridBasedData<Dim, uchar> &collided) = 0;
 };
 
 template <int Dim>
@@ -41,7 +42,8 @@ public:
 		GridBasedVectorData<Dim> &velocity,
 		const GridBasedScalarData<Dim> &mass,
 		const std::vector<std::unique_ptr<MaterialPointSubstance<Dim>>> &substances,
-		const real dt) override
+		const real dt,
+		const GridBasedData<Dim, uchar> &collided) override
 	{ }
 };
 
@@ -70,7 +72,8 @@ public:
 		GridBasedVectorData<Dim> &velocity,
 		const GridBasedScalarData<Dim> &mass,
 		const std::vector<std::unique_ptr<MaterialPointSubstance<Dim>>> &substances,
-		const real dt) override;
+		const real dt,
+		const GridBasedData<Dim, uchar> &collided) override;
 };
 
 }

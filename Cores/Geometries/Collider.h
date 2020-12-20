@@ -40,8 +40,8 @@ public:
 	void collide(VectorDr &pos, const real radius = 0) const;
 	void collide(VectorDr &pos, VectorDr &vel, const real radius = 0) const;
 
-	void resolve(const VectorDr &pos, VectorDr &vel) const;
-	void resolve(const VectorDr &pos, const VectorDr &normal, VectorDr &vel) const;
+	bool resolve(const VectorDr &pos, VectorDr &vel) const;
+	bool resolve(const VectorDr &pos, const VectorDr &normal, VectorDr &vel) const;
 
 	bool detect(const VectorDr &pos, const real radius = 0) const { return Surface<Dim>::isInside(surface()->signedDistance(pos) - radius); }
 };

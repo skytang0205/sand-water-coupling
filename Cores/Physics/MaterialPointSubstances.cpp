@@ -14,6 +14,7 @@ MaterialPointSubstances<Dim>::MaterialPointSubstances(const StaggeredGrid<Dim> &
 	_grid(grid),
 	_velocity(_grid.nodeGrid()),
 	_mass(_grid.nodeGrid()),
+	_collided(_grid.nodeGrid()),
 	_domainBoundary(
 		std::make_unique<ComplementarySurface<Dim>>(
 			std::make_unique<ImplicitBox<Dim>>(
@@ -138,17 +139,18 @@ void MaterialPointSubstances<Dim>::applyEulerianForces(const real dt)
 			vel[1] -= kGravity * dt;
 
 		// Resolve collisions.
-		if (_grid.isBoundaryNode(node))
-			_domainBoundary.resolve(pos, vel);
+		if (_grid.isBoundaryNode(node) && _domainBoundary.resolve(pos, vel))
+			_collided[node] = true;
 		for (const auto &collider : _colliders)
-			if (collider->detect(pos)) collider->resolve(pos, vel);
+			if (collider->detect(pos) && collider->resolve(pos, vel))
+				_collided[node] = true;
 	});
 }
 
 template <int Dim>
 void MaterialPointSubstances<Dim>::applyElasticForce(const real dt)
 {
-	_integrator->integrate(_velocity, _mass, _substances, dt);
+	_integrator->integrate(_velocity, _mass, _substances, dt, _collided);
 }
 
 template <int Dim>
@@ -180,6 +182,7 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 	ParticlesBasedData<Dim, MatrixDr> stresses;
 	_velocity.setZero();
 	_mass.setZero();
+	_collided.setZero();
 
 	for (auto &substance : _substances) {
 		const real mass = substance->particles.mass();

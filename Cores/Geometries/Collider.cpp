@@ -38,14 +38,14 @@ void Collider<Dim>::collide(VectorDr &pos, VectorDr &vel, const real radius) con
 }
 
 template <int Dim>
-void Collider<Dim>::resolve(const VectorDr &pos, VectorDr &vel) const
+bool Collider<Dim>::resolve(const VectorDr &pos, VectorDr &vel) const
 {
 	const VectorDr normal = surface()->closestNormal(pos);
-	resolve(pos, normal, vel);
+	return resolve(pos, normal, vel);
 }
 
 template <int Dim>
-void Collider<Dim>::resolve(const VectorDr &pos, const VectorDr &normal, VectorDr &vel) const
+bool Collider<Dim>::resolve(const VectorDr &pos, const VectorDr &normal, VectorDr &vel) const
 {
 	const VectorDr colliderVel = velocityAt(pos);
 	const VectorDr relativeVel = vel - colliderVel;
@@ -63,7 +63,9 @@ void Collider<Dim>::resolve(const VectorDr &pos, const VectorDr &normal, VectorD
 		}
 		// Reassemble the components.
 		vel = relativeVelN + relativeVelT + colliderVel;
+		return true;
 	}
+	return false;
 }
 
 template class Collider<2>;
