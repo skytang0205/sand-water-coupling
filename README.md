@@ -172,4 +172,6 @@ Viewer 使用下列键位及鼠标操作：
    APIC 方法对流液体速度场，参见 [`Physics/AffineParticleInCellLiquid`](Cores/Physics/AffineParticleInCellLiquid.h)。  
    APIC 方法对流速度场，并作为物质点法的基础，参见 [`Physics/MaterialPointSubstances`](Cores/Physics/MaterialPointSubstances.h)。
 10. Yuanming Hu, Yu Fang, Ziheng Ge, Ziyin Qu, Yixin Zhu, Andre Pradhana, and Chenfanfu Jiang. 2018. A moving least squares material point method with displacement discontinuity and two-way rigid body coupling. *ACM Trans. Graph*. 37, 4, Article 150 (August 2018), 14 pages.  
-   移动最小二乘物质点法模拟多物理场景，参见 [`Physics/MaterialPointSubstances`](Cores/Physics/MaterialPointSubstances.h)。
+    移动最小二乘物质点法模拟多物理场景，参见 [`Physics/MaterialPointSubstances`](Cores/Physics/MaterialPointSubstances.h)。
+11. Andre Pradhana Tampubolon, Theodore Gast, Gergely Klár, Chuyuan Fu, Joseph Teran, Chenfanfu Jiang, and Ken Museth. 2017. Multi-species simulation of porous sand and water mixtures. *ACM Trans. Graph*. 36, 4, Article 105 (July 2017), 11 pages.  
+    物质点法对液体的特化，参见 [`Materials/MaterialPointLiquid`](Cores/Materials/MaterialPointLiquid.h)。

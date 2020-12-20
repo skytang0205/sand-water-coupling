@@ -2,6 +2,8 @@
 
 #include "MaterialPointSubstance.h"
 
+#include <cmath>
+
 namespace PhysX {
 
 template <int Dim>
@@ -57,11 +59,31 @@ public:
 		});
 	}
 
+	virtual ParticlesBasedData<Dim, MatrixDr> getDeformationGradients() const override
+	{
+		ParticlesBasedData<Dim, MatrixDr> defmGrads(&particles);
+		particles.parallelForEach([&](const int i) {
+			if constexpr (Dim == 2)
+				defmGrads[i] = MatrixDr::Identity() * std::sqrt(_jacobians[i]);
+			else
+				defmGrads[i] = MatrixDr::Identity() * std::cbrt(_jacobians[i]);
+		});
+		return defmGrads;
+	}
+
 	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const override
 	{
 		stresses.resize(&particles);
 		particles.parallelForEach([&](const int i) {
 			stresses[i] = MatrixDr::Identity() * (_jacobians[i] - 1) * _bulkModulus * _jacobians[i];
+		});
+	}
+
+	virtual void computeEnergyHessians(ParticlesBasedData<Dim, Matrix<Dim * Dim, real>> &hessians) const override
+	{
+		hessians.resize(&particles);
+		particles.parallelForEach([&](const int i) {
+			// TODO: Impl
 		});
 	}
 };

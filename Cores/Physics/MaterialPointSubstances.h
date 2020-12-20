@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Geometries/Collider.h"
-#include "Materials/MaterialPointSubstance.h"
+#include "Physics/MaterialPointIntegrator.h"
 #include "Physics/Simulation.h"
 #include "Structures/GridBasedData.h"
 #include "Structures/ParticlesBasedData.h"
@@ -32,6 +32,8 @@ protected:
 	const StaticCollider<Dim> _domainBoundary;
 	std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 
+	std::unique_ptr<MaterialPointIntegrator<Dim>> _integrator;
+
 	bool _enableGravity = true;
 
 public:
@@ -58,7 +60,7 @@ protected:
 	virtual void moveParticles(const real dt);
 	virtual void applyLagrangianForces(const real dt) { }
 	virtual void applyEulerianForces(const real dt);
-	virtual void resolveVelocity(const real dt);
+	virtual void applyElasticForce(const real dt);
 
 	virtual void transferFromGridToParticles(const real dt);
 	virtual void transferFromParticlesToGrid(const real dt);

@@ -71,7 +71,9 @@ public:
 	}
 
 	virtual void update(const real dt) = 0;
+	virtual ParticlesBasedData<Dim, MatrixDr> getDeformationGradients() const = 0;
 	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const = 0;
+	virtual void computeEnergyHessians(ParticlesBasedData<Dim, Matrix<Dim * Dim, real>> &hessians) const = 0;
 };
 
 }

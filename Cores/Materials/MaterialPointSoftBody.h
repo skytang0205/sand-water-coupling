@@ -58,11 +58,21 @@ public:
 		});
 	}
 
+	virtual ParticlesBasedData<Dim, MatrixDr> getDeformationGradients() const override { return _deformationGradients; }
+
 	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const override
 	{
 		stresses.resize(&particles);
 		particles.parallelForEach([&](const int i) {
 			stresses[i] = Model::computeStressTensorMultipliedByJ(_deformationGradients[i], _lameLambda, _lameMu);
+		});
+	}
+
+	virtual void computeEnergyHessians(ParticlesBasedData<Dim, Matrix<Dim * Dim, real>> &hessians) const override
+	{
+		hessians.resize(&particles);
+		particles.parallelForEach([&](const int i) {
+			hessians[i] = Model::computeEnergyHessian(_deformationGradients[i], _lameLambda, _lameMu);
 		});
 	}
 };

@@ -57,8 +57,8 @@ protected:
 	void reinitializeParticlesBasedData();
 	void moveParticles(const real dt);
 
-	void calculateExternalForces();
-	void resolveVelocities(const real dt);
+	void applyExternalForces(const real dt);
+	void applyElasticForce(const real dt);
 };
 
 }

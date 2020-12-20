@@ -79,6 +79,15 @@ public:
 			stresses[i] = Model::computeStressTensorMultipliedByJ(_deformationGradients[i], ratio * _lameLambda, ratio * _lameMu);
 		});
 	}
+	
+	virtual void computeEnergyHessians(ParticlesBasedData<Dim, Matrix<Dim * Dim, real>> &hessians) const override
+	{
+		hessians.resize(&particles);
+		particles.parallelForEach([&](const int i) {
+			const real ratio = std::exp(_hardeningCoeff * (1 - _plasticJacobians[i]));
+			hessians[i] = Model::computeEnergyHessian(_deformationGradients[i], ratio * _lameLambda, ratio * _lameMu);
+		});
+	}
 };
 
 }

@@ -39,8 +39,8 @@ void EulerianProjector<Dim>::solveLinearSystem()
 {
 	_solver->solve(
 		_matLaplacian,
-		Eigen::Map<VectorXr, Eigen::Aligned>(_reducedPressure.data(), _reducedPressure.count()),
-		Eigen::Map<VectorXr, Eigen::Aligned>(_velocityDiv.data(), _velocityDiv.count()));
+		_reducedPressure.asVectorXr(),
+		_velocityDiv.asVectorXr());
 }
 
 template <int Dim>

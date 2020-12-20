@@ -3,24 +3,25 @@
 namespace PhysX {
 
 template <int Dim>
-void MpSymplecticEulerIntegrator<Dim>::integrate(
-	GridBasedVectorData<Dim> &momentum,
+MpSemiImplicitIntegrator<Dim>::MpSemiImplicitIntegrator() :
+	_solver(std::make_unique<IcPCgSolver>())
+{ }
+
+template <int Dim>
+void MpSemiImplicitIntegrator<Dim>::integrate(
+	GridBasedVectorData<Dim> &velocity,
+	const GridBasedScalarData<Dim> &mass,
 	const std::vector<std::unique_ptr<MaterialPointSubstance<Dim>>> &substances,
 	const real dt)
 {
-	for (auto &substance : _substances) {
-		const real stressCoeff = -dt * 4 * momentum.invSpacing() * momentum.invSpacing() * substance->particles.mass() / substance->density();
-		substance->computeStressTensors(stresses);
-
-		substance->particles.forEach([&](const int i) {
-			const VectorDr pos = substance->particles.positions[i];
-			const MatrixDr stress = stresses[i] * stressCoeff;
-			for (const auto [node, weight] : momentum.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
-				const VectorDr deltaPos = _velocity.position(node) - pos;
-				momentum[node] += stress * deltaPos * weight;
-			}
-		});
-	}
+	// TODO: Impl
 }
+
+template class MaterialPointIntegrator<2>;
+template class MaterialPointIntegrator<3>;
+template class MpSymplecticEulerIntegrator<2>;
+template class MpSymplecticEulerIntegrator<3>;
+template class MpSemiImplicitIntegrator<2>;
+template class MpSemiImplicitIntegrator<3>;
 
 }

@@ -82,6 +82,9 @@ public:
 		else return absoluteMax();
 	}
 
+	auto asVectorXr() { return Eigen::Map<VectorXr, Eigen::Aligned>(reinterpret_cast<real *>(_data.data()), _data.size() * (sizeof(Type) / sizeof(real))); }
+	auto asVectorXr() const { return Eigen::Map<const VectorXr, Eigen::Aligned>(reinterpret_cast<const real *>(_data.data()), _data.size() * (sizeof(Type) / sizeof(real))); }
+
 	void forEach(const std::function<void(const VectorDi &)> &func) const { _grid->forEach(func); }
 	void parallelForEach(const std::function<void(const VectorDi &)> &func) const { _grid->parallelForEach(func); }
 
