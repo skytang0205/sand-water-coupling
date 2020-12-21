@@ -119,11 +119,13 @@ template <int Dim>
 void MaterialPointSubstances<Dim>::moveParticles(const real dt)
 {
 	for (auto &substance : _substances) {
-		substance->update(dt);
-		// Resolve collisions.
-		_domainBoundary.collide(substance->particles.positions);
-		for (const auto &collider : _colliders)
-			collider->collide(substance->particles.positions);
+		substance->particles.parallelForEach([&](const int i) {
+			substance->update(i, dt);
+			// Resolve collisions.
+			_domainBoundary.collide(substance->particles.positions[i]);
+			for (const auto &collider : _colliders)
+				collider->collide(substance->particles.positions[i]);
+		});
 	}
 }
 
@@ -179,7 +181,6 @@ void MaterialPointSubstances<Dim>::transferFromGridToParticles(const real dt)
 template <int Dim>
 void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 {
-	ParticlesBasedData<Dim, MatrixDr> stresses;
 	_velocity.setZero();
 	_mass.setZero();
 	_collided.setZero();
@@ -187,13 +188,12 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 	for (auto &substance : _substances) {
 		const real mass = substance->particles.mass();
 		const real stressCoeff = -dt * 4 * _velocity.invSpacing() * _velocity.invSpacing() * substance->particles.mass() / substance->density();
-		substance->computeStressTensors(stresses);
 
 		substance->particles.forEach([&](const int i) {
 			const VectorDr pos = substance->particles.positions[i];
 			const VectorDr vel = substance->velocities[i];
 			const MatrixDr velDrv = substance->velocityDerivatives[i];
-			const MatrixDr stress = stresses[i] * stressCoeff;
+			const MatrixDr stress = substance->computeStressTensor(i) * stressCoeff;
 			// Transfer into velocity and mass.
 			for (const auto [node, weight] : _velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
 				const VectorDr deltaPos = _velocity.position(node) - pos;

@@ -51,40 +51,15 @@ public:
 		_jacobians.setConstant(1);
 	}
 
-	virtual void update(const real dt) override
+	virtual void update(const int idx, const real dt) override
 	{
-		particles.parallelForEach([&](const int i) {
-			particles.positions[i] += velocities[i] * dt;
-			_jacobians[i] *= (1 + velocityDerivatives[i].trace() * dt);
-		});
+		MaterialPointSubstance<Dim>::update(idx, dt);
+		_jacobians[idx] *= (1 + velocityDerivatives[idx].trace() * dt);
 	}
 
-	virtual ParticlesBasedData<Dim, MatrixDr> getDeformationGradients() const override
+	virtual MatrixDr computeStressTensor(const int idx) const override
 	{
-		ParticlesBasedData<Dim, MatrixDr> defmGrads(&particles);
-		particles.parallelForEach([&](const int i) {
-			if constexpr (Dim == 2)
-				defmGrads[i] = MatrixDr::Identity() * std::sqrt(_jacobians[i]);
-			else
-				defmGrads[i] = MatrixDr::Identity() * std::cbrt(_jacobians[i]);
-		});
-		return defmGrads;
-	}
-
-	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const override
-	{
-		stresses.resize(&particles);
-		particles.parallelForEach([&](const int i) {
-			stresses[i] = MatrixDr::Identity() * (_jacobians[i] - 1) * _bulkModulus * _jacobians[i];
-		});
-	}
-
-	virtual void computeEnergyHessians(ParticlesBasedData<Dim, Matrix<Dim * Dim, real>> &hessians) const override
-	{
-		hessians.resize(&particles);
-		particles.parallelForEach([&](const int i) {
-			// TODO: Impl
-		});
+		return MatrixDr::Identity() * (_jacobians[idx] - 1) * _bulkModulus * _jacobians[idx];
 	}
 };
 

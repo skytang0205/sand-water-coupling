@@ -57,36 +57,21 @@ public:
 		_plasticJacobians.setConstant(1);
 	}
 
-	virtual void update(const real dt) override
+	virtual void update(const int idx, const real dt) override
 	{
-		particles.parallelForEach([&](const int i) {
-			particles.positions[i] += velocities[i] * dt;
-			_deformationGradients[i] = (MatrixDr::Identity() + velocityDerivatives[i] * dt) * _deformationGradients[i];
+		MaterialPointSoftBody<Dim>::update(idx, dt);
 
-			Eigen::JacobiSVD<MatrixDr> svd(_deformationGradients[i], Eigen::ComputeFullU | Eigen::ComputeFullV);
-			_plasticJacobians[i] *= svd.singularValues().prod();
-			const VectorDr svdS = svd.singularValues().cwiseMax(_plasticLowerBound).cwiseMin(_plasticUpperBound);
-			_plasticJacobians[i] /= svdS.prod();
-			_deformationGradients[i] = svd.matrixU() * svdS.asDiagonal() * svd.matrixV().transpose();
-		});
+		Eigen::JacobiSVD<MatrixDr> svd(_deformationGradients[idx], Eigen::ComputeFullU | Eigen::ComputeFullV);
+		_plasticJacobians[idx] *= svd.singularValues().prod();
+		const VectorDr svdS = svd.singularValues().cwiseMax(_plasticLowerBound).cwiseMin(_plasticUpperBound);
+		_plasticJacobians[idx] /= svdS.prod();
+		_deformationGradients[idx] = svd.matrixU() * svdS.asDiagonal() * svd.matrixV().transpose();
 	}
 
-	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const override
+	virtual MatrixDr computeStressTensor(const int idx) const override
 	{
-		stresses.resize(&particles);
-		particles.parallelForEach([&](const int i) {
-			const real ratio = std::exp(_hardeningCoeff * (1 - _plasticJacobians[i]));
-			stresses[i] = Model::computeStressTensorMultipliedByJ(_deformationGradients[i], ratio * _lameLambda, ratio * _lameMu);
-		});
-	}
-	
-	virtual void computeEnergyHessians(ParticlesBasedData<Dim, Matrix<Dim * Dim, real>> &hessians) const override
-	{
-		hessians.resize(&particles);
-		particles.parallelForEach([&](const int i) {
-			const real ratio = std::exp(_hardeningCoeff * (1 - _plasticJacobians[i]));
-			hessians[i] = Model::computeEnergyHessian(_deformationGradients[i], ratio * _lameLambda, ratio * _lameMu);
-		});
+		const real ratio = std::exp(_hardeningCoeff * (1 - _plasticJacobians[idx]));
+		return Model::computeStressTensorMultipliedByJ(_deformationGradients[idx], ratio * _lameLambda, ratio * _lameMu);
 	}
 };
 

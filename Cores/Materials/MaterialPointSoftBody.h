@@ -50,30 +50,15 @@ public:
 		_deformationGradients.setConstant(MatrixDr::Identity());
 	}
 
-	virtual void update(const real dt) override
+	virtual void update(const int idx, const real dt) override
 	{
-		particles.parallelForEach([&](const int i) {
-			particles.positions[i] += velocities[i] * dt;
-			_deformationGradients[i] = (MatrixDr::Identity() + velocityDerivatives[i] * dt) * _deformationGradients[i];
-		});
+		MaterialPointSubstance<Dim>::update(idx, dt);
+		_deformationGradients[idx] = (MatrixDr::Identity() + velocityDerivatives[idx] * dt) * _deformationGradients[idx];
 	}
 
-	virtual ParticlesBasedData<Dim, MatrixDr> getDeformationGradients() const override { return _deformationGradients; }
-
-	virtual void computeStressTensors(ParticlesBasedData<Dim, MatrixDr> &stresses) const override
+	virtual MatrixDr computeStressTensor(const int idx) const override
 	{
-		stresses.resize(&particles);
-		particles.parallelForEach([&](const int i) {
-			stresses[i] = Model::computeStressTensorMultipliedByJ(_deformationGradients[i], _lameLambda, _lameMu);
-		});
-	}
-
-	virtual void computeEnergyHessians(ParticlesBasedData<Dim, Matrix<Dim * Dim, real>> &hessians) const override
-	{
-		hessians.resize(&particles);
-		particles.parallelForEach([&](const int i) {
-			hessians[i] = Model::computeEnergyHessian(_deformationGradients[i], _lameLambda, _lameMu);
-		});
+		return Model::computeStressTensorMultipliedByJ(_deformationGradients[idx], _lameLambda, _lameMu);
 	}
 };
 
