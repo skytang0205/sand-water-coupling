@@ -95,7 +95,7 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::transferFromGridToParticles()
 {
 	_particles.parallelForEach([&](const int i) {
-		const VectorDr pos = _particles.positions[i];
+		const VectorDr &pos = _particles.positions[i];
 		_particleVelocities[i] = _velocity(pos);
 	});
 }
@@ -120,8 +120,8 @@ template <int Dim>
 void ParticleInCellLiquid<Dim>::transferFromParticlesToGrid(StaggeredGridBasedScalarData<Dim> &weightSum)
 {
 	_particles.forEach([&](const int i) {
-		const VectorDr pos = _particles.positions[i];
-		const VectorDr vel = _particleVelocities[i];
+		const VectorDr &pos = _particles.positions[i];
+		const VectorDr &vel = _particleVelocities[i];
 		for (int axis = 0; axis < Dim; axis++) {
 			for (const auto [face, weight] : _velocity[axis].grid()->linearIntrplDataPoints(pos)) {
 				_velocity[axis][face] += vel[axis] * weight;
@@ -147,7 +147,7 @@ void ParticleInCellLiquid<Dim>::reinitializeLevelSet()
 	const real radius = liquidSdf.spacing() * real(1.1) / real(std::numbers::sqrt2);
 
 	_particles.forEach([&](const int i) {
-		const VectorDr pos = _particles.positions[i];
+		const VectorDr &pos = _particles.positions[i];
 		const ImplicitSphere<Dim> sphere(pos, radius);
 		for (const auto &cell : liquidSdf.grid()->cubicNearbyDataPoints(pos)) {
 			if (liquidSdf.isValid(cell))

@@ -19,7 +19,7 @@ MaterialPointSubstances<Dim>::MaterialPointSubstances(const StaggeredGrid<Dim> &
 		std::make_unique<ComplementarySurface<Dim>>(
 			std::make_unique<ImplicitBox<Dim>>(
 				_grid.domainOrigin(), _grid.domainLengths()))),
-	_integrator(std::make_unique<MpSemiImplicitIntegrator<Dim>>())
+	_integrator(std::make_unique<MpSymplecticEulerIntegrator<Dim>>())
 { }
 
 template <int Dim>
@@ -190,9 +190,9 @@ void MaterialPointSubstances<Dim>::transferFromParticlesToGrid(const real dt)
 		const real stressCoeff = -dt * 4 * _velocity.invSpacing() * _velocity.invSpacing() * substance->particles.mass() / substance->density();
 
 		substance->particles.forEach([&](const int i) {
-			const VectorDr pos = substance->particles.positions[i];
-			const VectorDr vel = substance->velocities[i];
-			const MatrixDr velDrv = substance->velocityDerivatives[i];
+			const VectorDr &pos = substance->particles.positions[i];
+			const VectorDr &vel = substance->velocities[i];
+			const MatrixDr &velDrv = substance->velocityDerivatives[i];
 			const MatrixDr stress = substance->computeStressTensor(i) * stressCoeff;
 			// Transfer into velocity and mass.
 			for (const auto [node, weight] : _velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {

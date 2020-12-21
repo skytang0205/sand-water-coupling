@@ -73,6 +73,7 @@ public:
 	virtual void update(const int idx, const real dt) { particles.positions[idx] += velocities[idx] * dt; }
 	virtual MatrixDr computeStressTensor(const int idx) const = 0;
 	virtual MatrixDr computeDeltaStressTensor(const int idx, const MatrixDr &weightSum) const = 0;
+	virtual MatrixDr computeDeltaStressTensorAtRef(const int idx, const MatrixDr &weightSum) const = 0;
 };
 
 }

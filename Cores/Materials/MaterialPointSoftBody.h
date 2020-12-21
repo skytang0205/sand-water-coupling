@@ -65,6 +65,11 @@ public:
 	{
 		return Model::computeDeltaNominalStressTensor(_deformationGradients[idx], weightSum * _deformationGradients[idx], _lameLambda, _lameMu) * _deformationGradients[idx].transpose();
 	}
+
+	virtual MatrixDr computeDeltaStressTensorAtRef(const int idx, const MatrixDr &weightSum) const override
+	{
+		return Model::computeDeltaNominalStressTensor(MatrixDr::Identity(), weightSum, _lameLambda, _lameMu);
+	}
 };
 
 }

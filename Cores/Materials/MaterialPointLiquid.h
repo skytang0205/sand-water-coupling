@@ -59,12 +59,17 @@ public:
 
 	virtual MatrixDr computeStressTensor(const int idx) const override
 	{
-		return MatrixDr::Identity() * (_jacobians[idx] - 1) * _bulkModulus * _jacobians[idx];
+		return _bulkModulus * _jacobians[idx] * (_jacobians[idx] - 1) * MatrixDr::Identity();
 	}
 
 	virtual MatrixDr computeDeltaStressTensor(const int idx, const MatrixDr &weightSum) const override
 	{
-		return MatrixDr::Zero();
+		return _bulkModulus * _jacobians[idx] * (2 * _jacobians[idx] - 1) * weightSum.trace() * MatrixDr::Identity();
+	}
+
+	virtual MatrixDr computeDeltaStressTensorAtRef(const int idx, const MatrixDr &weightSum) const override
+	{
+		return _bulkModulus * weightSum.trace() * MatrixDr::Identity();
 	}
 };
 

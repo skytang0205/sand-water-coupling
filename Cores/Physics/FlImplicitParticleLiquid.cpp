@@ -46,7 +46,7 @@ void FlImplicitParticleLiquid<Dim>::transferFromGridToParticles()
 		_deltaVelocity[axis][face] = _velocity[axis][face] - _deltaVelocity[axis][face];
 	});
 	_particles.parallelForEach([&](const int i) {
-		const VectorDr pos = _particles.positions[i];
+		const VectorDr &pos = _particles.positions[i];
 		_particleVelocities[i] = _propOfPic * _velocity(pos) + (1 - _propOfPic) * (_particleVelocities[i] + _deltaVelocity(pos));
 	});
 }

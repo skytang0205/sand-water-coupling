@@ -12,10 +12,15 @@ void MpSemiImplicitIntegrator<Dim>::integrate(
 	const real dt,
 	const GridBasedData<Dim, uchar> &collided)
 {
-	IterativeSolver::solve<MpIntHessianMatrix<Dim>, IterativeSolver::CG<MpIntHessianMatrix<Dim>>>(
-		MpIntHessianMatrix<Dim>(velocity, mass, substances, dt, collided),
+	GridBasedVectorData<Dim> massExt(mass.grid());
+	mass.parallelForEach([&](const VectorDi &node) {
+		massExt[node] = VectorDr::Constant(mass[node]);
+	});
+
+	IterativeSolver::solve<MpIntHessianMatrix<Dim>, Eigen::BiCGSTAB<MpIntHessianMatrix<Dim>, MpIntPreconditioner<Dim>>>(
+		MpIntHessianMatrix<Dim>(velocity, massExt, substances, dt, collided),
 		velocity.asVectorXr(),
-		mass.asVectorXr().cwiseProduct(velocity.asVectorXr()));
+		massExt.asVectorXr().cwiseProduct(velocity.asVectorXr()));
 }
 
 template class MaterialPointIntegrator<2>;
