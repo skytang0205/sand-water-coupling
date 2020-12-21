@@ -2,6 +2,8 @@
 
 #include "Physics/LevelSetLiquid.h"
 
+#include <fmt/core.h>
+
 namespace PhysX {
 
 class LevelSetLiquidBuilder final

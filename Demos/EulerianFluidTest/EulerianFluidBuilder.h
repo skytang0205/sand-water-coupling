@@ -2,6 +2,8 @@
 
 #include "Physics/EulerianFluid.h"
 
+#include <fmt/core.h>
+
 namespace PhysX {
 
 class EulerianFluidBuilder final

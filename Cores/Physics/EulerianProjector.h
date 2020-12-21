@@ -2,7 +2,6 @@
 
 #include "Geometries/Collider.h"
 #include "Geometries/LevelSet.h"
-#include "Solvers/SparseSolver.h"
 #include "Structures/GridBasedScalarField.h"
 #include "Structures/StaggeredGridBasedData.h"
 #include "Structures/StaggeredGridBasedVectorField.h"
@@ -21,8 +20,6 @@ protected:
 
 	std::vector<Tripletr> _coefficients;
 	SparseMatrixr _matLaplacian;
-
-	std::unique_ptr<SparseSolver> _solver;
 
 public:
 

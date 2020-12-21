@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Materials/Spring.h"
-#include "Solvers/SparseSolver.h"
 #include "Structures/ParticlesBasedData.h"
 
 #include <unordered_set>
@@ -98,12 +97,9 @@ protected:
 	SparseMatrixr _matLinearized;
 	VectorXr _rhsLinearized;
 
-	std::unique_ptr<SparseSolver> _solver;
-
 public:
 
-	SmsSemiImplicitIntegrator();
-
+	SmsSemiImplicitIntegrator() = default;
 	SmsSemiImplicitIntegrator(const SmsSemiImplicitIntegrator &rhs) = delete;
 	SmsSemiImplicitIntegrator &operator=(const SmsSemiImplicitIntegrator &rhs) = delete;
 	virtual ~SmsSemiImplicitIntegrator() = default;

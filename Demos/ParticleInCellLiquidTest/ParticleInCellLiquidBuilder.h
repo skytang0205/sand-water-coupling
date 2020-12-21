@@ -4,6 +4,8 @@
 #include "Physics/FlImplicitParticleLiquid.h"
 #include "Physics/ParticleInCellLiquid.h"
 
+#include <fmt/core.h>
+
 namespace PhysX {
 
 class ParticleInCellLiquidBuilder final

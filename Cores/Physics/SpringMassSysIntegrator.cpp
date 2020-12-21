@@ -1,5 +1,7 @@
 #include "SpringMassSysIntegrator.h"
 
+#include "Solvers/IterativeSolver.h"
+
 namespace PhysX {
 
 template <int Dim>
@@ -39,11 +41,6 @@ void SmsSymplecticEulerIntegrator<Dim>::integrate(
 	accumulateForces(positions, velocities, _forces, constrainedDofs);
 	velocities.asVectorXr() += _forces.asVectorXr() * _particles->invMass() * dt;
 }
-
-template <int Dim>
-SmsSemiImplicitIntegrator<Dim>::SmsSemiImplicitIntegrator() :
-	_solver(std::make_unique<IcPCgSolver>())
-{ }
 
 template <int Dim>
 void SmsSemiImplicitIntegrator<Dim>::integrate(
@@ -106,7 +103,7 @@ void SmsSemiImplicitIntegrator<Dim>::integrate(
 	}
 
 	_matLinearized.setFromTriplets(_coefficients.begin(), _coefficients.end());
-	_solver->solve(_matLinearized, velocities.asVectorXr(), _rhsLinearized);
+	IterativeSolver::solve(_matLinearized, velocities.asVectorXr(), _rhsLinearized);
 }
 
 template class SpringMassSysIntegrator<2>;

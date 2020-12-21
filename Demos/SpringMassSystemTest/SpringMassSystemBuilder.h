@@ -3,6 +3,8 @@
 #include "Geometries/ImplicitSurface.h"
 #include "Physics/SpringMassSystem.h"
 
+#include <fmt/core.h>
+
 #include <numbers>
 
 namespace PhysX {

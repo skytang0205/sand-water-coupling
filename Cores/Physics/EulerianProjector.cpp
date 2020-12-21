@@ -1,13 +1,14 @@
 #include "EulerianProjector.h"
 
+#include "Solvers/IterativeSolver.h"
+
 namespace PhysX {
 
 template <int Dim>
 EulerianProjector<Dim>::EulerianProjector(const Grid<Dim> *const grid) :
 	_reducedPressure(grid),
 	_velocityDiv(grid),
-	_matLaplacian(grid->dataCount(), grid->dataCount()),
-	_solver(std::make_unique<IcPCgSolver>())
+	_matLaplacian(grid->dataCount(), grid->dataCount())
 { }
 
 template <int Dim>
@@ -37,7 +38,7 @@ void EulerianProjector<Dim>::project(
 template <int Dim>
 void EulerianProjector<Dim>::solveLinearSystem()
 {
-	_solver->solve(
+	IterativeSolver::solve(
 		_matLaplacian,
 		_reducedPressure.asVectorXr(),
 		_velocityDiv.asVectorXr());

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Materials/MaterialPointSubstance.h"
-#include "Solvers/SparseSolver.h"
 #include "Structures/GridBasedData.h"
 
 namespace PhysX {
@@ -58,11 +57,9 @@ protected:
 	SparseMatrixr _matLinearized;
 	VectorXr _rhsLinearized;
 
-	std::unique_ptr<SparseSolver> _solver;
-
 public:
 
-	MpSemiImplicitIntegrator();
+	MpSemiImplicitIntegrator() = default;
 
 	MpSemiImplicitIntegrator(const MpSemiImplicitIntegrator &rhs) = delete;
 	MpSemiImplicitIntegrator &operator=(const MpSemiImplicitIntegrator &rhs) = delete;

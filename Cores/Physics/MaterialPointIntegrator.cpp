@@ -3,11 +3,6 @@
 namespace PhysX {
 
 template <int Dim>
-MpSemiImplicitIntegrator<Dim>::MpSemiImplicitIntegrator() :
-	_solver(std::make_unique<IcPCgSolver>())
-{ }
-
-template <int Dim>
 void MpSemiImplicitIntegrator<Dim>::integrate(
 	GridBasedVectorData<Dim> &velocity,
 	const GridBasedScalarData<Dim> &mass,
