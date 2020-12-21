@@ -82,13 +82,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="FixedCorotatedModel.h" />
     <ClInclude Include="HyperelasticModel.h" />
     <ClInclude Include="MaterialPointLiquid.h" />
     <ClInclude Include="MaterialPointSoftBody.h" />
     <ClInclude Include="MaterialPointSubstance.h" />
     <ClInclude Include="MatPointPlasticSoftBody.h" />
-    <ClInclude Include="NeoHookeanModel.h" />
     <ClInclude Include="Spring.h" />
   </ItemGroup>
   <ItemGroup>

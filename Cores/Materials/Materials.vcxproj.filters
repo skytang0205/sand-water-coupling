@@ -33,11 +33,5 @@
     <ClInclude Include="HyperelasticModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NeoHookeanModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FixedCorotatedModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

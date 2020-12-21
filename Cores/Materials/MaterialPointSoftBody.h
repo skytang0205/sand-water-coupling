@@ -5,7 +5,7 @@
 
 namespace PhysX {
 
-template <int Dim, Hyperelastic<Dim> Model = FixedCorotatedModel<Dim>>
+template <int Dim, Hyperelastic<Dim> Model = FixedCorotatedLinearModel<Dim>>
 class MaterialPointSoftBody : public MaterialPointSubstance<Dim>
 {
 	DECLARE_DIM_TYPES(Dim)

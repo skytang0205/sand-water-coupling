@@ -4,7 +4,7 @@
 
 namespace PhysX {
 
-template <int Dim, Hyperelastic<Dim> Model = FixedCorotatedModel<Dim>>
+template <int Dim, Hyperelastic<Dim> Model = FixedCorotatedLinearModel<Dim>>
 class MatPointPlasticSoftBody : public MaterialPointSoftBody<Dim, Model>
 {
 	DECLARE_DIM_TYPES(Dim)
@@ -59,7 +59,7 @@ public:
 
 	virtual void update(const int idx, const real dt) override
 	{
-		MaterialPointSoftBody<Dim>::update(idx, dt);
+		MaterialPointSoftBody<Dim, Model>::update(idx, dt);
 
 		Eigen::JacobiSVD<MatrixDr> svd(_deformationGradients[idx], Eigen::ComputeFullU | Eigen::ComputeFullV);
 		_plasticJacobians[idx] *= svd.singularValues().prod();
