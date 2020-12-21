@@ -59,10 +59,10 @@ protected:
 		StaggeredGrid<Dim> grid(3, length / scale / 8, resolution);
 		auto substances = std::make_unique<MaterialPointSubstances<Dim>>(grid);
 
-		auto jelly = std::make_unique<MaterialPointSoftBody<Dim>>("jelly", Vector4f(237, 85, 59, 255) / 255, real(1e3), real(7.5e3), real(1.2e5));
+		auto jelly = std::make_unique<MaterialPointSoftBody<Dim, NeoHookeanModel<Dim>>>("jelly", Vector4f(237, 85, 59, 255) / 255, real(1e3), real(7.5e3), real(1.2e5));
 		substances->sampleParticlesInsideSurface(jelly.get(), ImplicitSphere<Dim>(VectorDr::Unit(1) * length * (.15) - VectorDr::Unit(0) * length / 2, length * real(.3)), nppsc);
 
-		auto snow = std::make_unique<MatPointPlasticSoftBody<Dim>>("snow", Vector4f(238, 238, 240, 255) / 255, real(1e3), real(2.5e4), real(4e5), real(2.5e-2), real(4.5e-3), 10);
+		auto snow = std::make_unique<MatPointPlasticSoftBody<Dim, NeoHookeanModel<Dim>>>("snow", Vector4f(238, 238, 240, 255) / 255, real(1e3), real(2.5e4), real(4e5), real(2.5e-2), real(4.5e-3), 10);
 		substances->sampleParticlesInsideSurface(snow.get(), ImplicitSphere<Dim>(VectorDr::Unit(1) * length * (.15) + VectorDr::Unit(0) * length / 2, length * real(.3)), nppsc);
 
 		substances->_substances.push_back(std::move(jelly));

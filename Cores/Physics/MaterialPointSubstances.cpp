@@ -19,7 +19,7 @@ MaterialPointSubstances<Dim>::MaterialPointSubstances(const StaggeredGrid<Dim> &
 		std::make_unique<ComplementarySurface<Dim>>(
 			std::make_unique<ImplicitBox<Dim>>(
 				_grid.domainOrigin(), _grid.domainLengths()))),
-	_integrator(std::make_unique<MpSymplecticEulerIntegrator<Dim>>())
+	_integrator(std::make_unique<MpSemiImplicitIntegrator<Dim>>())
 { }
 
 template <int Dim>

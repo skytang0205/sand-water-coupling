@@ -1,5 +1,7 @@
 #include "MaterialPointIntegrator.h"
 
+#include "Solvers/IterativeSolver.h"
+
 namespace PhysX {
 
 template <int Dim>
@@ -10,7 +12,10 @@ void MpSemiImplicitIntegrator<Dim>::integrate(
 	const real dt,
 	const GridBasedData<Dim, uchar> &collided)
 {
-	// TODO: Impl
+	IterativeSolver::solve<MpIntHessianMatrix<Dim>, IterativeSolver::CG<MpIntHessianMatrix<Dim>>>(
+		MpIntHessianMatrix<Dim>(velocity, mass, substances, dt, collided),
+		velocity.asVectorXr(),
+		mass.asVectorXr().cwiseProduct(velocity.asVectorXr()));
 }
 
 template class MaterialPointIntegrator<2>;

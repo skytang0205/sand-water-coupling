@@ -73,6 +73,12 @@ public:
 		const real ratio = std::exp(_hardeningCoeff * (1 - _plasticJacobians[idx]));
 		return Model::computeStressTensorMultipliedByJ(_deformationGradients[idx], ratio * _lameLambda, ratio * _lameMu);
 	}
+
+	virtual MatrixDr computeDeltaStressTensor(const int idx, const MatrixDr &weightSum) const override
+	{
+		const real ratio = std::exp(_hardeningCoeff * (1 - _plasticJacobians[idx]));
+		return Model::computeDeltaNominalStressTensor(_deformationGradients[idx], weightSum * _deformationGradients[idx], ratio * _lameLambda, ratio * _lameMu) * _deformationGradients[idx].transpose();
+	}
 };
 
 }

@@ -88,6 +88,7 @@ public:
 	static MatrixDr computeDeltaNominalStressTensor(const MatrixDr &F, const MatrixDr &dF, const real lambda, const real mu)
 	{
 		// TODO: Impl
+		return MatrixDr::Zero();
 	}
 };
 
@@ -116,6 +117,7 @@ public:
 	static MatrixDr computeDeltaNominalStressTensor(const MatrixDr &F, const MatrixDr &dF, const real lambda, const real mu)
 	{
 		// TODO: Impl
+		return MatrixDr::Zero();
 	}
 };
 

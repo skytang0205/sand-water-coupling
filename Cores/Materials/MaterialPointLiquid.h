@@ -61,6 +61,11 @@ public:
 	{
 		return MatrixDr::Identity() * (_jacobians[idx] - 1) * _bulkModulus * _jacobians[idx];
 	}
+
+	virtual MatrixDr computeDeltaStressTensor(const int idx, const MatrixDr &weightSum) const override
+	{
+		return MatrixDr::Zero();
+	}
 };
 
 }
