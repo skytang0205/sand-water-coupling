@@ -162,30 +162,13 @@ public:
 			const real scale = substance->particles.mass() / substance->density() * coeff * coeff;
 			substance->particles.forEach([&](const int p) {
 				const auto &pos = substance->particles.positions[p];
-				const auto dataPoints = mat.velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos);
-
-				std::array<VectorDr, dataPoints.size()> deltaPositions;
-				std::array<int, dataPoints.size()> indices;
-				// Cache nodes informations.
-				for (int i = 0; i < dataPoints.size(); i++) {
-					const auto [node, weight] = dataPoints[i];
-					deltaPositions[i] = mat.velocity.position(node) - pos;
-					indices[i] = int(mat.velocity.index(node)) * Dim;
-				}
-				// Perform a G2P process.
-				MatrixDr weightSum = MatrixDr::Zero();
-				for (int i = 0; i < dataPoints.size(); i++) {
-					const auto [node, weight] = dataPoints[i];
+				for (const auto [node, weight] : mat.velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos)) {
 					if (mat.collided[node]) continue;
-					weightSum += weight * VectorDr::Ones() * deltaPositions[i].transpose();
-				}
-				// Get delta nominal stress tensor.
-				const auto deltaStress = substance->computeDeltaStressTensorAtRef(p, weightSum);
-				// Perform a P2G process.
-				for (int i = 0; i < dataPoints.size(); i++) {
-					const auto [node, weight] = dataPoints[i];
-					if (mat.collided[node]) continue;
-					_invDiag.segment<Dim>(indices[i]) += weight * deltaStress * deltaPositions[i] * scale;
+					const VectorDr weightedDeltaPos = weight * (mat.velocity.position(node) - pos);
+					const size_t offset = mat.velocity.index(node) * Dim;
+					for (int i = 0; i < Dim; i++) {
+						_invDiag[offset + i] += substance->computeDeltaStressTensor(p, VectorDr::Unit(i) * weightedDeltaPos.transpose()).row(i).dot(weightedDeltaPos) * scale;
+					}
 				}
 			});
 		}
@@ -227,20 +210,20 @@ struct generic_product_impl<PhysX::MpIntHessianMatrix<Dim>, Rhs, SparseShape, De
 				const auto &pos = substance->particles.positions[p];
 				const auto dataPoints = lhs.velocity.grid()->quadraticBasisSplineIntrplDataPoints(pos);
 
-				std::array<Matrix<Scalar, Dim, 1>, dataPoints.size()> deltaPositions;
-				std::array<int, dataPoints.size()> indices;
+				std::array<Matrix<Scalar, Dim, 1>, dataPoints.size()> weightedDeltaPositions;
+				std::array<int, dataPoints.size()> offsets;
 				// Cache nodes informations.
 				for (int i = 0; i < dataPoints.size(); i++) {
 					const auto [node, weight] = dataPoints[i];
-					deltaPositions[i] = lhs.velocity.position(node) - pos;
-					indices[i] = int(lhs.velocity.index(node)) * Dim;
+					weightedDeltaPositions[i] = weight * (lhs.velocity.position(node) - pos);
+					offsets[i] = int(lhs.velocity.index(node)) * Dim;
 				}
 				// Perform a G2P process.
 				Matrix<Scalar, Dim, Dim> weightSum = Matrix<Scalar, Dim, Dim>::Zero();
 				for (int i = 0; i < dataPoints.size(); i++) {
 					const auto [node, weight] = dataPoints[i];
 					if (lhs.collided[node]) continue;
-					weightSum += weight * rhs.segment<Dim>(indices[i]) * deltaPositions[i].transpose();
+					weightSum += rhs.segment<Dim>(offsets[i]) * weightedDeltaPositions[i].transpose();
 				}
 				// Get delta nominal stress tensor.
 				const auto deltaStress = substance->computeDeltaStressTensor(p, weightSum);
@@ -248,7 +231,7 @@ struct generic_product_impl<PhysX::MpIntHessianMatrix<Dim>, Rhs, SparseShape, De
 				for (int i = 0; i < dataPoints.size(); i++) {
 					const auto [node, weight] = dataPoints[i];
 					if (lhs.collided[node]) continue;
-					dst.segment<Dim>(indices[i]) += weight * deltaStress * deltaPositions[i] * scale;
+					dst.segment<Dim>(offsets[i]) += deltaStress * weightedDeltaPositions[i] * scale;
 				}
 			});
 		}

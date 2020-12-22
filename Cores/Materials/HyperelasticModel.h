@@ -87,8 +87,24 @@ public:
 
 	static MatrixDr computeDeltaNominalStressTensor(const MatrixDr &F, const MatrixDr &dF, const real lambda, const real mu)
 	{
-		// TODO: Impl
-		return MatrixDr::Zero();
+		Eigen::JacobiSVD<MatrixDr> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
+		const MatrixDr R = svd.matrixU() * svd.matrixV();
+		const MatrixDr S = svd.matrixV() * svd.singularValues().asDiagonal() * svd.matrixV().transpose();
+		// TODO: A dimension-free solution.
+		const MatrixDr RTdFmdFTR = R.transpose() * dF - dF.transpose() * R;
+		MatrixDr dR;
+		if constexpr (Dim == 2) {
+			const real x = RTdFmdFTR(0, 1) / S.trace();
+			dR << 0, x, -x, 0;
+		}
+		else {
+			MatrixDr A;
+			A << S(0, 0) + S(1, 1), S(1, 2), -S(0, 2), S(1, 2), S(0, 0) + S(2, 2), S(0, 1), -S(0, 2), S(0, 1), S(1, 1) + S(2, 2);
+			VectorDr x = A.inverse() * VectorDr(RTdFmdFTR(0, 1), RTdFmdFTR(0, 2), RTdFmdFTR(1, 2));
+			dR << 0, x[0], x[1], -x[0], 0, x[2], -x[1], -x[2], 0;
+		}
+		dR = R * dR;
+		return 2 * mu * (dF - dR) + lambda * ((R * F.transpose()).trace() - Dim) * dR + lambda * (dR * F.transpose() + R * dF.transpose()).trace() * R;
 	}
 };
 
@@ -116,8 +132,26 @@ public:
 
 	static MatrixDr computeDeltaNominalStressTensor(const MatrixDr &F, const MatrixDr &dF, const real lambda, const real mu)
 	{
-		// TODO: Impl
-		return MatrixDr::Zero();
+		Eigen::JacobiSVD<MatrixDr> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
+		const real J = svd.singularValues().prod();
+		const MatrixDr R = svd.matrixU() * svd.matrixV();
+		const MatrixDr S = svd.matrixV() * svd.singularValues().asDiagonal() * svd.matrixV().transpose();
+		const MatrixDr invF = F.inverse();
+		// TODO: A dimension-free solution.
+		const MatrixDr RTdFmdFTR = R.transpose() * dF - dF.transpose() * R;
+		MatrixDr dR;
+		if constexpr (Dim == 2) {
+			const real x = RTdFmdFTR(0, 1) / S.trace();
+			dR << 0, x, -x, 0;
+		}
+		else {
+			MatrixDr A;
+			A << S(0, 0) + S(1, 1), S(1, 2), -S(0, 2), S(1, 2), S(0, 0) + S(2, 2), S(0, 1), -S(0, 2), S(0, 1), S(1, 1) + S(2, 2);
+			VectorDr x = A.inverse() * VectorDr(RTdFmdFTR(0, 1), RTdFmdFTR(0, 2), RTdFmdFTR(1, 2));
+			dR << 0, x[0], x[1], -x[0], 0, x[2], -x[1], -x[2], 0;
+		}
+		dR = R * dR;
+		return 2 * mu * (dF - dR) + lambda * J * invF.transpose() * (J * invF.transpose().cwiseProduct(dF)) + lambda * J * (J - 1) * ((invF * dF).trace() * invF - invF * dF * invF).transpose();
 	}
 };
 
