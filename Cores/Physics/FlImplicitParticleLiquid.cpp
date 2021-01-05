@@ -19,8 +19,8 @@ void FlImplicitParticleLiquid<Dim>::saveFrame(const std::string &frameDir) const
 		std::ofstream fout(frameDir + "/particleVelocities.sav", std::ios::binary);
 		_particleVelocities.save(fout);
 	}
-	{ // Save delteVelocity.
-		std::ofstream fout(frameDir + "/delteVelocity.sav", std::ios::binary);
+	{ // Save deltaVelocity.
+		std::ofstream fout(frameDir + "/deltaVelocity.sav", std::ios::binary);
 		_deltaVelocity.save(fout);
 	}
 }
@@ -33,8 +33,8 @@ void FlImplicitParticleLiquid<Dim>::loadFrame(const std::string &frameDir)
 		std::ifstream fin(frameDir + "/particleVelocities.sav", std::ios::binary);
 		_particleVelocities.load(fin);
 	}
-	{ // Load delteVelocity.
-		std::ifstream fin(frameDir + "/delteVelocity.sav", std::ios::binary);
+	{ // Load deltaVelocity.
+		std::ifstream fin(frameDir + "/deltaVelocity.sav", std::ios::binary);
 		_deltaVelocity.load(fin);
 	}
 }
