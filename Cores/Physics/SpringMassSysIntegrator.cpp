@@ -70,7 +70,7 @@ void SmsSemiImplicitIntegrator<Dim>::integrate(
 			_coefficients.push_back(Tripletr(offset + i, offset + i, _particles->mass()));
 	});
 
-	// Set Jacobian of accelaration to velocity.
+	// Set Jacobian of force to velocity.
 	for (const auto &spring : *_springs) {
 		const int pid0 = spring.pid0;
 		const int pid1 = spring.pid1;
@@ -88,7 +88,7 @@ void SmsSemiImplicitIntegrator<Dim>::integrate(
 	accumulateForces(positions, velocities, _forces, constrainedDofs);
 	_rhsLinearized = _matLinearized * velocities.asVectorXr() + _forces.asVectorXr() * dt;
 
-	// Set Jacobian of acceleration to position.
+	// Set Jacobian of force to position.
 	for (const auto &spring : *_springs) {
 		const int pid0 = spring.pid0;
 		const int pid1 = spring.pid1;
