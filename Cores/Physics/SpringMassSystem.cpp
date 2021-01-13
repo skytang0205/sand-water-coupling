@@ -132,8 +132,7 @@ template <int Dim>
 void SpringMassSystem<Dim>::applyExternalForces(const real dt)
 {
 	_particles.parallelForEach([&](const int i) {
-		if (_constrainedDofs.contains(i)) return;
-		if (_enableGravity)
+		if (_enableGravity && !_constrainedDofs.contains(i * Dim + 1))
 			_velocities[i][1] -= kGravity * dt;
 	});
 }
