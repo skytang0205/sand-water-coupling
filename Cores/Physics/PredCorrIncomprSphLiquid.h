@@ -4,46 +4,43 @@
 
 namespace PhysX {
 
-template <int Dim>
-class PredCorrIncomprSphLiquid : public SmthParticleHydrodLiquid<Dim>
-{
-	DECLARE_DIM_TYPES(Dim)
+    template<int Dim>
+    class PredCorrIncomprSphLiquid : public SmthParticleHydrodLiquid<Dim> {
+        DECLARE_DIM_TYPES(Dim)
 
-protected:
+    protected:
+        using SmthParticleHydrodLiquid<Dim>::_particles;
+        using SmthParticleHydrodLiquid<Dim>::_velocities;
+        using SmthParticleHydrodLiquid<Dim>::_pressures;
+        using SmthParticleHydrodLiquid<Dim>::_colliders;
+        using SmthParticleHydrodLiquid<Dim>::_targetDensity;
 
-	using SmthParticleHydrodLiquid<Dim>::_particles;
-	using SmthParticleHydrodLiquid<Dim>::_velocities;
-	using SmthParticleHydrodLiquid<Dim>::_pressures;
-	using SmthParticleHydrodLiquid<Dim>::_colliders;
-	using SmthParticleHydrodLiquid<Dim>::_targetDensity;
+        static constexpr int  _kPredCorrMaxIters   = 5;
+        static constexpr real _kPredCorrErrorRatio = real(.01);
 
-	static constexpr int _kPredCorrMaxIters = 5;
-	static constexpr real _kPredCorrErrorRatio = real(.01);
+        ParticlesBasedVectorData<Dim>  _predPositions;
+        ParticlesBasedVectorField<Dim> _predVelocities;
+        ParticlesBasedScalarData<Dim>  _densityErrors;
 
-	ParticlesBasedVectorData<Dim> _predPositions;
-	ParticlesBasedVectorField<Dim> _predVelocities;
-	ParticlesBasedScalarData<Dim> _densityErrors;
+    public:
+        PredCorrIncomprSphLiquid(const StaggeredGrid<Dim> & grid, const real particleRadius):
+            SmthParticleHydrodLiquid<Dim>(grid, particleRadius) {}
 
-public:
+        PredCorrIncomprSphLiquid(const PredCorrIncomprSphLiquid & rhs)             = delete;
+        PredCorrIncomprSphLiquid & operator=(const PredCorrIncomprSphLiquid & rhs) = delete;
+        virtual ~PredCorrIncomprSphLiquid()                                        = default;
 
-	PredCorrIncomprSphLiquid(const real particleRadius) : SmthParticleHydrodLiquid<Dim>(particleRadius) { }
+        virtual void advance(const real dt) override;
 
-	PredCorrIncomprSphLiquid(const PredCorrIncomprSphLiquid &rhs) = delete;
-	PredCorrIncomprSphLiquid &operator=(const PredCorrIncomprSphLiquid &rhs) = delete;
-	virtual ~PredCorrIncomprSphLiquid() = default;
+    protected:
+        using SmthParticleHydrodLiquid<Dim>::moveParticles;
+        using SmthParticleHydrodLiquid<Dim>::applyExternalForces;
+        using SmthParticleHydrodLiquid<Dim>::applyViscosityForce;
 
-	virtual void advance(const real dt) override;
+        virtual void reinitializeParticlesBasedData() override;
+        virtual void applyPressureForce(const real dt) override;
 
-protected:
+        real computeDelta(const real dt) const;
+    };
 
-	using SmthParticleHydrodLiquid<Dim>::moveParticles;
-	using SmthParticleHydrodLiquid<Dim>::applyExternalForces;
-	using SmthParticleHydrodLiquid<Dim>::applyViscosityForce;
-
-	virtual void reinitializeParticlesBasedData() override;
-	virtual void applyPressureForce(const real dt) override;
-
-	real computeDelta(const real dt) const;
-};
-
-}
+} // namespace PhysX

@@ -31,9 +31,12 @@ namespace PhysX {
             if (scale < 0) scale = 30;
             const real length = real(2);
 
+            const VectorDi     resolution = scale * VectorDi::Ones();
+            StaggeredGrid<Dim> grid(2, length / scale, resolution);
+
             const real density = 1000;
             const real radius  = length / 2 / scale / 2;
-            auto       liquid  = makeLiquid<Dim>(radius, pci);
+            auto       liquid  = makeLiquid<Dim>(grid, radius, pci);
             liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
             liquid->_particles.setMass(density / liquid->_particles.getPackedKernelSum());
             liquid->_targetDensity = density;
@@ -48,9 +51,9 @@ namespace PhysX {
         }
 
         template<int Dim>
-        static std::unique_ptr<SmthParticleHydrodLiquid<Dim>> makeLiquid(const real radius, const bool pci) {
-            if (pci) return std::make_unique<PredCorrIncomprSphLiquid<Dim>>(radius);
-            else return std::make_unique<SmthParticleHydrodLiquid<Dim>>(radius);
+        static std::unique_ptr<SmthParticleHydrodLiquid<Dim>> makeLiquid(const StaggeredGrid<Dim> & grid, const real radius, const bool pci) {
+            if (pci) return std::make_unique<PredCorrIncomprSphLiquid<Dim>>(grid, radius);
+            else return std::make_unique<SmthParticleHydrodLiquid<Dim>>(grid, radius);
         }
 
         static void reportError(const std::string & msg) {
