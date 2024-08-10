@@ -26,6 +26,7 @@
     <ClInclude Include="StaggeredGrid.h" />
     <ClInclude Include="StaggeredGridBasedData.h" />
     <ClInclude Include="StaggeredGridBasedVectorField.h" />
+    <ClInclude Include="VirtualParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp" />
@@ -37,6 +38,7 @@
     <ClCompile Include="SmoothedParticles.cpp" />
     <ClCompile Include="StaggeredGrid.cpp" />
     <ClCompile Include="StaggeredGridBasedVectorField.cpp" />
+    <ClCompile Include="VirtualParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.vcxproj">

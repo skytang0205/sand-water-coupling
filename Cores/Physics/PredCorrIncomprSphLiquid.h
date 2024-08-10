@@ -4,19 +4,19 @@
 
 namespace PhysX {
 
-    template<int Dim>
-    class PredCorrIncomprSphLiquid : public SmthParticleHydrodLiquid<Dim> {
+    template<int Dim> class PredCorrIncomprSphLiquid : public SmthParticleHydrodLiquid<Dim> {
         DECLARE_DIM_TYPES(Dim)
 
     protected:
         using SmthParticleHydrodLiquid<Dim>::_particles;
-        using SmthParticleHydrodLiquid<Dim>::_velocities;
-        using SmthParticleHydrodLiquid<Dim>::_pressures;
         using SmthParticleHydrodLiquid<Dim>::_colliders;
         using SmthParticleHydrodLiquid<Dim>::_targetDensity;
 
         static constexpr int  _kPredCorrMaxIters   = 5;
         static constexpr real _kPredCorrErrorRatio = real(.01);
+
+        ParticlesBasedVectorField<Dim> _velocities;
+        ParticlesBasedScalarField<Dim> _pressures;
 
         ParticlesBasedVectorData<Dim>  _predPositions;
         ParticlesBasedVectorField<Dim> _predVelocities;
