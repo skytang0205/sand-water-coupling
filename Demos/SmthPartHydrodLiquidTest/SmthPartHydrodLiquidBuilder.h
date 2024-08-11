@@ -51,6 +51,8 @@ namespace PhysX {
                 VectorDr::Zero(),
                 VectorDr::Ones() * length * 1.2);
 
+            liquid->_boundary_particles.setMass(density / liquid->_particles.getPackedKernelSum());
+
             liquid->_boundary_velocity.resize(&liquid->_boundary_particles);
 
             return liquid;

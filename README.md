@@ -1,3 +1,78 @@
+# Pipeline 
+
+$$
+q_i = \sum_j V_j[q_j] W(\vb*{x}_i - \vb*{x}_j, h) \\
+\hat{q}_i = \sum_J V_J[q_J] W(\vb*{x}_i - \vb*{x}_J, H) \\
+q_I = \sum_j V_j[q_j] W(\vb*{x}_I - \vb*{x}_j, h) \\
+\hat{q}_I = \sum_J V_J[q_J] W(\vb*{x}_I - \vb*{x}_J, H) \\
+$$
+
+其中 $\hat{}$ 为了标记来自邻居虚粒子 $J$ 的效果，小写 $i, j$ 指示实粒子对应的分量，大写 $I, J$ 指示虚粒子对应的分量。
+
+
+
+### 算法
+
+1. 生成虚粒子
+
+2. 对于实粒子而言，
+   $$
+   V_i = \frac{m_i}{\rho_i}, \quad \rho_i = \sum_jV_j[\rho_j]W_{ij} = \sum_j m_j W_{ij}.
+   $$
+   对于虚粒子而言，
+   $$
+   V_I = \sum_jV_j[V_j]W(\vb*{x}_{Ij}, h) = \sum_j V_j^2W(\vb*{x}_{Ij}, h).
+   $$
+   计算粒子体积。
+
+3. 离散化压强投影方程 （11， 14），通过调整对角项来获得自由边界条件（4.2）
+
+   对于虚粒子而言
+   $$
+   \mathcal{D}_I(\vb*{v}^*) = -\sum_j V_j(\vb*{v}_j^* - \bar{\vb*{v}}_I^*) \vdot \grad_I W_{Ij} + \kappa\frac{\max(\rho_I - \rho_0, 0)}{\rho_0},
+   $$
+   其中 $\bar{\vb*{v}}_I^*$ 为虚粒子上的速度（用来减少边界上的误差）
+   $$
+   \bar{\vb*{v}}_I^* = \frac{\sum_j{V_j\vb*{v}_j^*W_{Ij}}}{\sum_jV_jW_{Ij}}.
+   $$
+   后一项是为了减少密度漂移，其中的 $\kappa$ 选取与 $m/\rho_0$ 同量级，$\rho_I = \sum_j m_jW_{Ij}$。使用了
+   $$
+   \grad_I W_{Ij} = \frac{\vb*{x}_{Ij}}{r_{Ij}}W_{Ij}'.
+   $$
+   关于压强的 Laplace 算子为
+   $$
+   \hat{\mathcal{L}}_I(p) = \hat{\alpha}_Ip_I - \sum_J \hat{\alpha}_{IJ}p_J,
+   $$
+   其中
+   $$
+   \hat{\alpha}_I = \sum_J{\hat{\alpha}_{IJ}},\quad \hat{\alpha}_{IJ} = 2\frac{V_J W'_{IJ}}{r_{IJ} + \eta},
+   $$
+   $\hat{\alpha}_I = \max(\hat{\alpha}_I, \alpha_0)$，使用的 $\alpha_0$ 为模拟开始时周围邻居中均存在实粒子和虚粒子的情况下计算得出的。
+
+   对于固体边界条件而言，在固体区域均匀地采样固体粒子，使用流体实粒子相同的质量。固体粒子携带着固体材料的速度，参与流体虚粒子的散度计算。
+
+4. 共轭梯度法求解线性系统
+   $$
+   \hat{\mathcal{L}}_I(p) = \mathcal{D}_I(\vb*{v}^*).
+   $$
+
+5. 对于实粒子计算压强效果（16）
+   $$
+   \mathcal{G}_i(p) = \sum_J V_Jp_J\grad_iW_{iJ} + \sum_{j^s} V_j^s \operatorname{Proj}_{\vb*{n}_{j^s}}(\vb*{v}_i - \vb*{v}_{j^s})W_{ij^s},
+   $$
+
+   $$
+   \vb*{v}_i^{n+1} = \vb*{v}_i^* - \mathcal{G}_i(p).
+   $$
+
+   
+
+6. 对于实粒子更新速度和位置，删除虚粒子
+
+
+
+
+
 # VCL-PhysX 物理模拟库
 
 ## 总览

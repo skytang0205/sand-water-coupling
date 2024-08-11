@@ -82,33 +82,37 @@ namespace PhysX {
             ParticlesBasedVectorField<Dim> &       velocity,
             const ParticlesBasedVectorField<Dim> & boundary_velocity,
             const SmoothedParticles<Dim> &         real_particle,
-            const SmoothedParticles<Dim> &         boundary_particle,
-            const real                             target_rho);
+            const BoundaryParticles<Dim> &         boundary_particle,
+            const real                             target_rho,
+            const real                             dt);
 
     protected:
         void buildLinearSystem(
             const ParticlesBasedVectorField<Dim> & velocity,
             const ParticlesBasedVectorField<Dim> & boundary_velocity,
             const SmoothedParticles<Dim> &         real_particle,
-            const SmoothedParticles<Dim> &         boundary_particle,
+            const BoundaryParticles<Dim> &         boundary_particle,
             const real                             target_rho);
         void solveLinearSystem();
         void applyPressureGradient(
-            ParticlesBasedVectorField<Dim> & velocity,
-            const SmoothedParticles<Dim> &   real_particle,
-            const real                       target_rho);
+            ParticlesBasedVectorField<Dim> &       velocity,
+            const ParticlesBasedVectorField<Dim> & boundary_velocity,
+            const SmoothedParticles<Dim> &         real_particle,
+            const BoundaryParticles<Dim> &         boundary_particle,
+            const real                             target_rho,
+            const real                             dt);
 
         void calculateVelocity(
             const ParticlesBasedVectorField<Dim> & velocity,
             const ParticlesBasedVectorField<Dim> & boundary_velocity,
             const SmoothedParticles<Dim> &         real_particle,
-            const SmoothedParticles<Dim> &         boundary_particle);
+            const BoundaryParticles<Dim> &         boundary_particle);
         void calculateCoef(const real target_rho);
         void calculateDiv(
             const ParticlesBasedVectorField<Dim> & velocity,
             const ParticlesBasedVectorField<Dim> & boundary_velocity,
             const SmoothedParticles<Dim> &         real_particle,
-            const SmoothedParticles<Dim> &         boundary_particle,
+            const BoundaryParticles<Dim> &         boundary_particle,
             const real                             target_rho);
     };
 

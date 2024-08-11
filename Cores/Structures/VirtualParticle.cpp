@@ -77,11 +77,12 @@ namespace PhysX {
         ParticlesBasedVectorField<Dim> &       velocity,
         const ParticlesBasedVectorField<Dim> & boundary_velocity,
         const SmoothedParticles<Dim> &         real_particle,
-        const SmoothedParticles<Dim> &         boundary_particle,
-        const real                             target_rho) {
+        const BoundaryParticles<Dim> &         boundary_particle,
+        const real                             target_rho,
+        const real                             dt) {
         buildLinearSystem(velocity, boundary_velocity, real_particle, boundary_particle, target_rho);
         solveLinearSystem();
-        applyPressureGradient(velocity, real_particle, target_rho);
+        applyPressureGradient(velocity, boundary_velocity, real_particle, boundary_particle, target_rho, dt);
     }
 
     template<int Dim>
@@ -89,7 +90,7 @@ namespace PhysX {
         const ParticlesBasedVectorField<Dim> & velocity,
         const ParticlesBasedVectorField<Dim> & boundary_velocity,
         const SmoothedParticles<Dim> &         real_particle,
-        const SmoothedParticles<Dim> &         boundary_particle,
+        const BoundaryParticles<Dim> &         boundary_particle,
         const real                             target_rho) {
         _pressures.resize(this);
         _divergence.resize(this);
@@ -102,14 +103,18 @@ namespace PhysX {
     }
 
     template<int Dim> void VirtualParticle<Dim>::solveLinearSystem() {
+        std::cout << "Divergence: " << _divergence[0] << std::endl;
         IterativeSolver::solve(_matLaplacian, _pressures.asVectorXr(), _divergence.asVectorXr());
     }
 
     template<int Dim>
     void VirtualParticle<Dim>::applyPressureGradient(
-        ParticlesBasedVectorField<Dim> & velocity,
-        const SmoothedParticles<Dim> &   real_particle,
-        const real                       target_rho) {
+        ParticlesBasedVectorField<Dim> &       velocity,
+        const ParticlesBasedVectorField<Dim> & boundary_velocity,
+        const SmoothedParticles<Dim> &         real_particle,
+        const BoundaryParticles<Dim> &         boundary_particle,
+        const real                             target_rho,
+        const real                             dt) {
         real_particle.parallelForEach([&](const int i) {
             VectorDr p_i   = real_particle.positions[i];
             VectorDr force = VectorDr::Zero();
@@ -118,7 +123,13 @@ namespace PhysX {
                 force += volumes[J] * _pressures[J] * gradientKernel(r_iJ);
             });
 
-            _velocities[i] -= force / target_rho;
+            boundary_particle.forEachNearby(p_i, [&](const int js, const VectorDr & p_js) {
+                force -= boundary_particle.volumes[js]
+                    * std::min(boundary_particle.norms[js].dot(velocity[i] - boundary_velocity[js]), 0.)
+                    * boundary_particle.norms[js] * boundary_particle.kernel(p_i - p_js);
+            });
+
+            velocity[i] += force;
         });
     }
 
@@ -127,7 +138,7 @@ namespace PhysX {
         const ParticlesBasedVectorField<Dim> & velocity,
         const ParticlesBasedVectorField<Dim> & boundary_velocity,
         const SmoothedParticles<Dim> &         real_particle,
-        const SmoothedParticles<Dim> &         boundary_particle) {
+        const BoundaryParticles<Dim> &         boundary_particle) {
         parallelForEach([&](const int I) {
             VectorDr p_I   = positions[I];
             _velocities[I] = (velocity(p_I) + boundary_velocity(p_I))
@@ -141,9 +152,9 @@ namespace PhysX {
         forEach([&](const int I) {
             VectorDr p_I = positions[I];
             double   sum = 0;
-            forEachNearby(p_I, [&](int J, const VectorDr p_J) {
+            forEachNearby(p_I, [&](int J, const VectorDr & p_J) {
                 double r_ij     = (p_I - p_J).norm();
-                double alpha_ij = 2. / target_rho * volumes[J] * firstDerivativeKernel(r_ij) / (r_ij + 1e-6);
+                double alpha_ij = 2. * volumes[J] * firstDerivativeKernel(r_ij) / (r_ij + 1e-6);
                 sum -= alpha_ij;
                 _coefficients.push_back({ I, J, alpha_ij });
             });
@@ -153,8 +164,8 @@ namespace PhysX {
 
         _matLaplacian.setFromTriplets(_coefficients.begin(), _coefficients.end());
 
-        std::cout << _matLaplacian.coeff(0, 0) << std::endl;
-        std::cout << _matLaplacian.coeff(0, 1) << std::endl;
+        std::cout << "P[0, 0]: " << _matLaplacian.coeff(0, 0) << std::endl;
+        std::cout << "P[0, 1]: " << _matLaplacian.coeff(0, 1) << std::endl;
     }
 
     template<int Dim>
@@ -162,14 +173,13 @@ namespace PhysX {
         const ParticlesBasedVectorField<Dim> & velocity,
         const ParticlesBasedVectorField<Dim> & boundary_velocity,
         const SmoothedParticles<Dim> &         real_particle,
-        const SmoothedParticles<Dim> &         boundary_particle,
+        const BoundaryParticles<Dim> &         boundary_particle,
         const real                             target_rho) {
         parallelForEach([&](const int I) {
-            VectorDr p_I = positions[I];
-            _divergence[I] =
-                (velocity.divergence(p_I) - _velocities[I].dot(real_particle.getBiasGradient(p_I))
-                 + boundary_velocity.divergence(p_I) - _velocities[I].dot(boundary_particle.getBiasGradient(p_I))
-                 + kappa * std::max(densities[I] - target_rho, 0.) / target_rho);
+            VectorDr p_I   = positions[I];
+            _divergence[I] = velocity.divergence(p_I) - _velocities[I].dot(real_particle.getBiasGradient(p_I))
+                + boundary_velocity.divergence(p_I) - _velocities[I].dot(boundary_particle.getBiasGradient(p_I))
+                - kappa * std::max(densities[I] - target_rho, 0.) / target_rho;
 
             //_particles.forEachNearby(p_I, [&](const int j, const VectorDr & p_j) {
             //    VectorDr r_Ij = p_I - p_j;

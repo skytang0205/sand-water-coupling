@@ -103,6 +103,8 @@ namespace PhysX {
         _particles.resetNearbySearcher();
         _particles.computeInfo();
 
+        _targetDensity = _particles.densities.max();
+
         _boundary_particles.resetNearbySearcher();
         _boundary_particles.computeInfo();
 
@@ -174,7 +176,8 @@ namespace PhysX {
         //    _velocities[i] -= _pressures.symmetricGradientAtDataPoint(i) /
         //    _particles.densities[i] * dt;
         //});
-        _virtual_particles.project(_velocities, _boundary_velocity, _particles, _boundary_particles, _targetDensity);
+        _virtual_particles.project(
+            _velocities, _boundary_velocity, _particles, _boundary_particles, _targetDensity, dt);
     }
 
     template<int Dim> void SmthParticleHydrodLiquid<Dim>::generateSurface(const Surface<Dim> & surface) {
