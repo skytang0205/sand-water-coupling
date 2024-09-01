@@ -16,6 +16,7 @@ add_requires("eigen", "glfw", "glad", "yaml-cpp", "fmt")
 pkgs = {"eigen", "glfw", "glad", "yaml-cpp", "fmt"}
 
 add_rules("mode.debug", "mode.release")
+add_cxflags("/utf-8")
 
 -- BLAS is used for only dense matrix operations, which is not useful for this project.
 -- option("use_blas")
@@ -83,7 +84,7 @@ target("vcl-viewer")
     add_files("Cores/Viewer/*.cpp")
 target_end()
 
-local examples = {"EulerianFluidTest", "LevelSetLiquidTest", "ParticleInCellLiquidTest", "SpringMassSystemTest"}
+local examples = {"EulerianFluidTest", "LevelSetLiquidTest", "ParticleInCellLiquidTest", "MatPointSubstancesTest", "SpringMassSystemTest", "SmthPartHydrodLiquidTest"}
 for _, example in ipairs(examples) do
 
 target(example)
