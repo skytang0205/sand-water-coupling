@@ -84,7 +84,7 @@ target("vcl-viewer")
     add_files("Cores/Viewer/*.cpp")
 target_end()
 
-local examples = {"EulerianFluidTest", "LevelSetLiquidTest", "ParticleInCellLiquidTest", "MatPointSubstancesTest", "SpringMassSystemTest", "SmthPartHydrodLiquidTest"}
+local examples = {"EulerianFluidTest", "LevelSetLiquidTest", "ParticleInCellLiquidTest", "MatPointSubstancesTest", "SpringMassSystemTest", "SmthPartHydrodLiquidTest", "DEMParticleSandTest"}
 for _, example in ipairs(examples) do
 
 target(example)

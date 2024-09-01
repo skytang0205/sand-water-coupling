@@ -39,7 +39,7 @@ namespace PhysX {
         using Particles<Dim>::parallelForEach;
 
         SmoothedParticles(
-            const real radius, const size_t cnt = 0, const VectorDr & pos = VectorDr::Zero(), const real mass = 1);
+            const real radius, const size_t cnt = 0, const VectorDr & pos = VectorDr::Zero(), const real mass = 1, const real kernel_rate = 4);
 
         SmoothedParticles & operator=(const SmoothedParticles & rhs) = delete;
         virtual ~SmoothedParticles()                                 = default;

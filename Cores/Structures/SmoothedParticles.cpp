@@ -12,9 +12,9 @@ namespace PhysX {
 
     template<int Dim>
     SmoothedParticles<Dim>::SmoothedParticles(
-        const real radius, const size_t cnt, const VectorDr & pos, const real mass):
+        const real radius, const size_t cnt, const VectorDr & pos, const real mass, const real kernel_rate):
         Particles<Dim>(cnt, pos, mass),
-        _radius(radius), _kernelRadius(radius * 4), _squaredKernelRadius(_kernelRadius * _kernelRadius),
+        _radius(radius), _kernelRadius(radius * kernel_rate), _squaredKernelRadius(_kernelRadius * _kernelRadius),
         _invKernelRadius(1 / _kernelRadius), _invSquaredKernelRadius(1 / _squaredKernelRadius),
         _kernelNormCoeff0(
             real(std::numbers::inv_pi) * _invSquaredKernelRadius * (Dim == 2 ? real(40) / 7 : 8 * _invKernelRadius)),

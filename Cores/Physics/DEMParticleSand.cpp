@@ -37,7 +37,7 @@ namespace PhysX {
             if constexpr (Dim == 3) {
                 _particles.forEach([&](const int i) { IO::writeValue(fout, VectorDf::Unit(2).eval()); });
             }
-            _particles.forEach([&](const int i) { IO::writeValue(fout, float(_velocities[i].norm())); });
+            _particles.forEach([&](const int i) { IO::writeValue(fout, float(_particles.velocities[i].norm())); });
         }
         { // Write particles.
             std::ofstream fout(frameDir + "/boundary_particles.mesh", std::ios::binary);
@@ -84,30 +84,19 @@ namespace PhysX {
         _boundary_particles.resetNearbySearcher();
         _boundary_particles.computeInfo();
 
-        double omega = 2.;
-
-        if constexpr (Dim == 2)
-            _particles.parallelForEach([&](const int i) {
-                _particles.velocities[i] = omega * _particles.positions[i].y() * VectorDr::Unit(0)
-                    - omega * _particles.positions[i].x() * VectorDr::Unit(1);
-            });
-
         std::cout << "Boundary Particle size: " << _boundary_particles.size() << std::endl;
-        std::cout << "Virtual Particle size: " << _virtual_particles.size() << std::endl;
     }
 
     template<int Dim> void DEMParticleSand<Dim>::advance(const real dt) {
         moveParticles(dt);
-
-        applyExternalForces(dt);
-
         applyPressureForce(dt);
+        applyExternalForces(dt);        
     }
 
     template<int Dim> void DEMParticleSand<Dim>::reinitializeParticlesBasedData() {}
 
     template<int Dim> void DEMParticleSand<Dim>::moveParticles(const real dt) {
-        _particles.parallelForEach([&](const int i) { _particles.positions[i] += _velocities[i] * dt; });
+        _particles.parallelForEach([&](const int i) { _particles.positions[i] += _particles.velocities[i] * dt; });
 
         // Resolve collisions.
         // for (const auto & collider : _colliders) {
@@ -115,13 +104,13 @@ namespace PhysX {
         //}
 
         _particles.resetNearbySearcher();
-        _particles.computeDensities();
-        _particles.computeVolumes();
+        //_particles.computeDensities();
+        //_particles.computeVolumes();
     }
 
     template<int Dim> void DEMParticleSand<Dim>::applyExternalForces(const real dt) {
         if (_enableGravity) {
-            _particles.parallelForEach([&](const int i) { _velocities[i][1] -= kGravity * dt; });
+            _particles.parallelForEach([&](const int i) { _particles.velocities[i][1] -= kGravity * dt; });
         }
     }
 
@@ -138,6 +127,7 @@ namespace PhysX {
         //    _velocities[i] -= _pressures.symmetricGradientAtDataPoint(i) /
         //    _particles.densities[i] * dt;
         //});
+        _particles.applyForce(_boundary_velocity, _boundary_particles, dt);
     }
 
     template<int Dim> void DEMParticleSand<Dim>::generateSurface(const Surface<Dim> & surface) {
@@ -152,6 +142,16 @@ namespace PhysX {
         //_boundary_particles.computeDensities();
         //_boundary_particles.computeVolumes();
     }
+
+    template<int Dim> void DEMParticleSand<Dim>::addShape(const Shapes<Dim> & shape) {
+        auto origin_size =  _particles.positions.size();
+        _particles.resize(origin_size + shape.positions.size());
+        _particles.velocities.resize(&_particles);
+        for (int i = 0; i < shape.positions.size(); i++){
+            _particles.positions[origin_size + i] = shape.positions[i];
+            _particles.velocities[origin_size + i] = shape.velocities[i];
+        }
+    } 
 
     template class DEMParticleSand<2>;
     template class DEMParticleSand<3>;

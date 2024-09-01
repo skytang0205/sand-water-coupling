@@ -6,6 +6,7 @@
 #include "Structures/ParticlesBasedVectorField.h"
 #include "Structures/StaggeredGrid.h"
 #include "Structures/DEMParticle.h"
+#include "Utilities/Shapes.h"
 
 namespace PhysX {
 
@@ -23,22 +24,18 @@ namespace PhysX {
 
         std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 
-        bool _enableGravity = false;
-
-        real _targetDensity = real(1e3);
-        real _eosMultiplier = 25;
+        bool _enableGravity = true;
 
     public:
         DEMParticleSand(const real particleRadius):
-            _particles(particleRadius), _boundary_particles(particleRadius),
-            _alpha_0(-1e6) {}
+            _particles(particleRadius), _boundary_particles(particleRadius){}
 
-        DEMParticleSandd(const DEMParticleSand & rhs)             = delete;
+        DEMParticleSand(const DEMParticleSand & rhs)             = delete;
         DEMParticleSand & operator=(const DEMParticleSand & rhs) = delete;
         virtual ~DEMParticleSand()                                        = default;
 
         virtual real getTimeStep(const uint frameRate, const real stepRate) const override {
-            return stepRate * _particles.radius() * 2 / _particles.velosities.normMax();
+            return stepRate * _particles.radius() * 2 / _particles.velocities.normMax();
         }
 
         virtual int  dimension() const override { return Dim; }
@@ -51,12 +48,12 @@ namespace PhysX {
         virtual void advance(const real dt) override;
 
         void generateSurface(const Surface<Dim> & surface);
+        void addShape(const Shapes<Dim> & shape);
 
     protected:
         virtual void reinitializeParticlesBasedData();
         virtual void moveParticles(const real dt);
         virtual void applyExternalForces(const real dt);
-        virtual void applyViscosityForce(const real dt);
         virtual void applyPressureForce(const real dt);
     };
 
