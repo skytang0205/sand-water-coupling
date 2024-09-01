@@ -6,6 +6,7 @@
 #include "Structures/ParticlesBasedVectorField.h"
 #include "Structures/StaggeredGrid.h"
 #include "Structures/VirtualParticle.h"
+#include "Utilities/Shapes.h"
 
 namespace PhysX {
 
@@ -58,6 +59,7 @@ namespace PhysX {
         virtual void advance(const real dt) override;
 
         void generateSurface(const Surface<Dim> & surface);
+        void addShape(const Shapes<Dim> & shape);
 
     protected:
         virtual void reinitializeParticlesBasedData();

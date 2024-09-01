@@ -14,6 +14,7 @@ namespace PhysX {
     template<int Dim> class BoundaryParticles;
     template<int Dim> class VirtualParticle;
     template<int Dim> class DEMParticle;
+    template<int Dim> class Shapes;
 
     template<int Dim, typename Type> class ParticlesAttribute {
         DECLARE_DIM_TYPES(Dim)
@@ -24,6 +25,7 @@ namespace PhysX {
         friend class BoundaryParticles<Dim>;
         friend class VirtualParticle<Dim>;
         friend class DEMParticle<Dim>;
+        friend class Shapes<Dim>;
 
     protected:
         std::vector<Type> _data;
