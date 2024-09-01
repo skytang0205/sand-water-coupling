@@ -4,6 +4,7 @@
 #include "Physics/PredCorrIncomprSphLiquid.h"
 #include "Physics/SmthParticleHydrodLiquid.h"
 #include "Structures/StaggeredGrid.h"
+#include "Utilities/Shapes.h"
 
 #include <fmt/core.h>
 
@@ -32,11 +33,14 @@ namespace PhysX {
             const real         density = 1000;
             const real         radius  = length / 2 / scale / 2;
             auto               liquid  = makeLiquid<Dim>(grid, radius, pci);
-            liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
+            auto               shape   = Shapes<Dim>(radius);           
+            const real         omega   = 2.;
+            shape.generateBox(VectorDr::Zero(), VectorDr::Ones() * length / 6);
+            shape.generateRotate(omega);
+            liquid->addShape(shape);
+            //liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
             liquid->_particles.setMass(density / liquid->_particles.getPackedKernelSum());
             liquid->_targetDensity = density;
-
-            liquid->_velocities.resize(&liquid->_particles);
 
             liquid->_virtual_particles.setKappa(1. / liquid->_particles.getPackedKernelSum());
 

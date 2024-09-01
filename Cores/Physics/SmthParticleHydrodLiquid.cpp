@@ -110,13 +110,13 @@ namespace PhysX {
 
         _virtual_particles.setAlpha(_particles, _targetDensity);
 
-        double omega = 2.;
+        /*double omega = 2.;
 
         if constexpr (Dim == 2)
             _particles.parallelForEach([&](const int i) {
                 _velocities[i] = omega * _particles.positions[i].y() * VectorDr::Unit(0)
                     - omega * _particles.positions[i].x() * VectorDr::Unit(1);
-            });
+            });*/
 
         std::cout << "Boundary Particle size: " << _boundary_particles.size() << std::endl;
         std::cout << "Virtual Particle size: " << _virtual_particles.size() << std::endl;
@@ -192,6 +192,16 @@ namespace PhysX {
         //_boundary_particles.computeDensities();
         //_boundary_particles.computeVolumes();
     }
+
+    template<int Dim> void SmthParticleHydrodLiquid<Dim>::addShape(const Shapes<Dim> & shape) {
+        auto origin_size =  _particles.positions.size();
+        _particles.resize(origin_size + shape.positions.size());
+        _velocities.resize(&_particles);
+        for (int i = 0; i < shape.positions.size(); i++){
+            _particles.positions[origin_size + i] = shape.positions[i];
+            _velocities[origin_size + i] = shape.velocities[i];
+        }
+    } 
 
     template class SmthParticleHydrodLiquid<2>;
     template class SmthParticleHydrodLiquid<3>;
