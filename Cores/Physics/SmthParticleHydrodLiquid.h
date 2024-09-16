@@ -29,7 +29,7 @@ namespace PhysX {
 
         std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 
-        bool _enableGravity = true;
+        bool _enableGravity = false;
 
         real _viscosityCoeff = 0;
         // real _viscosityCoeff = real(.01);
