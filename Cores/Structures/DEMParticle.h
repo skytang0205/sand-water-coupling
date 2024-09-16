@@ -84,7 +84,7 @@ namespace PhysX {
     private:
         real Young, Poisson, K_norm, K_tang, tan_fricangle;
         real contact_angle, volume_liquid_bridge, d_rupture;
-        real c0, cmc, cmcp, csat, sr;
+        real c0, cmc, cmcp, csat, sr, surface_tensor_cof;
         QuadraticBezierCoeff G;
 
     public:
@@ -102,78 +102,13 @@ namespace PhysX {
         void setfricangle(const real k);
 
 
-        VectorDr getForce(const int i, const int j) const {
-            VectorDr dij = positions[j] - positions[i];
-            VectorDr vij = velocities[j] - velocities[i];
-            return ComputeDemForces(dij, vij) ;//+ ComputeDemCapillaryForces(dij, vij);
-        }
+        VectorDr getForce(const int i, const int j) const;
 
-        VectorDr ComputeDemForces(const VectorDr & dij, const VectorDr & vij) const {
-            VectorDr f = VectorDr::Zero();
-            real dist = dij.norm();
-            real penetration_depth = 2 * _radius - dist;
-            if (penetration_depth > 0.)
-            {
-                VectorDr n = VectorDr::Zero();
-                if(dist <= 0.0001 * _radius)
-                    dist = 0.0001 * _radius;
-
-                n = dij * (1 / dist);
-                real dot_epslion = vij.dot(n);
-                VectorDr vij_tangential = vij - dot_epslion * n;
-
-                VectorDr normal_force = K_norm * penetration_depth * n;
-                VectorDr shear_force = -K_tang * vij_tangential;
-
-                real max_fs = normal_force.norm() * tan_fricangle;
-                real shear_force_norm = shear_force.norm();
-
-                if (shear_force_norm > max_fs){
-                    shear_force = shear_force * max_fs / shear_force_norm;
-                }
-                f = -normal_force - shear_force;
-            }
-            return f;
-        }
+        VectorDr ComputeDemForces(const VectorDr & dij, const VectorDr & vij) const;
         
-        VectorDr ComputeDemCapillaryForces(const VectorDr & dij, const VectorDr & vij) const {
-            VectorDr f = VectorDr::Zero();
-            real dist = dij.norm();
-            real H = dist - 2 * _radius;
-            if (H < d_rupture && H > 0.000001)
-            {
-                VectorDr n = VectorDr::Zero();
-                n = dij * (1 / dist);
-                real dot_epslion = vij.dot(n);
-                VectorDr vij_normal = dot_epslion * n;
-                VectorDr vij_tangential = vij - dot_epslion * n;
+        VectorDr ComputeDemCapillaryForces(const VectorDr & dij, const VectorDr & vij) const;
 
-                // float coeff_c = csat + (1.f - sr) * (c0 - csat);
-                real coeff_c = G.calculate(sr);
-
-                // printf("cohesive=%.3f \n", coeff_c);
-
-                real d = -H + std::sqrt(H * H + volume_liquid_bridge / (std::numbers::pi * _radius));
-                real phi = std::sqrt(2. * H / _radius * (-1.f + sqrtf(1.f + volume_liquid_bridge / (std::numbers::pi * _radius * H * H))));
-                real neck_curvature_pressure = -2. * std::numbers::pi * coeff_c * _radius * std::cos(contact_angle) / (1. + H / (2. * d));
-                real surface_tension_force = -2. * std::numbers::pi * coeff_c * _radius * phi * std::sin(contact_angle);
-
-                f = -n * (neck_curvature_pressure + surface_tension_force);
-            }
-            return f;
-        }
-
-
-        VectorDr getForceSum(const int i) const{
-            VectorDr f = VectorDr::Zero();
-            forEachNearby(
-                positions[i], [&](const int j, const VectorDr & nearbyPos) { 
-                    f += getForce(i, j); 
-                });
-            return f;
-        }
-
-
+        VectorDr getForceSum(const int i) const;
     };
 
 } // namespace PhysX
