@@ -117,14 +117,14 @@ void Simulator::advanceTimeBySteps(const real targetTime)
 			dt = (targetTime - time) / 2;
 		}
 
-		std::cout << fmt::format("[{:>6.0f} SPF] ", targetTime / dt);
+		// std::cout << fmt::format("[{:>6.0f} SPF] ", targetTime / dt);
 		_simulation->advance(dt);
 		time += dt;
 		const auto endTime = steady_clock::now();
-		std::cout << fmt::format(
-			"    ... {:>7.2f}s used",
-			duration<double>(endTime - beginTime).count())
-			<< std::endl;
+		// std::cout << fmt::format(
+		// 	"    ... {:>7.2f}s used",
+		// 	duration<double>(endTime - beginTime).count())
+		// 	<< std::endl;
 	}
 }
 

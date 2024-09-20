@@ -127,7 +127,28 @@ namespace PhysX {
         //    _velocities[i] -= _pressures.symmetricGradientAtDataPoint(i) /
         //    _particles.densities[i] * dt;
         //});
-        _particles.applyForce(_boundary_velocity, _boundary_particles, dt);
+        _particles.parallelForEach([&](const int i) {
+            VectorDr p_i   = _particles.positions[i];
+            VectorDr force = VectorDr::Zero();
+            force += _particles.getForceSum(i) * dt;
+            //std::cout << getForceSum(i) << std::endl;
+
+            //force = VectorDr::Zero(); 
+
+            _boundary_particles.forEachNearby(p_i, [&](const int js, const VectorDr & p_js) {
+                VectorDr dis_vel = _particles.velocities[i] - _boundary_velocity[js];
+                real dis_vel_norm = _boundary_particles.norms[js].dot(dis_vel);
+                VectorDr F_norm = - _boundary_particles.volumes[js]
+                    * std::min(dis_vel_norm, 0.)
+                    * _boundary_particles.norms[js] * _boundary_particles.kernel(p_i - p_js);
+                VectorDr F_tang = - _particles._K_tang() * (dis_vel - dis_vel_norm * _boundary_particles.norms[js]);
+                if(F_tang.norm() <= 0.000001)
+                    force += F_norm + F_tang;
+                else
+                    force += F_norm + (F_norm.norm() * _particles._tan_fricangle() > F_tang.norm() ?  F_tang : (F_norm.norm() * _particles._tan_fricangle() / F_tang.norm()) * F_tang);
+                });
+            _particles.velocities[i] += force;
+        });
     }
 
     template<int Dim> void DEMParticleSand<Dim>::generateSurface(const Surface<Dim> & surface) {

@@ -1,15 +1,58 @@
 #pragma once
 
-#include "Structures/GridBasedScalarField.h"
+#include "Geometries/Surface.h"
 #include "Structures/Particles.h"
 #include "Structures/ParticlesNearbySearcher.h"
+#include "Structures/GridBasedScalarField.h"
 #include "Structures/SmoothedParticles.h"
 #include "Structures/StaggeredGrid.h"
-
-#include <iostream>
-#include <cmath>
+#include "Structures/ParticlesBasedData.h"
+#include "Utilities/Types.h"
 
 namespace PhysX {
+
+    class QuadraticBezierCoeff{   
+    private:
+        real a, b, c, d, e;
+        real py0, py1, px1, py2;
+    public:
+       
+        QuadraticBezierCoeff(const real py0 = 0., const real py1 = 0., const real px1 = 0., const real py2 = 0.): 
+            py0(py0), py1(py1), px1(px1), py2(py2){
+            a = (px1 + 1.f) / 4.f;
+            b = -2.f * a;
+            c = b * b;
+            d = -4.f * (1.f + b - px1);
+            e = 2.f * (1.f + b - px1);
+        }
+
+        real rx2t(const real sr) const
+        {
+            return (b + std::sqrt(c + d * (px1 - sr))) / e;
+        }
+
+        real calculate(const real sr) const
+        {
+            if (sr < 0.f)
+                return py0;
+
+            if (sr >= 1.f)
+                return py2;
+
+            if (sr <= px1)
+            {
+                const real t = sr / px1;
+                const real omt = 1. - t;
+                return omt * omt * py0 + 2 * t * omt * py1 + t * t * py1;
+            }
+            else
+            {
+                const real t = rx2t(sr);
+                const real omt = 1. - t;
+                return omt * omt * py1 + 2 * t * omt * py1 + t * t * py2;
+            }
+        }
+    };
 
     template<int Dim> class DEMParticle : public SmoothedParticles<Dim> {
         DECLARE_DIM_TYPES(Dim)
@@ -39,75 +82,33 @@ namespace PhysX {
         //using SmoothedParticles<Dim>::firstDerivativeKernel;
 
     private:
-        real K_norm    = 10000000;
-        real K_tang    = 1000;
-        real fricangle = 0.1;
+        real Young, Poisson, K_norm, K_tang, tan_fricangle;
+        real contact_angle, volume_liquid_bridge, d_rupture;
+        real c0, cmc, cmcp, csat, sr, surface_tensor_cof;
+        QuadraticBezierCoeff G;
 
     public:
         DEMParticle(
-            const real radius, const size_t cnt = 0, const VectorDr & pos = VectorDr::Zero(), const real mass = 1):
-            SmoothedParticles<Dim>(radius, cnt, pos, mass, 2){}
-
-
+            const real radius, const real mass = 1, const size_t cnt = 0, const VectorDr & pos = VectorDr::Zero());
         DEMParticle & operator=(const DEMParticle & rhs) = delete;
-        virtual ~DEMParticle()                            = default;
+        virtual ~DEMParticle()                           = default;
 
-        void setK_norm(const real k) { K_norm = k; }
-        void setK_tang(const real k) { K_tang = k; }
-        void setfricangleg(const real k) { fricangle = k; }
+        real _tan_fricangle();
+        real _K_norm();
+        real _K_tang();
 
-        VectorDr getForce(const int i, const int j) const {
-            VectorDr dis_pos = positions[i] - positions[j];
-            real dis_pos_len = dis_pos.norm();
-            VectorDr dis_pos_norm = VectorDr::Zero();
-            if(dis_pos_len >=0.000001)
-                dis_pos_norm = dis_pos / dis_pos_len;
-            VectorDr dis_vel = velocities[i] - velocities[j];
-            VectorDr F_norm = K_norm * (2 * _radius - dis_pos_len) * dis_pos_norm;
-            VectorDr F_tang = - K_tang * (dis_vel - dis_vel.dot(dis_pos_norm) * dis_pos_norm);
-            if(F_tang.norm() <= 0.000001)
-                return F_norm + F_tang;
-            return F_norm + (F_norm.norm()*fricangle > F_tang.norm() ?  F_tang : (F_norm.norm() * fricangle / F_tang.norm()) * F_tang);
-        }
+        void setYoung(const real k);
+        void setPoisson(const real k);
+        void setfricangle(const real k);
 
-        VectorDr getForceSum(const int i) const {
-            VectorDr f = VectorDr::Zero();
-            forEachNearby(
-                positions[i], [&](const int j, const VectorDr & nearbyPos) { 
-                    f += getForce(i, j); 
-                });
-            return f;
-        }
 
-        void applyForce(
-            const ParticlesBasedVectorField<Dim> & boundary_velocity,
-            const BoundaryParticles<Dim> &         boundary_particle,
-            const real                             dt) {
-            parallelForEach([&](const int i) {
-                VectorDr p_i   = positions[i];
-                VectorDr force = VectorDr::Zero();
-                force += getForceSum(i) * dt;
-                //std::cout << getForceSum(i) << std::endl;
+        VectorDr getForce(const int i, const int j) const;
 
-                //force = VectorDr::Zero(); 
+        VectorDr ComputeDemForces(const VectorDr & dij, const VectorDr & vij) const;
+        
+        VectorDr ComputeDemCapillaryForces(const VectorDr & dij, const VectorDr & vij) const;
 
-                boundary_particle.forEachNearby(p_i, [&](const int js, const VectorDr & p_js) {
-                    VectorDr dis_vel = velocities[i] - boundary_velocity[js];
-                    real dis_vel_norm = boundary_particle.norms[js].dot(dis_vel);
-                    VectorDr F_norm = - boundary_particle.volumes[js]
-                        * std::min(dis_vel_norm, 0.)
-                        * boundary_particle.norms[js] * boundary_particle.kernel(p_i - p_js);
-                    VectorDr F_tang = - K_tang * (dis_vel - dis_vel_norm * boundary_particle.norms[js]);
-                    if(F_tang.norm() <= 0.000001)
-                        force += F_norm + F_tang;
-                    else
-                        force += F_norm + (F_norm.norm()*fricangle > F_tang.norm() ?  F_tang : (F_norm.norm() * fricangle / F_tang.norm()) * F_tang);
-                  });
-
-                velocities[i] += force;
-            });
-        }
-
+        VectorDr getForceSum(const int i) const;
     };
 
 } // namespace PhysX
