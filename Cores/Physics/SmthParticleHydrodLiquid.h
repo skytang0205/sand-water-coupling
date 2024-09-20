@@ -5,7 +5,6 @@
 #include "Structures/ParticlesBasedScalarField.h"
 #include "Structures/ParticlesBasedVectorField.h"
 #include "Structures/StaggeredGrid.h"
-#include "Structures/VirtualParticle.h"
 #include "Utilities/Shapes.h"
 
 namespace PhysX {
@@ -19,27 +18,19 @@ namespace PhysX {
     protected:
         SmoothedParticles<Dim>         _particles;
         ParticlesBasedVectorField<Dim> _velocities;
-
-        double _alpha_0;
-
-        VirtualParticle<Dim> _virtual_particles;
-
-        BoundaryParticles<Dim>         _boundary_particles;
-        ParticlesBasedVectorField<Dim> _boundary_velocity;
+        ParticlesBasedScalarField<Dim> _pressures;
 
         std::vector<std::unique_ptr<Collider<Dim>>> _colliders;
 
         bool _enableGravity = true;
 
-        real _viscosityCoeff = 0;
-        // real _viscosityCoeff = real(.01);
-        real _targetDensity = real(1e3);
-        real _eosMultiplier = 25;
+        // real _viscosityCoeff = 0;
+        real _viscosityCoeff = real(.01);
+        real _targetDensity  = real(1e3);
+        real _eosMultiplier  = 25;
 
     public:
-        SmthParticleHydrodLiquid(const StaggeredGrid<Dim> & grid, const real particleRadius):
-            _particles(particleRadius), _virtual_particles(grid, grid.spacing()), _boundary_particles(particleRadius),
-            _alpha_0(-1e6) {}
+        SmthParticleHydrodLiquid(const real particleRadius): _particles(particleRadius) {}
 
         SmthParticleHydrodLiquid(const SmthParticleHydrodLiquid & rhs)             = delete;
         SmthParticleHydrodLiquid & operator=(const SmthParticleHydrodLiquid & rhs) = delete;
@@ -58,8 +49,8 @@ namespace PhysX {
         virtual void initialize() override;
         virtual void advance(const real dt) override;
 
-        void generateSurface(const Surface<Dim> & surface);
-        void addShape(const Shapes<Dim> & shape);
+        void         generateSurface(const Surface<Dim> & surface);
+        virtual void addShape(const Shapes<Dim> & shape);
 
     protected:
         virtual void reinitializeParticlesBasedData();

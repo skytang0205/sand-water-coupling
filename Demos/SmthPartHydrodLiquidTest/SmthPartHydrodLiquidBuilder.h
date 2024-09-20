@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Geometries/ImplicitSurface.h"
+#include "Physics/DualParticleSphLiquid.h"
 #include "Physics/PredCorrIncomprSphLiquid.h"
 #include "Physics/SmthParticleHydrodLiquid.h"
+#include "Physics/WeakCompSphLiquid.h"
 #include "Structures/StaggeredGrid.h"
 #include "Utilities/Shapes.h"
 
@@ -33,31 +35,18 @@ namespace PhysX {
             const real         density = 1000;
             const real         radius  = length / 2 / scale / 2;
             auto               liquid  = makeLiquid<Dim>(grid, radius, pci);
-            auto               shape   = Shapes<Dim>(radius);           
+            auto               shape   = Shapes<Dim>(radius);
             const real         omega   = 2.;
-            shape.generateBox(VectorDr::Zero(), VectorDr::Ones() * length / 6);
-            shape.generateRotate(omega);
+            shape.generateBox(VectorDr::Zero(), VectorDr::Ones() * length / 6, true);
+            // shape.generateRotate(omega);
             liquid->addShape(shape);
-            //liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
+            // liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
             liquid->_particles.setMass(density / liquid->_particles.getPackedKernelSum());
             liquid->_targetDensity = density;
 
-            liquid->_virtual_particles.setKappa(1. / liquid->_particles.getPackedKernelSum());
-
-            // liquid->_colliders.push_back(
-            //     std::make_unique<StaticCollider<Dim>>(
-            //         std::make_unique<ComplementarySurface<Dim>>(
-            //             std::make_unique<ImplicitBox<Dim>>(-length / 2 * VectorDr::Ones(), length *
-            //             VectorDr::Ones()))));
-            liquid->_boundary_particles.addSurface(
-                ComplementarySurface<Dim>(
-                    std::make_unique<ImplicitBox<Dim>>(-length / 2 * VectorDr::Ones(), length * VectorDr::Ones())),
-                VectorDr::Zero(),
-                VectorDr::Ones() * length * 1.2);
-
-            liquid->_boundary_particles.setMass(density / liquid->_particles.getPackedKernelSum());
-
-            liquid->_boundary_velocity.resize(&liquid->_boundary_particles);
+            liquid->_colliders.push_back(
+                std::make_unique<StaticCollider<Dim>>(std::make_unique<ComplementarySurface<Dim>>(
+                    std::make_unique<ImplicitBox<Dim>>(-length / 2 * VectorDr::Ones(), length * VectorDr::Ones()))));
 
             return liquid;
         }
@@ -65,8 +54,8 @@ namespace PhysX {
         template<int Dim>
         static std::unique_ptr<SmthParticleHydrodLiquid<Dim>>
             makeLiquid(const StaggeredGrid<Dim> & grid, const real radius, const bool pci) {
-            if (pci) return std::make_unique<PredCorrIncomprSphLiquid<Dim>>(grid, radius);
-            else return std::make_unique<SmthParticleHydrodLiquid<Dim>>(grid, radius);
+            if (pci) return std::make_unique<PredCorrIncomprSphLiquid<Dim>>(radius);
+            else return std::make_unique<WeakCompSphLiquid<Dim>>(radius);
         }
 
         static void reportError(const std::string & msg) {

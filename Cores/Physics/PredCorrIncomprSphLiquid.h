@@ -23,8 +23,7 @@ namespace PhysX {
         ParticlesBasedScalarData<Dim>  _densityErrors;
 
     public:
-        PredCorrIncomprSphLiquid(const StaggeredGrid<Dim> & grid, const real particleRadius):
-            SmthParticleHydrodLiquid<Dim>(grid, particleRadius) {}
+        PredCorrIncomprSphLiquid(const real particleRadius): SmthParticleHydrodLiquid<Dim>(particleRadius) {}
 
         PredCorrIncomprSphLiquid(const PredCorrIncomprSphLiquid & rhs)             = delete;
         PredCorrIncomprSphLiquid & operator=(const PredCorrIncomprSphLiquid & rhs) = delete;

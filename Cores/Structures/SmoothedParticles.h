@@ -15,11 +15,10 @@ namespace PhysX {
         ParticlesScalarAttribute<Dim> densities;
         ParticlesScalarAttribute<Dim> volumes;
 
-    private:
+    protected:
         using Particles<Dim>::_mass;
         using Particles<Dim>::_invMass;
 
-    protected:
         const real _radius;
         const real _kernelRadius;
         const real _squaredKernelRadius;
@@ -39,7 +38,11 @@ namespace PhysX {
         using Particles<Dim>::parallelForEach;
 
         SmoothedParticles(
-            const real radius, const size_t cnt = 0, const VectorDr & pos = VectorDr::Zero(), const real mass = 1, const real kernel_rate = 4);
+            const real       radius,
+            const size_t     cnt         = 0,
+            const VectorDr & pos         = VectorDr::Zero(),
+            const real       mass        = 1,
+            const real       kernel_rate = 4);
 
         SmoothedParticles & operator=(const SmoothedParticles & rhs) = delete;
         virtual ~SmoothedParticles()                                 = default;
@@ -50,6 +53,7 @@ namespace PhysX {
         virtual void computeDensities();
         virtual void computeVolumes();
         virtual void computeInfo();
+        virtual void resize(const size_t cnt, const VectorDr & pos = VectorDr::Zero()) override;
 
         // Interpolation helper functions, using the cubic spline kernel
 
@@ -127,6 +131,80 @@ namespace PhysX {
         virtual ~BoundaryParticles()                                 = default;
 
         void addSurface(const Surface<Dim> & s, const VectorDr & center, const VectorDr & halfLengths);
+    };
+
+    template<int Dim> class WeakCompParticles : public SmoothedParticles<Dim> {
+        DECLARE_DIM_TYPES(Dim)
+
+    public:
+        using SmoothedParticles<Dim>::positions;
+        using SmoothedParticles<Dim>::densities;
+
+    private:
+        using SmoothedParticles<Dim>::_mass;
+        using SmoothedParticles<Dim>::_invMass;
+
+    protected:
+        using SmoothedParticles<Dim>::_radius;
+        using SmoothedParticles<Dim>::_kernelRadius;
+        using SmoothedParticles<Dim>::_squaredKernelRadius;
+        using SmoothedParticles<Dim>::_invKernelRadius;
+        using SmoothedParticles<Dim>::_invSquaredKernelRadius;
+
+        const real _kernelNormCoeff;
+
+        using SmoothedParticles<Dim>::_nearbySearcher;
+
+    public:
+        using SmoothedParticles<Dim>::setMass;
+        using SmoothedParticles<Dim>::mass;
+        using SmoothedParticles<Dim>::forEach;
+        using SmoothedParticles<Dim>::parallelForEach;
+        using SmoothedParticles<Dim>::radius;
+        using SmoothedParticles<Dim>::kernelRadius;
+        using SmoothedParticles<Dim>::getNeighborWeight;
+        using SmoothedParticles<Dim>::getBiasWeight;
+        using SmoothedParticles<Dim>::getBiasGradient;
+        using SmoothedParticles<Dim>::getPackedKernelSum;
+        using SmoothedParticles<Dim>::resetNearbySearcher;
+        using SmoothedParticles<Dim>::forEachNearby;
+        using SmoothedParticles<Dim>::generateBoxPacked;
+
+        WeakCompParticles(
+            const real       radius,
+            const size_t     cnt         = 0,
+            const VectorDr & pos         = VectorDr::Zero(),
+            const real       mass        = 1,
+            const real       kernel_rate = 4);
+
+        WeakCompParticles & operator=(const WeakCompParticles &) = delete;
+        virtual ~WeakCompParticles()                             = default;
+
+        real kernel(const real dis) const {
+            const real x = dis * _invKernelRadius;
+            if (x < 1.) return _kernelNormCoeff * (1 - 1.5 * x * x * (1 - .5 * x));
+            else if (x < 2.) return _kernelNormCoeff * (.25 * (2. - x) * (2. - x) * (2. - x));
+            else return 0.;
+        }
+
+        real firstDerivativeKernel(const real dis) const {
+            const real x = dis * _invKernelRadius;
+            if (x < 1.) return _kernelNormCoeff * _invKernelRadius * (1.5 * x * (1.5 * x - 2));
+            else if (x < 2.) return _kernelNormCoeff * _invKernelRadius * (-.75 * (2 - x) * (2 - x));
+            else return 0.;
+        }
+
+        real secondDerivativeKernel(const real dis) const {
+            const real x = dis * _invKernelRadius;
+            if (x < 1.) return _kernelNormCoeff * _invKernelRadius * _invKernelRadius * (4.5 * x - 3.);
+            else if (x < 2.) return _kernelNormCoeff * _invKernelRadius * _invKernelRadius * (3. - 1.5 * x);
+            else return 0;
+        }
+
+        real     kernel(const VectorDr & delta) const { return kernel(delta.norm()); }
+        VectorDr gradientKernel(const VectorDr & delta) const {
+            return -firstDerivativeKernel(delta.norm()) * delta.normalized();
+        }
     };
 
 } // namespace PhysX
