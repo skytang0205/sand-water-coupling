@@ -27,13 +27,16 @@ namespace PhysX {
             if (scale < 0) scale = 30;
             const real length = real(1);
 
-            const real         density = 1000;
+            const real         density = 2700;
             const real         radius  = length / 2 / scale / 2;
             auto               sand  = std::make_unique<DEMParticleSand<Dim>>(radius);
             auto               shape   = Shapes<Dim>(radius);           
             const real         omega   = 2.;
-            shape.generateBox(VectorDr::Zero(), VectorDr::Ones() * length / 8);
-            shape.generateRotate(omega);
+            const bool      if_Possion = false;
+            VectorDr           box     = VectorDr::Ones() * length / 4;
+            box(0) /= 2;
+            shape.generateBox(VectorDr::Zero(), box / 2 , if_Possion);
+            //shape.generateRotate(omega);
             sand->addShape(shape);
             //liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
             sand->_particles.setMass(density / sand->_particles.positions.size());

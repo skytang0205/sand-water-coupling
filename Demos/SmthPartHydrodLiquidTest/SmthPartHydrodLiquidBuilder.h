@@ -25,7 +25,7 @@ namespace PhysX {
     protected:
         template<int Dim> static std::unique_ptr<SmthParticleHydrodLiquid<Dim>> buildCase0(int scale, const bool pci) {
             DECLARE_DIM_TYPES(Dim)
-            if (scale < 0) scale = 30;
+            if (scale < 0) scale = 50;
             const real length = real(2);
 
             const VectorDi     resolution = 3 * scale * VectorDi::Ones();
@@ -35,7 +35,8 @@ namespace PhysX {
             auto               liquid  = makeLiquid<Dim>(grid, radius, pci);
             auto               shape   = Shapes<Dim>(radius);           
             const real         omega   = 2.;
-            shape.generateBox(VectorDr::Zero(), VectorDr::Ones() * length / 6);
+            const bool      if_Possion = true;
+            shape.generateBox(VectorDr::Zero(), VectorDr::Ones() * length / 4, if_Possion);
             shape.generateRotate(omega);
             liquid->addShape(shape);
             //liquid->_particles.generateBoxPacked(VectorDr::Zero(), VectorDr::Ones() * length / 4);
