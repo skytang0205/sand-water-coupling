@@ -40,6 +40,11 @@ namespace PhysX {
         computeVolumes();
     }
 
+    template<int Dim> void SmoothedParticles<Dim>::resize(const size_t cnt, const VectorDr & pos) {
+        positions._data.resize(cnt, pos);
+        densities._data.resize(cnt, 0);
+    }
+
     template<int Dim> real SmoothedParticles<Dim>::getNeighborWeight(const VectorDr & pos) const {
         double sum = 0;
 
@@ -149,9 +154,18 @@ namespace PhysX {
         }
     }
 
+    template<int Dim>
+    WeakCompParticles<Dim>::WeakCompParticles(
+        const real radius, const size_t cnt, const VectorDr & pos, const real mass, const real kernel_rate):
+        SmoothedParticles<Dim>(radius, cnt, pos, mass),
+        _kernelNormCoeff(
+            real(std::numbers::inv_pi) * _invSquaredKernelRadius * (Dim == 2 ? 10. / 7. : _invKernelRadius)) {}
+
     template class SmoothedParticles<2>;
     template class SmoothedParticles<3>;
     template class BoundaryParticles<2>;
     template class BoundaryParticles<3>;
+    template class WeakCompParticles<2>;
+    template class WeakCompParticles<3>;
 
 } // namespace PhysX

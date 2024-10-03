@@ -7,44 +7,40 @@
 
 namespace PhysX {
 
-template <int Dim>
-class Particles
-{
-	DECLARE_DIM_TYPES(Dim)
+    template<int Dim> class Particles {
+        DECLARE_DIM_TYPES(Dim)
 
-public:
+    public:
+        ParticlesVectorAttribute<Dim> positions;
 
-	ParticlesVectorAttribute<Dim> positions;
+    protected:
+        real _mass;
+        real _invMass;
 
-protected:
+    public:
+        Particles(const size_t cnt = 0, const VectorDr & pos = VectorDr::Zero(), const real mass = 1) {
+            resize(cnt, pos);
+            setMass(mass);
+        }
 
-	real _mass;
-	real _invMass;
+        Particles & operator=(const Particles & rhs) = delete;
+        virtual ~Particles()                         = default;
 
-public:
+        virtual void resize(const size_t cnt, const VectorDr & pos = VectorDr::Zero()) {
+            positions._data.resize(cnt, pos);
+        }
 
-	Particles(const size_t cnt = 0, const VectorDr &pos = VectorDr::Zero(), const real mass = 1)
-	{
-		resize(cnt, pos);
-		setMass(mass);
-	}
+        real mass() const { return _mass; }
+        real invMass() const { return _invMass; }
+        void setMass(const real mass) { _mass = mass, _invMass = 1 / _mass; }
 
-	Particles &operator=(const Particles &rhs) = delete;
-	virtual ~Particles() = default;
+        void   add(const VectorDr & pos = VectorDr::Zero()) { positions._data.push_back(pos); }
+        void   clear() { positions._data.clear(); }
+        size_t size() const { return positions.size(); }
+        bool   empty() const { return positions.empty(); }
 
-	void resize(const size_t cnt, const VectorDr &pos = VectorDr::Zero()) { positions._data.resize(cnt, pos); }
+        void forEach(const std::function<void(const int)> & func) const { positions.forEach(func); }
+        void parallelForEach(const std::function<void(const int)> & func) const { positions.parallelForEach(func); }
+    };
 
-	real mass() const { return _mass; }
-	real invMass() const { return _invMass; }
-	void setMass(const real mass) { _mass = mass, _invMass = 1 / _mass; }
-
-	void add(const VectorDr &pos = VectorDr::Zero()) { positions._data.push_back(pos); }
-	void clear() { positions._data.clear(); }
-	size_t size() const { return positions.size(); }
-	bool empty() const { return positions.empty(); }
-
-	void forEach(const std::function<void(const int)> &func) const { positions.forEach(func); }
-	void parallelForEach(const std::function<void(const int)> &func) const { positions.parallelForEach(func); }
-};
-
-}
+} // namespace PhysX

@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AffineParticleInCellLiquid.h" />
+    <ClInclude Include="DivFreeSphLiquid.h" />
+    <ClInclude Include="DualParticleSphLiquid.h" />
     <ClInclude Include="EulerianAdvector.h" />
     <ClInclude Include="EulerianBoundaryHelper.h" />
     <ClInclude Include="EulerianFluid.h" />
@@ -27,9 +29,12 @@
     <ClInclude Include="SmthParticleHydrodLiquid.h" />
     <ClInclude Include="SpringMassSysIntegrator.h" />
     <ClInclude Include="SpringMassSystem.h" />
+    <ClInclude Include="WeakCompSphLiquid.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AffineParticleInCellLiquid.cpp" />
+    <ClCompile Include="DivFreeSphLiquid.cpp" />
+    <ClCompile Include="DualParticleSphLiquid.cpp" />
     <ClCompile Include="EulerianAdvector.cpp" />
     <ClCompile Include="EulerianBoundaryHelper.cpp" />
     <ClCompile Include="EulerianFluid.cpp" />
@@ -44,6 +49,7 @@
     <ClCompile Include="SmthParticleHydrodLiquid.cpp" />
     <ClCompile Include="SpringMassSysIntegrator.cpp" />
     <ClCompile Include="SpringMassSystem.cpp" />
+    <ClCompile Include="WeakCompSphLiquid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Geometries\Geometries.vcxproj">
