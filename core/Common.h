@@ -58,11 +58,19 @@ namespace YAML {
 namespace Pivot {
 	using namespace Eigen;
 
+	template <typename T>
+	struct is_vector : std::false_type {};
+
+	template <typename T>
+	struct is_vector<std::vector<T>> : std::true_type {};
+
 	template <typename Type>
 	inline Type Zero() {
 		if constexpr (requires { { Type::Zero() } -> std::convertible_to<Type>; }) {
 			return Type::Zero();
-		} else {
+		} else if constexpr (is_vector<Type>::value) {
+			return Type{};
+		} else{
 			return 0;
 		}
 	}

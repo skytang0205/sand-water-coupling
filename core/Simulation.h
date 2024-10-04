@@ -15,7 +15,7 @@ namespace Pivot {
 		enum class Scene { Falling, BigBall, Slope };
 
 	public:
-		explicit Simulation(StaggeredGrid const &sgrid);
+		explicit Simulation(StaggeredGrid const &sgrid, double particleRadius);
 
 		void Describe(YAML::Node &root) const;
 		void Export(std::filesystem::path const &dirname, bool initial = false) const;
@@ -42,7 +42,7 @@ namespace Pivot {
 
 		void CacheNeighborHoods();
 
-		void MoveParticles(double dt);
+		void MoveDEMParticles(double dt);
 		void ApplyDEMForces(double dt);
 	
 	private:
@@ -79,7 +79,7 @@ namespace Pivot {
 
 		DEMForce m_DEMForce;
 
-		GridData<std::vector<Particle*> m_DEMGrid;
+		GridData<std::vector<Particle*>> m_DEMGrid;
 
 		std::vector<Particle> m_DEMParticles;
 

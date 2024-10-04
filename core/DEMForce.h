@@ -20,7 +20,7 @@ namespace Pivot {
             cmc = 1.;
             cmcp = 0.1;
             csat = 0.1;
-            G = QuadraticBezierCoeff(c0, cmc, cmcp, csat);
+            //G = QuadraticBezierCoeff(c0, cmc, cmcp, csat);
             surface_tensor_cof = 1.0;
             printf("drupture: %lf\n", d_rupture/radius);
         }
@@ -114,8 +114,9 @@ namespace Pivot {
 
         Vector2d getForceSum(GridData<std::vector<Particle*>> const &grid, Particle & particle){
             Vector2d f = Vector2d::Zero();
-            int range = int(m_SupportRadius * grid.GetGrid().GetInvSpacing() + 2.);
-			Vector2i const size = grid.GetGrid().GetSize()
+            Vector2i const lower = grid.GetGrid().CalcLower<1>(particle.Position);
+            int range = int(_radius * grid.GetGrid().GetInvSpacing() + 2.);
+			Vector2i const size = grid.GetGrid().GetSize();
 			for(int i = std::max(0, lower.x()-range); i <+ std::min(size.x(), lower.x()+range); i++){
 				for(int j = std::max(0, lower.y()-range); j <+ std::min(size.y(), lower.y()+range); j++){
                     for(auto *nb : grid[Vector2i(i,j)]){
@@ -132,6 +133,6 @@ namespace Pivot {
         double Young, Poisson, K_norm, K_tang, tan_fricangle;
         double contact_angle, volume_liquid_bridge, d_rupture;
         double c0, cmc, cmcp, csat, sr, surface_tensor_cof;
-        QuadraticBezierCoeff G;
+        //QuadraticBezierCoeff G;
     };
 }

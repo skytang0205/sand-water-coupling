@@ -13,6 +13,10 @@ namespace Pivot {
 		virtual Vector2d ClosestNormalOf  (Vector2d const &pos) const override { return (pos - m_Center).normalized(); }
 		virtual double   SignedDistanceTo (Vector2d const &pos) const override { return (pos - m_Center).norm() - m_Radius; }
 
+		virtual std::pair<Vector2d, Vector2d> GetCornersOfAABB() const override {
+			return { m_Center - Vector2d::Ones() * m_Radius, m_Center + Vector2d::Ones() * m_Radius };
+		}
+
 	private:
 		Vector2d m_Center;
 		double   m_Radius;
@@ -45,6 +49,10 @@ namespace Pivot {
 			}
 		}
 
+		virtual std::pair<Vector2d, Vector2d> GetCornersOfAABB() const override {
+			return { m_Center - m_HalfLengths, m_Center + m_HalfLengths };
+		}
+
 	private:
 		Vector2d m_Center;
 		Vector2d m_HalfLengths;
@@ -56,6 +64,10 @@ namespace Pivot {
 
 		virtual Vector2d ClosestNormalOf (Vector2d const &pos) const override { return m_Normal; }
 		virtual double   SignedDistanceTo(Vector2d const &pos) const override { return (pos - m_Position).dot(m_Normal); }
+		
+		virtual std::pair<Vector2d, Vector2d> GetCornersOfAABB() const override {
+			return { Vector2d::Zero(), Vector2d::Zero() };
+		}
 
 	private:
 		Vector2d const m_Position;
@@ -72,6 +84,10 @@ namespace Pivot {
 		virtual double   DistanceTo       (Vector2d const &pos) const override { return (pos - ClosestPositionOf(pos)).norm(); }
 		virtual double   SignedDistanceTo (Vector2d const &pos) const override { return DistanceTo(pos) * (Surrounds(pos) ? -1 : 1); }
 		virtual bool     Surrounds        (Vector2d const &pos) const override { return pos.cwiseQuotient(m_SemiAxels).squaredNorm() <= 1; }
+
+		virtual std::pair<Vector2d, Vector2d> GetCornersOfAABB() const override {
+			return { m_Center - m_SemiAxels, m_Center + m_SemiAxels };
+		}
 
 	private:
 		Vector2d m_Center;

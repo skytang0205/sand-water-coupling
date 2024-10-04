@@ -201,7 +201,7 @@ namespace Pivot {
 
 		ApplyBodyForces(deltaTime);
 		ApplyDEMForces(deltaTime);
-		MoveParticles(deltaTime);
+		MoveDEMParticles(deltaTime);
 
 		ProjectVelocity(deltaTime);
 		CacheNeighborHoods();

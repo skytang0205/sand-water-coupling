@@ -12,5 +12,7 @@ namespace Pivot {
 		virtual double   DistanceTo       (Vector2d const &pos) const { return std::abs(SignedDistanceTo(pos)); }
 		virtual double   SignedDistanceTo (Vector2d const &pos) const = 0;
 		virtual bool     Surrounds        (Vector2d const &pos) const { return SignedDistanceTo(pos) <= 0; }
+
+		virtual std::pair<Vector2d, Vector2d> GetCornersOfAABB() const = 0;
 	};
 }
