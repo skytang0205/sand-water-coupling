@@ -38,7 +38,7 @@ namespace Pivot {
 		void SetTime(double time) { m_Time = time; }
 		auto GetTime() const { return m_Time; }
 
-		double GetCourantTimeStep() const { return m_SGrid.GetSpacing() / m_Velocity.GetMaxAbsComponent(); }
+		double GetCourantTimeStep() const;
 
 		void CacheNeighborHoods();
 

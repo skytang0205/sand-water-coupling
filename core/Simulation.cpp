@@ -1,5 +1,7 @@
 #include "Simulation.h"
 
+#include <mutex>
+
 #include "Advection.h"
 #include "BiBSpline.h"
 #include "BiLerp.h"
@@ -39,7 +41,7 @@ namespace Pivot {
 			node["Name"] = "DEMparticles";
 			node["Animated"] = true;
 			node["Primitive"] = "Points";
-			node["Material"]["Albedo"] = Vector4f(1, 0, 0, 1);
+			//node["Material"]["Albedo"] = Vector4f(0, 0, 1, 1);
 			root["Objects"].push_back(node);
 		}
 		{ // Description of collider
@@ -129,18 +131,18 @@ namespace Pivot {
 				IO::Write(fout, normVel);
 			});
 		}
-		{ // Export velocity
-			std::ofstream fout(dirname / "DEMvelocity.out", std::ios::binary);
-			IO::Write(fout, static_cast<std::uint32_t>(m_DEMParticles.size() * 2));
-			for (auto const &p : m_DEMParticles) {
-				IO::Write(fout, p.Position.cast<float>().eval());
-				IO::Write(fout, (p.Position + p.Velocity.normalized() * m_ParticleRadius * 2).cast<float>().eval());
-			}
-			for (auto const &p : m_DEMParticles) {
-				IO::Write(fout, static_cast<float>(p.Velocity.norm()));
-				IO::Write(fout, static_cast<float>(p.Velocity.norm()));
-			}
-		}
+		// { // Export velocity
+		// 	std::ofstream fout(dirname / "DEMvelocity.out", std::ios::binary);
+		// 	IO::Write(fout, static_cast<std::uint32_t>(m_DEMParticles.size() * 2));
+		// 	for (auto const &p : m_DEMParticles) {
+		// 		IO::Write(fout, p.Position.cast<float>().eval());
+		// 		IO::Write(fout, (p.Position + p.Velocity.normalized() * m_ParticleRadius * 2).cast<float>().eval());
+		// 	}
+		// 	for (auto const &p : m_DEMParticles) {
+		// 		IO::Write(fout, static_cast<float>(p.Velocity.norm()));
+		// 		IO::Write(fout, static_cast<float>(p.Velocity.norm()));
+		// 	}
+		// }
 		if (initial) { // Export the collider
 			std::ofstream fout(dirname / "collider.out", std::ios::binary);
 			IO::Write(fout, static_cast<std::uint32_t>(m_ColliderParticles.size()));
@@ -175,6 +177,18 @@ namespace Pivot {
 	}
 
 	void Simulation::Load(std::istream &in) {
+	}
+
+	double Simulation::GetCourantTimeStep() const { 
+		double maxVel = 0;
+		for (auto const &particle : m_DEMParticles) {
+			maxVel = std::max(maxVel, particle.Velocity.norm());
+		}
+		printf("%lf\n",maxVel);
+		maxVel += std::sqrt(9.8 * m_ParticleRadius * 2);
+		
+
+		return  std::min(m_SGrid.GetSpacing() / (m_Velocity.GetMaxAbsComponent()), m_ParticleRadius * 2. / maxVel); 
 	}
 
 	void Simulation::Initialize() {
@@ -296,12 +310,10 @@ namespace Pivot {
 	}
 
 	void Simulation::ApplyBodyForces(double dt) {
-		if (m_GravityEnabled) {
+		if (!m_GravityEnabled) {
 			ParallelForEach(m_Velocity[1].GetGrid(), [&](Vector2i const &face) {
 				m_Velocity[1][face] -= 9.8 * dt;
 			});
-		}
-		if(m_GravityEnabled){
 			tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
 				p.Velocity[1] -= 9.8 * dt;
 			});
@@ -388,11 +400,15 @@ namespace Pivot {
 		ParallelForEach(m_DEMGrid.GetGrid(), [&](Vector2i const &cell){
 			m_DEMGrid[cell].clear();
 		});
-
-		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
-			Vector2i const lower = m_DEMGrid.GetGrid().CalcLower<1>(p.Position);
-			m_DEMGrid[lower].push_back(&p);
-		});
+		//printf("breakpoint 1\n");
+		for(Particle p : m_DEMParticles){
+			//printf("breakpoint 3\n");
+			Vector2i lower = m_DEMGrid.GetGrid().CalcLower<1>(p.Position);
+			//printf("breakpoint 4\n");
+			//std::lock_guard<std::mutex> lock(m_mutex);
+			m_DEMGrid[ m_DEMGrid.GetGrid().Clamp(lower)].push_back(&p);
+		}
+		//printf("breakpoint 2\n");
 	}
 
 	void Simulation::MoveDEMParticles(double dt) {
