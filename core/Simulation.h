@@ -79,7 +79,7 @@ namespace Pivot {
 
 		DEMForce m_DEMForce;
 
-		GridData<std::vector<Particle*>> m_DEMGrid;
+		GridData<std::vector<Particle>> m_DEMGrid;
 
 		std::vector<Particle> m_DEMParticles;
 

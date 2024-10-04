@@ -41,7 +41,7 @@ namespace Pivot {
 			node["Name"] = "DEMparticles";
 			node["Animated"] = true;
 			node["Primitive"] = "Points";
-			//node["Material"]["Albedo"] = Vector4f(0, 0, 1, 1);
+			node["Material"]["Albedo"] = Vector4f(0, 0, 1, 1);
 			root["Objects"].push_back(node);
 		}
 		{ // Description of collider
@@ -59,14 +59,14 @@ namespace Pivot {
 			node["Shader"] = "heatmap";
 			root["Objects"].push_back(node);
 		}
-		{ // Description of velocity
-			YAML::Node node;
-			node["Name"] = "DEMvelocity";
-			node["Animated"] = true;
-			node["Primitive"] = "Lines";
-			node["Shader"] = "heatmap";
-			root["Objects"].push_back(node);
-		}
+		// { // Description of velocity
+		// 	YAML::Node node;
+		// 	node["Name"] = "DEMvelocity";
+		// 	node["Animated"] = true;
+		// 	node["Primitive"] = "Lines";
+		// 	node["Shader"] = "heatmap";
+		// 	root["Objects"].push_back(node);
+		// }
 		{ // Description of grid
 			YAML::Node node;
 			node["Name"] = "grid";
@@ -103,9 +103,9 @@ namespace Pivot {
 			for (auto const &p : m_DEMParticles) {
 				IO::Write(fout, p.Position.cast<float>().eval());
 			}
-			for (auto const &p : m_DEMParticles) {
-				IO::Write(fout, static_cast<float>(p.Velocity.norm()));
-			}
+			// for (auto const &p : m_DEMParticles) {
+			// 	IO::Write(fout, static_cast<float>(p.Velocity.norm()));
+			// }
 			for (auto const &p : m_DEMParticles) {
 				IO::Write(fout, static_cast<float>(m_ParticleRadius));
 			}
@@ -136,7 +136,7 @@ namespace Pivot {
 		// 	IO::Write(fout, static_cast<std::uint32_t>(m_DEMParticles.size() * 2));
 		// 	for (auto const &p : m_DEMParticles) {
 		// 		IO::Write(fout, p.Position.cast<float>().eval());
-		// 		IO::Write(fout, (p.Position + p.Velocity.normalized() * m_ParticleRadius * 2).cast<float>().eval());
+		// 		IO::Write(fout, (p.Position + p.Velocity.normalized() * m_ParticleRadius * std::numbers::sqrt2).cast<float>().eval());
 		// 	}
 		// 	for (auto const &p : m_DEMParticles) {
 		// 		IO::Write(fout, static_cast<float>(p.Velocity.norm()));
@@ -184,7 +184,7 @@ namespace Pivot {
 		for (auto const &particle : m_DEMParticles) {
 			maxVel = std::max(maxVel, particle.Velocity.norm());
 		}
-		printf("%lf\n",maxVel);
+		//printf("%lf\n",maxVel);
 		maxVel += std::sqrt(9.8 * m_ParticleRadius * 2);
 		
 
@@ -310,7 +310,7 @@ namespace Pivot {
 	}
 
 	void Simulation::ApplyBodyForces(double dt) {
-		if (!m_GravityEnabled) {
+		if (m_GravityEnabled) {
 			ParallelForEach(m_Velocity[1].GetGrid(), [&](Vector2i const &face) {
 				m_Velocity[1][face] -= 9.8 * dt;
 			});
@@ -403,10 +403,10 @@ namespace Pivot {
 		//printf("breakpoint 1\n");
 		for(Particle p : m_DEMParticles){
 			//printf("breakpoint 3\n");
-			Vector2i lower = m_DEMGrid.GetGrid().CalcLower<1>(p.Position);
+			Vector2i lower = m_DEMGrid.GetGrid().Clamp(m_DEMGrid.GetGrid().CalcLower<1>(p.Position));
 			//printf("breakpoint 4\n");
 			//std::lock_guard<std::mutex> lock(m_mutex);
-			m_DEMGrid[ m_DEMGrid.GetGrid().Clamp(lower)].push_back(&p);
+			m_DEMGrid[lower].push_back(p);
 		}
 		//printf("breakpoint 2\n");
 	}

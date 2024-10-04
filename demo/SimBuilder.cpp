@@ -34,8 +34,8 @@ namespace Pivot {
 		double const radius = options.ParticleRadius < 0 ? .5/double(scale) : options.ParticleRadius;
 		StaggeredGrid sgrid(2, length / (scale - bw * 2), Vector2i(1, 1) * scale);
 		auto sim = std::make_unique<Simulation>(sgrid, radius);
-		//CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector2d::Zero(), length * .25));
-		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length), false);
+		CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector2d::Zero(), length * .25));
+		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length), true);
 		return sim;
 	}
 

@@ -130,11 +130,11 @@ namespace Pivot {
 			} else if (time + 2 * deltaTime >= m_SecondPerFrame) {
 				deltaTime = (m_SecondPerFrame - time) * .5; 
 			}
-			fmt::print(fmt::fg(fmt::color::yellow_green), "[{:>6.0f} SPF] ", m_SecondPerFrame / deltaTime);
+			//fmt::print(fmt::fg(fmt::color::yellow_green), "[{:>6.0f} SPF] ", m_SecondPerFrame / deltaTime);
 			{ // Advance with timing
 				auto sw = StopWatch("alg.");
 				simulation->Advance(deltaTime);
-				fmt::print("    ... {:>8.3f}s used\n", sw.Stop());
+				//fmt::print("    ... {:>8.3f}s used\n", sw.Stop());
 			}
 			time += deltaTime;
 		}

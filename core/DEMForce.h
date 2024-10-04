@@ -65,7 +65,7 @@ namespace Pivot {
             {
                 Vector2d n = Vector2d::Zero();
                 if(dist <= 0.0001 * _radius)
-                    dist = 0.0001 * _radius;
+                    return Vector2d::Zero();
 
                 n = dij * (1 / dist);
                 double dot_epslion = vij.dot(n);
@@ -112,18 +112,28 @@ namespace Pivot {
         //     return f;
         // }
 
-        Vector2d getForceSum(GridData<std::vector<Particle*>> const &grid, Particle & particle){
+        Vector2d getForceSum(GridData<std::vector<Particle>> const &grid, Particle & particle){
             Vector2d f = Vector2d::Zero();
             Vector2i const lower = grid.GetGrid().Clamp(grid.GetGrid().CalcLower<1>(particle.Position));
             int range = int(_radius * grid.GetGrid().GetInvSpacing() + 2.) * 2;
 			Vector2i const size = grid.GetGrid().GetSize();
-			for(int i = std::max(0, lower.x()-range); i <+ std::min(size.x(), lower.x()+range); i++){
-				for(int j = std::max(0, lower.y()-range); j <+ std::min(size.y(), lower.y()+range); j++){
-                    for(auto *nb : grid[Vector2i(i,j)]){
-                        if(nb == &particle || (nb->Position-particle.Position).norm()>=2 * _radius) continue;
-                        f += getForce(particle, *nb);
+			for(int i = std::max(0, lower.x()-range); i < std::min(size.x(), lower.x()+range); i++){
+				for(int j = std::max(0, lower.y()-range); j < std::min(size.y(), lower.y()+range); j++){
+                    for(auto nb : grid[Vector2i(i,j)]){
+                        if((nb.Position-particle.Position).squaredNorm() < 4 * _radius * _radius)
+                            f += getForce(particle, nb);
                     }
 			    }
+			}
+            return f;
+        }
+
+        Vector2d getForceSum(std::vector<Particle> const &m_Particles, Particle & p0){
+            Vector2d f = Vector2d::Zero();
+			for (auto p1 : m_Particles) {
+				if (((p0.Position - p1.Position).squaredNorm() < 4 * _radius * _radius)) {
+					f = f + getForce(p0, p1);
+				}
 			}
             return f;
         }
