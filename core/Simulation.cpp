@@ -244,6 +244,9 @@ namespace Pivot {
 			ParallelForEach(m_Velocity[1].GetGrid(), [&](Vector3i const &face) {
 				m_Velocity[1][face] -= 9.8 * dt;
 			});
+			tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
+				p.Velocity[1] -= 9.8 * dt;
+			});
 		}
 	}
 
