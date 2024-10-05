@@ -20,10 +20,10 @@ namespace Pivot {
 		constexpr int bw = 2;
 		int const scale = options.Scale < 0 ? 128 : options.Scale;
 		double const radius = options.ParticleRadius < 0 ? .5/double(scale) : options.ParticleRadius;
-		StaggeredGrid sgrid(2, length / (scale - bw * 2), Vector2i(1, 1) * scale);
-		auto sim = std::make_unique<Simulation>(sgrid, radius);
-		CSG::Union(sim->m_LevelSet, ImplicitPlane (-Vector2d::Unit(1) * length * .15, Vector2d::Unit(1)));
-		CSG::Union(sim->m_LevelSet, ImplicitSphere( Vector2d::Unit(1) * length * .05, length * .1));
+		StaggeredGrid sgrid(bw, length / (scale - bw * 2), Vector3i(1, 1, 1) * scale);
+		auto sim = std::make_unique<Simulation>(sgrid,radius);
+		CSG::Union(sim->m_LevelSet, ImplicitPlane (-Vector3d::Unit(1) * length * .15, Vector3d::Unit(1)));
+		CSG::Union(sim->m_LevelSet, ImplicitSphere( Vector3d::Unit(1) * length * .05, length * .1));
 		return sim;
 	}
 
@@ -32,10 +32,10 @@ namespace Pivot {
 		constexpr int bw = 2;
 		int const scale = options.Scale < 0 ? 128 : options.Scale;
 		double const radius = options.ParticleRadius < 0 ? .5/double(scale) : options.ParticleRadius;
-		StaggeredGrid sgrid(2, length / (scale - bw * 2), Vector2i(1, 1) * scale);
+		StaggeredGrid sgrid(bw, length / (scale - bw * 2), Vector3i(1, 1, 1) * scale);
 		auto sim = std::make_unique<Simulation>(sgrid, radius);
-		CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector2d::Zero(), length * .25));
-		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length), true);
+		CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector3d::Zero(), length * .25));
+		AddParticles(sim.get(), ImplicitSphere(Vector3d::Zero() * length, .25 * length), true);
 		return sim;
 	}
 
@@ -44,22 +44,22 @@ namespace Pivot {
 		constexpr int bw = 2;
 		int const scale = options.Scale < 0 ? 128 : options.Scale;
 		double const radius = options.ParticleRadius < 0 ? .5/double(scale) : options.ParticleRadius;
-		StaggeredGrid sgrid(2, length / (scale - bw * 2), Vector2i(1, 1) * scale);
+		StaggeredGrid sgrid(bw, length / (scale - bw * 2), Vector3i(1, 1, 1) * scale);
 		auto sim = std::make_unique<Simulation>(sgrid, radius);
-		//CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector2d::Zero(), length * .25));
-		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length));
-		CSG::Union(sim->m_Collider.LevelSet, ImplicitPlane(Vector2d(-2, -1) * length * .25, Vector2d(1, 4).normalized()));
+		CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector3d::Zero(), length * .25));
+		AddParticles(sim.get(), ImplicitSphere(Vector3d::Zero() * length, .25 * length));
+		CSG::Union(sim->m_Collider.LevelSet, ImplicitPlane(Vector3d(-2, -1, 0) * length * .25, Vector3d(1, 4, 0).normalized()));
 		return sim;
 	}
 
-	void SimBuilder::AddParticles(Simulation *simulation, Surface const &surface, bool if_Poission, std::function<Vector2d(Vector2d const &)> velocity) {
+	void SimBuilder::AddParticles(Simulation *simulation, Surface const &surface, bool if_Poission, std::function<Vector3d(Vector3d const &)> velocity) {
 		VolumeSampler sampler(simulation->m_ParticleRadius * 2.);
 		auto const positions = sampler.Sample(surface, if_Poission);
 		simulation->m_DEMParticles.reserve(simulation->m_DEMParticles.size() + positions.size());
 		for (auto const &pos : positions) {
 			simulation->m_DEMParticles.push_back({
 				.Position = pos,
-				.Velocity = velocity ? velocity(pos) : Vector2d::Zero(),
+				.Velocity = velocity ? velocity(pos) : Vector3d::Zero(),
 			});
 		}
 	}

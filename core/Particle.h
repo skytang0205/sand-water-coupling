@@ -4,8 +4,8 @@
 
 namespace Pivot {
 	struct Particle {
-		Vector2d Position;
-		Vector2d Velocity = Vector2d::Zero();
-		std::array<Vector2d, 2> VelocityDrv = { Vector2d::Zero().eval(), Vector2d::Zero().eval() }; // Used for APIC
+		Vector3d Position;
+		Vector3d Velocity = Vector3d::Zero();
+		std::array<Vector3d, 3> VelocityDrv = { Vector3d::Zero().eval(), Vector3d::Zero().eval(), Vector3d::Zero().eval() }; // Used for APIC
 	};
 }

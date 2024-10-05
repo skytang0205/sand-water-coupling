@@ -1,6 +1,6 @@
 #include "Pressure.h"
 
-#include "BiLerp.h"
+#include "TriLerp.h"
 
 #include <amgcl/backend/eigen.hpp>
 #include <amgcl/make_solver.hpp>
@@ -35,7 +35,7 @@ namespace Pivot {
 	void Pressure::InitRestDensity(int numPartPerCell, std::vector<Particle> const &particles) {
 		m_NumPartPerCell = numPartPerCell;
 		for (auto const &particle : particles) {
-			for (auto const [cell, weight] : BiLerp::GetWtPoints(m_RestDensity.GetGrid(), particle.Position)) {
+			for (auto const [cell, weight] : TriLerp::GetWtPoints(m_RestDensity.GetGrid(), particle.Position)) {
 				m_RestDensity[m_RestDensity.GetGrid().Clamp(cell)] += weight / m_NumPartPerCell;
 			}
 		}
@@ -45,11 +45,11 @@ namespace Pivot {
 		std::vector<Triplet<double>> elements;
 
 		for (int r = 0; r < m_RdP.size(); r++) {
-			Vector2i const cell = levelSet.GetGrid().CoordOf(m_Mat2Grid[r]);
+			Vector3i const cell = levelSet.GetGrid().CoordOf(m_Mat2Grid[r]);
 			double diagCoeff = 0;
 			double div = 0;
 			for (int i = 0; i < Grid::GetNumNeighbors(); i++) {
-				Vector2i const nbCell = Grid::NeighborOf(cell, i);
+				Vector3i const nbCell = Grid::NeighborOf(cell, i);
 				auto const [axis, face] = StaggeredGrid::FaceOfCell(cell, i);
 				int const side = StaggeredGrid::FaceSideOfCell(i);
 				double const weight = 1 - collider.GetFraction()[axis][face];
@@ -80,18 +80,18 @@ namespace Pivot {
 	void Pressure::BuildCorrectionMatrix(std::vector<Particle> const &particles, Collider const &collider) {
 		auto density = m_RestDensity;
 		for (auto const &particle : particles) {
-			for (auto const [cell, weight] : BiLerp::GetWtPoints(density.GetGrid(), particle.Position)) {
+			for (auto const [cell, weight] : TriLerp::GetWtPoints(density.GetGrid(), particle.Position)) {
 				density[density.GetGrid().Clamp(cell)] += weight / m_NumPartPerCell;
 			}
 		}
 		std::vector<Triplet<double>> elements;
 
 		for (int r = 0; r < m_RdP.size(); r++) {
-			Vector2i const cell = m_RestDensity.GetGrid().CoordOf(m_Mat2Grid[r]);
+			Vector3i const cell = m_RestDensity.GetGrid().CoordOf(m_Mat2Grid[r]);
 			double diagCoeff = 0;
 			bool isBoundary = false;
 			for (int i = 0; i < Grid::GetNumNeighbors(); i++) {
-				Vector2i const nbCell = Grid::NeighborOf(cell, i);
+				Vector3i const nbCell = Grid::NeighborOf(cell, i);
 				auto const [axis, face] = StaggeredGrid::FaceOfCell(cell, i);
 				int const side = StaggeredGrid::FaceSideOfCell(i);
 				double const weight = 1 - collider.GetFraction()[axis][face];
@@ -118,7 +118,7 @@ namespace Pivot {
 
 		int n = 0;
 
-		ForEach(levelSet.GetGrid(), [&](Vector2i const &cell) {
+		ForEach(levelSet.GetGrid(), [&](Vector3i const &cell) {
 			if (levelSet[cell] <= 0) {
 				m_Grid2Mat[cell] = n++;
 				m_Mat2Grid.push_back(levelSet.GetGrid().IndexOf(cell));
@@ -141,13 +141,13 @@ namespace Pivot {
 			amgcl::solver::bicgstab<amgcl::backend::eigen<double>>>;
 		Solver solve(m_MatL);
 		auto const [iters, error] = solve(m_Rhs, m_RdP);
-		std::cout << fmt::format("{:>6} iters", iters);
+		fmt::print("{:>6} iters", iters);
 	}
 
 	void Pressure::ApplyProjection(SGridData<double> &velocity, GridData<double> const &levelSet, Collider const &collider) {
-		ParallelForEach(velocity.GetGrids(), [&](int axis, Vector2i const &face) {
-			Vector2i const cell0 = StaggeredGrid::AdjCellOfFace(axis, face, 0);
-			Vector2i const cell1 = StaggeredGrid::AdjCellOfFace(axis, face, 1);
+		ParallelForEach(velocity.GetGrids(), [&](int axis, Vector3i const &face) {
+			Vector3i const cell0 = StaggeredGrid::AdjCellOfFace(axis, face, 0);
+			Vector3i const cell1 = StaggeredGrid::AdjCellOfFace(axis, face, 1);
 			double const weight = 1. - collider.GetFraction()[axis][face];
 			if (weight == 0.) return;
 
@@ -173,9 +173,9 @@ namespace Pivot {
 	}
 
 	void Pressure::ApplyCorrection(std::vector<Particle> &particles, Collider const &collider) {
-		ParallelForEach(m_DeltaPos.GetGrids(), [&](int axis, Vector2i const &face) {
-			Vector2i const cell0 = StaggeredGrid::AdjCellOfFace(axis, face, 0);
-			Vector2i const cell1 = StaggeredGrid::AdjCellOfFace(axis, face, 1);
+		ParallelForEach(m_DeltaPos.GetGrids(), [&](int axis, Vector3i const &face) {
+			Vector3i const cell0 = StaggeredGrid::AdjCellOfFace(axis, face, 0);
+			Vector3i const cell1 = StaggeredGrid::AdjCellOfFace(axis, face, 1);
 			double const weight = 1. - collider.GetFraction()[axis][face];
 			if (weight == 0.) {
 				m_DeltaPos[axis][face] = 0;
@@ -196,7 +196,7 @@ namespace Pivot {
 		});
 
 		tbb::parallel_for_each(particles.begin(), particles.end(), [&](Particle &particle) {
-			particle.Position += BiLerp::Interpolate(m_DeltaPos, particle.Position);
+			particle.Position += TriLerp::Interpolate(m_DeltaPos, particle.Position);
 		});
 	}
 }

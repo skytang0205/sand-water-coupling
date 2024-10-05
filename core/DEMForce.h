@@ -8,7 +8,7 @@ namespace Pivot {
         public:
         DEMForce(double radius){
             _radius = radius;
-            Young = 1e8;
+            Young = 1e10;
             Poisson = 0.3;
             contact_angle = 30. / 180. * std::numbers::pi;
             tan_fricangle = std::tan(0.5);
@@ -51,28 +51,28 @@ namespace Pivot {
         }
 
 
-        Vector2d getForce(Particle &particlei, Particle &particlej){
-            Vector2d dij = particlej.Position - particlei.Position;
-            Vector2d vij = particlej.Velocity - particlei.Velocity;
+        Vector3d getForce(Particle &particlei, Particle &particlej){
+            Vector3d dij = particlej.Position - particlei.Position;
+            Vector3d vij = particlej.Velocity - particlei.Velocity;
             //double sr = (particlei.SaturateRate + particlej.SaturateRate) * .5;
             return ComputeDemForces(dij, vij);// + ComputeDemCapillaryForces(dij, vij, sr);
         }
-        Vector2d ComputeDemForces(Vector2d & dij, Vector2d & vij){
-            Vector2d f = Vector2d::Zero();
+        Vector3d ComputeDemForces(Vector3d & dij, Vector3d & vij){
+            Vector3d f = Vector3d::Zero();
             double dist = dij.norm();
             double penetration_depth = 2 * _radius - dist;
             if (penetration_depth > 0.)
             {
-                Vector2d n = Vector2d::Zero();
+                Vector3d n = Vector3d::Zero();
                 if(dist <= 0.0001 * _radius)
-                    return Vector2d::Zero();
+                    dist = 0.0001 * _radius;
 
                 n = dij * (1 / dist);
                 double dot_epslion = vij.dot(n);
-                Vector2d vij_tangential = vij - dot_epslion * n;
+                Vector3d vij_tangential = vij - dot_epslion * n;
 
-                Vector2d normal_force = K_norm * penetration_depth * n;
-                Vector2d shear_force = -K_tang * vij_tangential;
+                Vector3d normal_force = K_norm * penetration_depth * n;
+                Vector3d shear_force = -K_tang * vij_tangential;
 
                 double max_fs = normal_force.norm() * tan_fricangle;
                 double shear_force_norm = shear_force.norm();
@@ -85,17 +85,17 @@ namespace Pivot {
             return f;
         }
 
-        // Vector2d ComputeDemCapillaryForces(Vector2d & dij, Vector2d & vij, double sr){
-        //     Vector2d f = Vector2d::Zero();
+        // Vector3d ComputeDemCapillaryForces(Vector3d & dij, Vector3d & vij, double sr){
+        //     Vector3d f = Vector3d::Zero();
         //     double dist = dij.norm();
         //     double H = dist - 2 * _radius;
         //     if (H < d_rupture && H > 0.000001)
         //     {
-        //         Vector2d n = Vector2d::Zero();
+        //         Vector3d n = Vector3d::Zero();
         //         n = dij * (1 / dist);
         //         double dot_epslion = vij.dot(n);
-        //         Vector2d vij_normal = dot_epslion * n;
-        //         Vector2d vij_tangential = vij - dot_epslion * n;
+        //         Vector3d vij_normal = dot_epslion * n;
+        //         Vector3d vij_tangential = vij - dot_epslion * n;
 
         //         // float coeff_c = csat + (1.f - sr) * (c0 - csat);
         //         double coeff_c = G.calculate(sr) * surface_tensor_cof;
@@ -112,24 +112,26 @@ namespace Pivot {
         //     return f;
         // }
 
-        Vector2d getForceSum(GridData<std::vector<Particle>> const &grid, Particle & particle){
-            Vector2d f = Vector2d::Zero();
-            Vector2i const lower = grid.GetGrid().Clamp(grid.GetGrid().CalcLower<1>(particle.Position));
+        Vector3d getForceSum(GridData<std::vector<Particle>> const &grid, Particle & particle){
+            Vector3d f = Vector3d::Zero();
+            Vector3i const lower = grid.GetGrid().Clamp(grid.GetGrid().CalcLower<1>(particle.Position));
             int range = int(_radius * grid.GetGrid().GetInvSpacing() + 2.) * 2;
-			Vector2i const size = grid.GetGrid().GetSize();
+			Vector3i const size = grid.GetGrid().GetSize();
 			for(int i = std::max(0, lower.x()-range); i < std::min(size.x(), lower.x()+range); i++){
 				for(int j = std::max(0, lower.y()-range); j < std::min(size.y(), lower.y()+range); j++){
-                    for(auto nb : grid[Vector2i(i,j)]){
-                        if((nb.Position-particle.Position).squaredNorm() < 4 * _radius * _radius)
-                            f += getForce(particle, nb);
+                    for(int k = std::max(0, lower.z()-range); k < std::min(size.z(), lower.z()+range); k++){
+                        for(auto nb : grid[Vector3i(i,j,k)]){
+                            if((nb.Position-particle.Position).squaredNorm() < 4 * _radius * _radius)
+                                f += getForce(particle, nb);
+                        }
                     }
 			    }
 			}
             return f;
         }
 
-        Vector2d getForceSum(std::vector<Particle> const &m_Particles, Particle & p0){
-            Vector2d f = Vector2d::Zero();
+        Vector3d getForceSum(std::vector<Particle> const &m_Particles, Particle & p0){
+            Vector3d f = Vector3d::Zero();
 			for (auto p1 : m_Particles) {
 				if (((p0.Position - p1.Position).squaredNorm() < 4 * _radius * _radius)) {
 					f = f + getForce(p0, p1);

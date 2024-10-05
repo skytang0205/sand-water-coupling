@@ -6,9 +6,9 @@ namespace Pivot {
 	class FiniteDiff {
 	public:
 		template <typename Type>
-		static Type CalcFirstDrv(GridData<Type> const &grData, Vector2i const &coord, int axis) {
+		static Type CalcFirstDrv(GridData<Type> const &grData, Vector3i const &coord, int axis) {
 			double const invDx = grData.GetGrid().GetInvSpacing();
-			auto const f = [&](int i)->Type { return grData[coord + Vector2i::Unit(axis) * i]; };
+			auto const f = [&](int i)->Type { return grData[coord + Vector3i::Unit(axis) * i]; };
 			if (coord[axis] == 0) {
 				return CalcFirstForward(f(0), f(+1), f(+2)) * invDx * .5;
 			} else if (coord[axis] + 1 == grData.GetGrid().GetSize()[axis]) {

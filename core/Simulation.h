@@ -65,7 +65,7 @@ namespace Pivot {
 		double m_BlendingFactor    = 0.95; // Used for FLIP
 		// Parameters for particles
 		int    m_SeedingSubFactor  = 3;
-		double m_ParticleRadFactor = 1.01 * std::numbers::sqrt2 / 2;
+		double m_ParticleRadFactor = 1.01 * std::numbers::sqrt3 / 2;
 		// Boolean configurations
 		bool m_DensityCorrectionEnabled = true;
 		bool m_SmoothSurfaceEnabled     = true;

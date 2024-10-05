@@ -15,7 +15,7 @@ namespace Pivot {
 		SGridData<double> const &GetNormal     () const { return m_Normal; }
 		GridData<double>  const &GetAuxLevelSet() const { return m_AuxLevelSet; }
 
-		bool IsInside(Vector2i const &cell) const { return m_AuxLevelSet[cell] <= 0; }
+		bool IsInside(Vector3i const &cell) const { return m_AuxLevelSet[cell] <= 0; }
 
 		void Finish(StaggeredGrid const &sgrid);
 
@@ -23,7 +23,7 @@ namespace Pivot {
 		void Enforce(std::vector<Particle> &particles) const;
 
 	private:
-		double CalcFaceFraction(int axis, Vector2i const &face) const;
+		double CalcFaceFraction(int axis, Vector3i const &face) const;
 
 	public:
 		GridData<double>  LevelSet;

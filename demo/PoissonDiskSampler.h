@@ -17,39 +17,44 @@ namespace Pivot {
             auto const [minCorner, maxCorner] = surface.GetCornersOfAABB();
             low_bound = minCorner;
             up_bound = maxCorner;
-            gridCellSize = radius / std::numbers::sqrt2;
+            gridCellSize = radius / std::numbers::sqrt3;
             grid_size    = ((up_bound - low_bound) / gridCellSize).cast<int>();
             int size     = 1;
-            for (int i = 0; i < 2; i++) size *= grid_size(i);
+            for (int i = 0; i < 3; i++) size *= grid_size(i);
             grid.resize(size, -1);
         }
 
-        Vector2d generateNewPoint(Vector2d point) {
+        Vector3d generateNewPoint(Vector3d point) {
             static std::random_device               rd;
             static std::mt19937                     gen(rd());
             static std::uniform_real_distribution<> dis(0.0, 1.0);
 
-            double     angle    = dis(gen) * 2 * std::numbers::pi;
-            double     dist     = radius + dis(gen) * radius;
-            Vector2d newPoint = { std::cos(angle), std::sin(angle) };
-            newPoint          = newPoint * dist + point;
+            double            angle1   = dis(gen) * 2 * std::numbers::pi;
+            double            angle2   = std::acos(1 - 2 * dis(gen));
+            double            dist     = radius + dis(gen) * radius;
+            Vector3d newPoint = { std::cos(angle1) * std::sin(angle2),
+                                            std::sin(angle1) * std::sin(angle2),
+                                            std::cos(angle2) };
+
+            newPoint = newPoint * dist + point;
             return newPoint;
+            
         }
 
-        std::vector<Vector2d> generatePoints(Surface const &surface) {
-            std::vector<Vector2d> samples;
-            std::vector<Vector2d> processList;
-            Vector2d              initialPoint = (up_bound + low_bound) * 0.5;
+        std::vector<Vector3d> generatePoints(Surface const &surface) {
+            std::vector<Vector3d> samples;
+            std::vector<Vector3d> processList;
+            Vector3d              initialPoint = (up_bound + low_bound) * 0.5;
             processList.push_back(initialPoint);
             addToGrid(initialPoint);
 
             while (! processList.empty()) {
                 int      idx   = rand() % processList.size();
-                Vector2d point = processList[idx];
+                Vector3d point = processList[idx];
                 bool     found = false;
 
-                for (int i = 0; i < 300; ++i) {
-                    Vector2d newPoint = generateNewPoint(point);
+                for (int i = 0; i < 3000; ++i) {
+                    Vector3d newPoint = generateNewPoint(point);
                     if (isInBounds(newPoint) && surface.Surrounds(newPoint) && isFarEnough(newPoint)) {
                         // samples.push_back(newPoint);
                         processList.push_back(newPoint);
@@ -74,41 +79,49 @@ namespace Pivot {
             return samples;
         }
 
-        bool isInBounds(const Vector2d & point) const {
-            Vector2i grid_idx = ((point - low_bound) / gridCellSize).cast<int>();
+        bool isInBounds(const Vector3d & point) const {
+            Vector3i grid_idx = ((point - low_bound) / gridCellSize).cast<int>();
             return grid_idx.x() >= 0 && grid_idx.x() < grid_size.x() && grid_idx.y() >= 0
-                && grid_idx.y() < grid_size.y();
+                    && grid_idx.y() < grid_size.y() && grid_idx.z() >= 0 && grid_idx.z() < grid_size.z();
         }
 
     private:
-        double                  radius, gridCellSize;
-        Vector2d              boundary, center, low_bound, up_bound;
-        Vector2i              grid_size;
+        double                radius, gridCellSize;
+        Vector3d              low_bound, up_bound;
+        Vector3i              grid_size;
         std::vector<int>      grid;
-        std::vector<Vector2d> gridPoints;
+        std::vector<Vector3d> gridPoints;
 
-        bool isFarEnough(const Vector2d & point) const {
-            Vector2i grid_idx = ((point - low_bound) / gridCellSize).cast<int>();
+        bool isFarEnough(const Vector3d & point) const {
+            Vector3i grid_idx = ((point - low_bound) / gridCellSize).cast<int>();
 
-            for (int y = std::max(0, grid_idx.y() - 3); y <= std::min(grid_size.y() - 1, grid_idx.y() + 3); ++y) {
-                for (int x = std::max(0, grid_idx.x() - 3); x <= std::min(grid_size.x() - 1, grid_idx.x() + 3);
-                        ++x) {
-                    int i   = y * grid_size.x() + x;
-                    int idx = grid[i];
-                    if (idx != -1) {
-                        Vector2d p = gridPoints[idx];
-                        if ((p - point).norm() < radius) { return false; }
+            // for (const auto & p : gridPoints)
+            //     if ((p - point).norm() < radius)
+            //         return false;
+            // return true;
+
+            for (int z = std::max(0, grid_idx.z() - 2); z <= std::min(grid_size.z() - 1, grid_idx.z() + 2); ++z) {
+                for (int y = std::max(0, grid_idx.y() - 2); y <= std::min(grid_size.y() - 1, grid_idx.y() + 2);
+                        ++y) {
+                    for (int x = std::max(0, grid_idx.x() - 2); x <= std::min(grid_size.x() - 1, grid_idx.x() + 2);
+                            ++x) {
+                        int idx = grid[z * grid_size.y() * grid_size.x() + y * grid_size.x() + x];
+                        if (idx != -1) {
+                            Vector3d p = gridPoints[idx];
+                            if ((p - point).norm() < radius) { return false; }
+                        }
                     }
                 }
             }
             return true;
         }
 
-        void addToGrid(const Vector2d & point) {
-            Vector2i grid_idx = ((point - low_bound) / gridCellSize).cast<int>();
-            grid[grid_idx.y() * grid_size.x() + grid_idx.x()] = gridPoints.size();
+        void addToGrid(const Vector3d & point) {
+            Vector3i grid_idx = ((point - low_bound) / gridCellSize).cast<int>();
+            grid[grid_idx.z() * grid_size.y() * grid_size.x() + grid_idx.y() * grid_size.x() + grid_idx.x()] =
+                gridPoints.size();
             gridPoints.push_back(point);
             
         }
     };
-}
+} // namespace PhysX

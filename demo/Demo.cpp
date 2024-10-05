@@ -22,14 +22,14 @@ auto ParseArgs(int argc, char **argv) {
 	try {
 		cxxopts::Options argParser("demo", "The demo of Particle-In-Cell liquid simulation");
 		argParser.add_options()
-			("n,dirname", "Directory name" , cxxopts::value<std::string>()->default_value("output"))
-			("b,begin"  , "Begin frame"    , cxxopts::value<std::uint32_t>()->default_value("0"))
-			("e,end"    , "End frame"      , cxxopts::value<std::uint32_t>())
-			("t,test"   , "Test case"      , cxxopts::value<std::string>())
-			("s,scale"  , "Size scale"     , cxxopts::value<int>()->default_value("-1"))
+			("n,dirname", "Directory name", cxxopts::value<std::string>()->default_value("output"))
+			("b,begin"  , "Begin frame"   , cxxopts::value<std::uint32_t>()->default_value("0"))
+			("e,end"    , "End frame"     , cxxopts::value<std::uint32_t>())
+			("t,test"   , "Test case"     , cxxopts::value<std::string>())
+			("s,scale"  , "Size scale"    , cxxopts::value<int>()->default_value("-1"))
 			("R,radius" , "Particle radius", cxxopts::value<double>()->default_value("-1"))
-			("r,rate"   , "Frame rate"     , cxxopts::value<double>())
-			("c,cfl"    , "Courant number" , cxxopts::value<double>()->default_value("1"))
+			("r,rate"   , "Frame rate"    , cxxopts::value<double>())
+			("c,cfl"    , "Courant number", cxxopts::value<double>()->default_value("1"))
 			("h,help"   , "Print usage");
 		auto result = argParser.parse(argc, argv);
 		if (result.count("help")) {
