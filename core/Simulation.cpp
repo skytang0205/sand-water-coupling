@@ -43,7 +43,7 @@ namespace Pivot {
 			node["Name"] = "DEMparticles";
 			node["Animated"] = true;
 			node["Primitive"] = "Points";
-			node["Material"]["Albedo"] = Vector4f(0, 0, 1, 1);
+			node["Material"]["Albedo"] = Vector4f(.5, .5, 0, 1);
 			root["Objects"].push_back(node);
 		}
 		{ // Description of collider
@@ -204,7 +204,7 @@ namespace Pivot {
 		if (m_DensityCorrectionEnabled)
 			m_Pressure.InitRestDensity(m_SeedingSubFactor * m_SeedingSubFactor, m_ColliderParticles);
 
-		m_ParticleMass = m_DEMDensity * m_SupportRadius * m_SupportRadius * std::numbers::sqrt3 / 2;
+		m_ParticleMass = m_DEMDensity * m_ParticleRadius * m_ParticleRadius * std::numbers::pi;
 		CacheNeighborHoods();
 		m_CouplingForce.SetZero();
 	}
@@ -453,6 +453,9 @@ namespace Pivot {
 		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
 			particle.Velocity += m_DEMForce.getForceSum(m_DEMGrid, particle) * ddt / m_ParticleMass;
 			particle.Velocity[1] -= 9.8 * ddt;
+			
+			// if(BiLerp::Interpolate(m_LevelSet, particle.Position) <= 0)
+			// 	particle.Velocity[1] += 9.8 * ddt / m_DEMDensity;
 			particle.Velocity += particle.CouplingForce * ddt / m_ParticleMass;
 		});
 	}

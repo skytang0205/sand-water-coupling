@@ -65,7 +65,7 @@ namespace Pivot {
 		std::vector<Particle> m_ColliderParticles;
 		std::vector<Particle> m_Particles;
 		// Parameters for the scheme
-		Scheme m_Scheme            		= Scheme::APIC;
+		Scheme m_Scheme            		= Scheme::PIC;
 		Algorithm m_CouplingAlgorithm   = Algorithm::alg0;
 		double m_BlendingFactor    		= 0.95; // Used for FLIP
 		// Parameters for particles
@@ -89,7 +89,7 @@ namespace Pivot {
 
 		std::vector<Particle> m_DEMParticles;
 
-		double m_DEMDensity = 10;
+		double m_DEMDensity = 2;
 
 		// coupling structure
 		SGridData<double>     m_CouplingForce;
