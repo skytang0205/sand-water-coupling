@@ -18,6 +18,6 @@ namespace Pivot {
 		static std::unique_ptr<Simulation> BuildBigBall(SimBuildOptions const &options);
 		static std::unique_ptr<Simulation> BuildSlope  (SimBuildOptions const &options);
 
-		static void AddParticles(Simulation *simulation, Surface const &surface, bool if_Poission = false, std::function<Vector2d(Vector2d const &)> velocity = nullptr);
+		static void AddParticles(Simulation *simulation, Surface const &surface, ParticleType type, bool if_Poission = false, std::function<Vector2d(Vector2d const &)> velocity = nullptr);
 	};
 }

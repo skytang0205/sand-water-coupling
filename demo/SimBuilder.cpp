@@ -35,7 +35,7 @@ namespace Pivot {
 		StaggeredGrid sgrid(2, length / (scale - bw * 2), Vector2i(1, 1) * scale);
 		auto sim = std::make_unique<Simulation>(sgrid, radius);
 		CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector2d::Zero(), length * .25));
-		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length), true);
+		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length), ParticleType::DEM, true);
 		return sim;
 	}
 
@@ -47,17 +47,18 @@ namespace Pivot {
 		StaggeredGrid sgrid(2, length / (scale - bw * 2), Vector2i(1, 1) * scale);
 		auto sim = std::make_unique<Simulation>(sgrid, radius);
 		//CSG::Union(sim->m_LevelSet, ImplicitSphere(Vector2d::Zero(), length * .25));
-		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length));
+		AddParticles(sim.get(), ImplicitSphere(Vector2d::Zero() * length, .25 * length), ParticleType::DEM, true);
 		CSG::Union(sim->m_Collider.LevelSet, ImplicitPlane(Vector2d(-2, -1) * length * .25, Vector2d(1, 4).normalized()));
 		return sim;
 	}
 
-	void SimBuilder::AddParticles(Simulation *simulation, Surface const &surface, bool if_Poission, std::function<Vector2d(Vector2d const &)> velocity) {
+	void SimBuilder::AddParticles(Simulation *simulation, Surface const &surface, ParticleType type, bool if_Poission, std::function<Vector2d(Vector2d const &)> velocity) {
 		VolumeSampler sampler(simulation->m_ParticleRadius * 2.);
 		auto const positions = sampler.Sample(surface, if_Poission);
 		simulation->m_DEMParticles.reserve(simulation->m_DEMParticles.size() + positions.size());
 		for (auto const &pos : positions) {
 			simulation->m_DEMParticles.push_back({
+				.Type     = type,
 				.Position = pos,
 				.Velocity = velocity ? velocity(pos) : Vector2d::Zero(),
 			});

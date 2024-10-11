@@ -188,7 +188,7 @@ namespace Pivot {
 		maxVel += std::sqrt(9.8 * m_ParticleRadius * 2);
 		
 
-		return  std::min(m_SGrid.GetSpacing() / (m_Velocity.GetMaxAbsComponent()), m_ParticleRadius * 2. / maxVel); 
+		return  m_SGrid.GetSpacing() / (m_Velocity.GetMaxAbsComponent());//std::min(, ); 
 	}
 
 	void Simulation::Initialize() {
@@ -214,11 +214,10 @@ namespace Pivot {
 		TransferFromParticlesToGrid();
 
 		ApplyBodyForces(deltaTime);
-		ApplyDEMForces(deltaTime);
 		MoveDEMParticles(deltaTime);
 
 		ProjectVelocity(deltaTime);
-		CacheNeighborHoods();
+		//CacheNeighborHoods();
 	}
 
 	void Simulation::TransferFromGridToParticles() {
@@ -313,9 +312,6 @@ namespace Pivot {
 		if (m_GravityEnabled) {
 			ParallelForEach(m_Velocity[1].GetGrid(), [&](Vector2i const &face) {
 				m_Velocity[1][face] -= 9.8 * dt;
-			});
-			tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
-				p.Velocity[1] -= 9.8 * dt;
 			});
 		}
 	}
@@ -412,6 +408,32 @@ namespace Pivot {
 	}
 
 	void Simulation::MoveDEMParticles(double dt) {
+
+		while(1){			
+			CacheNeighborHoods();
+
+			double maxVel = 0;
+			for (auto const &particle : m_DEMParticles) {
+				maxVel = std::max(maxVel, particle.Velocity.norm());
+			}
+			//printf("%lf\n",maxVel);
+			maxVel += std::sqrt(9.8 * m_ParticleRadius * 2);
+			double ddt = m_ParticleRadius * 2. / maxVel;
+
+			if(dt < ddt)
+				break;
+			else
+				dt -= ddt;
+
+			ApplyDEMForces(ddt);
+			tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
+				p.Position += p.Velocity * ddt;
+			});
+			m_Collider.Enforce(m_DEMParticles);
+		}
+
+		CacheNeighborHoods();
+		ApplyDEMForces(dt);
 		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
 			p.Position += p.Velocity * dt;
 		});
@@ -422,6 +444,10 @@ namespace Pivot {
 		// Note: Do not apply external forces to boundary particles
 		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
 				p.Velocity += m_DEMForce.getForceSum(m_DEMGrid, p) * dt / m_ParticleMass;
-			});		
+		});
+		
+		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
+			p.Velocity[1] -= 9.8 * dt;
+		});		
 	}
 }

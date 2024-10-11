@@ -13,6 +13,7 @@ namespace Pivot {
 	public:
 		enum class Scheme { PIC, FLIP, APIC };
 		enum class Scene { Falling, BigBall, Slope };
+		enum class Algorithm { 0, 1, 2, 3};
 
 	public:
 		explicit Simulation(StaggeredGrid const &sgrid, double particleRadius);
@@ -62,6 +63,7 @@ namespace Pivot {
 		std::vector<Particle> m_Particles;
 		// Parameters for the scheme
 		Scheme m_Scheme            = Scheme::APIC;
+		Algorithm m_Algorithm      = 0;
 		double m_BlendingFactor    = 0.95; // Used for FLIP
 		// Parameters for particles
 		int    m_SeedingSubFactor  = 3;
