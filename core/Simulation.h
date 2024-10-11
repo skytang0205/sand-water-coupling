@@ -13,7 +13,7 @@ namespace Pivot {
 	public:
 		enum class Scheme { PIC, FLIP, APIC };
 		enum class Scene { Falling, BigBall, Slope };
-		enum class Algorithm { 0, 1, 2, 3};
+		enum class Algorithm { none, alg0, alg1, alg2, alg3};
 
 	public:
 		explicit Simulation(StaggeredGrid const &sgrid, double particleRadius);
@@ -44,7 +44,10 @@ namespace Pivot {
 		void CacheNeighborHoods();
 
 		void MoveDEMParticles(double dt);
-		void ApplyDEMForces(double dt);
+		void MoveDEMParticlesSplit(double ddt, double dt);
+		void ApplyDEMForces(double ddt);
+		void CalCoupling(double ddt, double dt);
+		void TransferCouplingForces(double ddt, double dt);
 	
 	private:
 		// Parameters for basic simulation
@@ -62,12 +65,12 @@ namespace Pivot {
 		std::vector<Particle> m_ColliderParticles;
 		std::vector<Particle> m_Particles;
 		// Parameters for the scheme
-		Scheme m_Scheme            = Scheme::APIC;
-		Algorithm m_Algorithm      = 0;
-		double m_BlendingFactor    = 0.95; // Used for FLIP
+		Scheme m_Scheme            		= Scheme::APIC;
+		Algorithm m_CouplingAlgorithm   = Algorithm::alg0;
+		double m_BlendingFactor    		= 0.95; // Used for FLIP
 		// Parameters for particles
-		int    m_SeedingSubFactor  = 3;
-		double m_ParticleRadFactor = 1.01 * std::numbers::sqrt2 / 2;
+		int    m_SeedingSubFactor  		= 3;
+		double m_ParticleRadFactor 		= 1.01 * std::numbers::sqrt2 / 2;
 		// Boolean configurations
 		bool m_DensityCorrectionEnabled = true;
 		bool m_SmoothSurfaceEnabled     = true;
@@ -78,6 +81,7 @@ namespace Pivot {
 		double m_ParticleRadius;
 		double m_SupportRadius;
 		double m_ParticleMass;
+		double m_ParticleVolume;
 
 		DEMForce m_DEMForce;
 
@@ -85,6 +89,10 @@ namespace Pivot {
 
 		std::vector<Particle> m_DEMParticles;
 
-		double m_TargetDensity = 2700;
+		double m_DEMDensity = 10;
+
+		// coupling structure
+		SGridData<double>     m_CouplingForce;
+
 	};
 }

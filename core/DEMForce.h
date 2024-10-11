@@ -8,8 +8,8 @@ namespace Pivot {
         public:
         DEMForce(double radius){
             _radius = radius;
-            Young = 1e8;
-            Poisson = 0.3;
+            Young = 1e6;
+            Poisson = 0.1;
             contact_angle = 30. / 180. * std::numbers::pi;
             tan_fricangle = std::tan(0.5);
             K_norm = Young * radius;

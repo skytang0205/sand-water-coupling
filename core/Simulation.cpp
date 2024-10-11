@@ -20,9 +20,11 @@ namespace Pivot {
 		m_Contour(m_SGrid.GetCellGrid()),
 		m_VelDiff(m_SGrid.GetFaceGrids()),
 		m_DEMGrid(m_SGrid.GetCellGrid()),
+		m_CouplingForce(m_SGrid.GetFaceGrids()),
 		m_DEMForce(particleRadius),
 		m_ParticleRadius(particleRadius),
-		m_SupportRadius(2 * particleRadius) {
+		m_SupportRadius(2 * particleRadius),
+		m_ParticleVolume(std::numbers::pi * particleRadius * particleRadius){
 	}
 
 	void Simulation::Describe(YAML::Node &root) const {
@@ -202,19 +204,19 @@ namespace Pivot {
 		if (m_DensityCorrectionEnabled)
 			m_Pressure.InitRestDensity(m_SeedingSubFactor * m_SeedingSubFactor, m_ColliderParticles);
 
-		m_ParticleMass = m_TargetDensity * m_SupportRadius * m_SupportRadius * std::numbers::sqrt3 / 2;
+		m_ParticleMass = m_DEMDensity * m_SupportRadius * m_SupportRadius * std::numbers::sqrt3 / 2;
 		CacheNeighborHoods();
+		m_CouplingForce.SetZero();
 	}
 
 	void Simulation::Advance(double deltaTime) {
-		
-		
+
+		MoveDEMParticles(deltaTime);
 		TransferFromGridToParticles();
 		AdvectFields(deltaTime);
 		TransferFromParticlesToGrid();
 
 		ApplyBodyForces(deltaTime);
-		MoveDEMParticles(deltaTime);
 
 		ProjectVelocity(deltaTime);
 		//CacheNeighborHoods();
@@ -314,6 +316,11 @@ namespace Pivot {
 				m_Velocity[1][face] -= 9.8 * dt;
 			});
 		}
+		double dx = m_SGrid.GetSpacing();
+		ParallelForEach(m_Velocity.GetGrids(), [&](int axis, Vector2i const &face) {
+			m_Velocity[axis][face] -= m_CouplingForce[axis][face] * dt / (dx * dx);
+		});
+		m_CouplingForce.SetZero();
 	}
 
 	void Simulation::ProjectVelocity(double dt) {
@@ -409,9 +416,9 @@ namespace Pivot {
 
 	void Simulation::MoveDEMParticles(double dt) {
 
-		while(1){			
-			CacheNeighborHoods();
+		double deltaTime = dt;
 
+		while(1){
 			double maxVel = 0;
 			for (auto const &particle : m_DEMParticles) {
 				maxVel = std::max(maxVel, particle.Velocity.norm());
@@ -425,29 +432,73 @@ namespace Pivot {
 			else
 				dt -= ddt;
 
-			ApplyDEMForces(ddt);
-			tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
-				p.Position += p.Velocity * ddt;
-			});
-			m_Collider.Enforce(m_DEMParticles);
+			MoveDEMParticlesSplit(ddt, deltaTime);
 		}
+		MoveDEMParticlesSplit(dt, deltaTime);
+	}
 
+	void Simulation::MoveDEMParticlesSplit(double ddt, double dt) {
 		CacheNeighborHoods();
-		ApplyDEMForces(dt);
-		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
-			p.Position += p.Velocity * dt;
+		CalCoupling(ddt, dt);
+		ApplyDEMForces(ddt);
+		TransferCouplingForces(ddt, dt);
+		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
+			particle.Position += particle.Velocity * ddt;
 		});
 		m_Collider.Enforce(m_DEMParticles);
 	}
 
-	void Simulation::ApplyDEMForces(double dt) {
+	void Simulation::ApplyDEMForces(double ddt) {
 		// Note: Do not apply external forces to boundary particles
-		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
-				p.Velocity += m_DEMForce.getForceSum(m_DEMGrid, p) * dt / m_ParticleMass;
+		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
+			particle.Velocity += m_DEMForce.getForceSum(m_DEMGrid, particle) * ddt / m_ParticleMass;
+			particle.Velocity[1] -= 9.8 * ddt;
+			particle.Velocity += particle.CouplingForce * ddt / m_ParticleMass;
 		});
-		
-		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &p) {
-			p.Velocity[1] -= 9.8 * dt;
-		});		
+	}
+
+	void Simulation::CalCoupling(double ddt, double dt) {
+		switch(m_CouplingAlgorithm){
+		case Algorithm::none:
+			break;
+		case Algorithm::alg0:
+			tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
+				particle.CouplingForce -= (BiLerp::Interpolate(m_Pressure.GetGradPressure(), particle.Position) / dt) * m_ParticleVolume;
+			});	
+			break;
+		case Algorithm::alg1:
+			break;
+		case Algorithm::alg2:
+			break;
+		case Algorithm::alg3:
+			break;
+		}
+	}
+	void Simulation::TransferCouplingForces(double ddt, double dt){
+		SGridData<double> weightSum(m_CouplingForce.GetGrids());
+		SGridData<double> m_RestCouplingForce(m_CouplingForce.GetGrids());
+		for (auto const &particle : m_DEMParticles) {
+			for (int axis = 0; axis < 2; axis++) {
+				for (auto [face, weight] : BiLerp::GetWtPoints(m_RestCouplingForce[axis].GetGrid(), particle.Position)) {
+					face = m_RestCouplingForce[axis].GetGrid().Clamp(face);
+					m_RestCouplingForce[axis][face] += particle.CouplingForce[axis] * weight;
+					weightSum[axis][face] += weight;
+				}
+			}
+		}
+
+		ParallelForEach(m_CouplingForce.GetGrids(), [&](int axis, Vector2i const &face) {
+			if (weightSum[axis][face]) {
+				m_CouplingForce[axis][face] += m_RestCouplingForce[axis][face] * ddt / (dt * weightSum[axis][face]);
+			}
+		});
+
+		// Extrapolation::Solve(m_CouplingForce, 0., 3, [&](int axis, Vector2i const &face) {
+		// 	return weightSum[axis][face] != 0;
+		// });
+
+		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
+			particle.CouplingForce = Vector2d::Zero();
+		});
 	}
 }

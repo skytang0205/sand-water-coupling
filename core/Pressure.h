@@ -13,6 +13,8 @@ namespace Pivot {
 
 		void InitRestDensity(int numPartPerCell, std::vector<Particle> const &particles);
 
+		GridData<double>  const &GetPressure() const { return m_Pressure; }
+		SGridData<double>  const &GetGradPressure() const { return m_GradPressure; }
 	private:
 		void BuildProjectionMatrix(SGridData<double> const &velocity, GridData<double> const &levelSet, Collider const &collider);
 		void BuildCorrectionMatrix(std::vector<Particle> const &particles, Collider const &collider);
@@ -35,6 +37,8 @@ namespace Pivot {
 
 		int               m_NumPartPerCell;
 		GridData<double>  m_RestDensity;
+		GridData<double>  m_Pressure;
+		SGridData<double> m_GradPressure;
 		SGridData<double> m_DeltaPos;
 	};
 }

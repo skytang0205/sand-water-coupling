@@ -13,10 +13,13 @@ namespace Pivot {
 	Pressure::Pressure(StaggeredGrid const &sgrid) :
 		m_Grid2Mat(sgrid.GetCellGrid()),
 		m_RestDensity(sgrid.GetCellGrid()),
+		m_Pressure(sgrid.GetCellGrid()),
+		m_GradPressure(sgrid.GetFaceGrids()),
 		m_DeltaPos(sgrid.GetFaceGrids()) {
 	}
 
 	void Pressure::Project(SGridData<double> &velocity, GridData<double> const &levelSet, Collider const &collider) {
+		m_GradPressure.SetZero();
 		SetUnKnowns(levelSet);
 		if (m_Mat2Grid.empty()) return;
 		BuildProjectionMatrix(velocity, levelSet, collider);
@@ -153,10 +156,16 @@ namespace Pivot {
 
 			int const id0 = m_Grid2Mat[cell0];
 			int const id1 = m_Grid2Mat[cell1];
+
+			// double const p0 = id0 >= 0 ? m_RdP[id0] : 0;
+			// double const p1 = id1 >= 0 ? m_RdP[id1] : 0;
+			
+
 			if (id0 < 0 && id1 < 0) return;
 
 			if (id0 >= 0 && id1 >= 0) {
 				velocity[axis][face] -= (m_RdP[id1] - m_RdP[id0]) * weight;
+				m_GradPressure[axis][face] = (m_RdP[id1] - m_RdP[id0]);// * weight;
 			} else {
 				double const phi0 = levelSet[cell0];
 				double const phi1 = levelSet[cell1];
