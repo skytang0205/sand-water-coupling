@@ -16,6 +16,7 @@ namespace Pivot {
 		m_Collider(m_SGrid),
 		m_Pressure(m_SGrid),
 		m_Velocity(m_SGrid.GetFaceGrids()),
+		m_ConvectVelocity(m_SGrid.GetFaceGrids()),
 		m_LevelSet(m_SGrid.GetCellGrid(), std::numeric_limits<double>::infinity()),
 		m_Contour(m_SGrid.GetCellGrid()),
 		m_VelDiff(m_SGrid.GetFaceGrids()),
@@ -210,16 +211,18 @@ namespace Pivot {
 	}
 
 	void Simulation::Advance(double deltaTime) {
-
 		MoveDEMParticles(deltaTime);
-		TransferFromGridToParticles();
+
 		AdvectFields(deltaTime);
+
 		TransferFromParticlesToGrid();
 
 		ApplyBodyForces(deltaTime);
 
 		ProjectVelocity(deltaTime);
-		//CacheNeighborHoods();
+		
+		TransferFromGridToParticles();
+		m_LastDeltaTime = deltaTime;
 	}
 
 	void Simulation::TransferFromGridToParticles() {
@@ -290,9 +293,7 @@ namespace Pivot {
 			return weightSum[axis][face] != 0;
 		});
 
-		if (m_Scheme == Scheme::FLIP) {
-			m_VelDiff = m_Velocity;
-		}
+		m_VelDiff = m_Velocity;
 	}
 
 	void Simulation::AdvectFields(double dt) {
@@ -332,11 +333,18 @@ namespace Pivot {
 		});
 		m_Collider.Enforce(m_Velocity);
 
-		if (m_Scheme == Scheme::FLIP) {
-			ParallelForEach(m_VelDiff.GetGrids(), [&](int axis, Vector2i const &face) {
-				m_VelDiff[axis][face] = m_Velocity[axis][face] - m_VelDiff[axis][face];
-			});
-		}
+		// \partial v / \partial t
+		ParallelForEach(m_VelDiff.GetGrids(), [&](int axis, Vector2i const &face) {
+			m_VelDiff[axis][face] = m_Velocity[axis][face] - m_VelDiff[axis][face];
+		});
+
+		// (v /dot /grad) v convection diriv
+		m_ConvectVelocity.SetZero();
+		ParallelForEach(m_ConvectVelocity.GetGrids(), [&](int axis, Vector2i const &face) {
+			for (int ax = 0; ax < 2; ax++) {
+				m_ConvectVelocity[axis][face] += (m_Velocity[axis][m_Velocity[axis].GetGrid().Clamp(face + Vector2i::Unit(ax))] - m_Velocity[axis][m_Velocity[axis].GetGrid().Clamp(face - Vector2i::Unit(ax))]) *  m_Velocity[ax][face] / m_SGrid.GetSpacing() * 0.5;
+			}
+		});
 	}
 
 	void Simulation::SeedParticles() {
@@ -451,12 +459,14 @@ namespace Pivot {
 	void Simulation::ApplyDEMForces(double ddt) {
 		// Note: Do not apply external forces to boundary particles
 		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
+			particle.AccVelocity = particle.Velocity;
 			particle.Velocity += m_DEMForce.getForceSum(m_DEMGrid, particle) * ddt / m_ParticleMass;
 			particle.Velocity[1] -= 9.8 * ddt;
 			
 			// if(BiLerp::Interpolate(m_LevelSet, particle.Position) <= 0)
 			// 	particle.Velocity[1] += 9.8 * ddt / m_DEMDensity;
 			particle.Velocity += particle.CouplingForce * ddt / m_ParticleMass;
+			particle.AccVelocity = (particle.Velocity - particle.AccVelocity) / ddt;
 		});
 	}
 
@@ -466,10 +476,20 @@ namespace Pivot {
 			break;
 		case Algorithm::alg0:
 			tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
-				particle.CouplingForce -= (BiLerp::Interpolate(m_Pressure.GetGradPressure(), particle.Position) / dt) * m_ParticleVolume;
+				if(BiLerp::Interpolate(m_LevelSet, particle.Position) <= 0){
+					particle.CouplingForce -= (BiLerp::Interpolate(m_Pressure.GetGradPressure(), particle.Position) / m_LastDeltaTime) * m_ParticleVolume;
+					particle.CouplingForce += (BiLerp::Interpolate(m_VelDiff, particle.Position) / m_LastDeltaTime  + BiLerp::Interpolate(m_ConvectVelocity, particle.Position) - particle.AccVelocity) * m_ParticleVolume * 0.5;
+				}
 			});	
 			break;
 		case Algorithm::alg1:
+		tbb::parallel_for_each(m_DEMParticles.begin(), m_DEMParticles.end(), [&](Particle &particle) {
+				if(BiLerp::Interpolate(m_LevelSet, particle.Position) <= 0){
+					particle.CouplingForce -= (BiLerp::Interpolate(m_Pressure.GetGradPressure(), particle.Position) / m_LastDeltaTime) * m_ParticleVolume;
+					particle.CouplingForce += (BiLerp::Interpolate(m_VelDiff, particle.Position) / m_LastDeltaTime  + BiLerp::Interpolate(m_ConvectVelocity, particle.Position) - particle.AccVelocity) * m_ParticleVolume * 0.5;
+					particle.CouplingForce += (BiLerp::Interpolate(m_Velocity, particle.Position) - particle.Velocity) * (BiLerp::Interpolate(m_Velocity, particle.Position) - particle.Velocity).norm() * 3 * std::numbers::pi * m_ParticleRadius * m_ViscosityCoeff;
+				}
+			});	
 			break;
 		case Algorithm::alg2:
 			break;

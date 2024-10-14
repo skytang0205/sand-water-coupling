@@ -12,7 +12,7 @@ namespace Pivot {
 		ParticleType Type = ParticleType::PIC;
 		Vector2d Position;
 		Vector2d Velocity = Vector2d::Zero();
-		Vector2d PrevVelocity = Vector2d::Zero();
+		Vector2d AccVelocity = Vector2d::Zero();
 		Vector2d CouplingForce = Vector2d::Zero();
 		std::array<Vector2d, 2> VelocityDrv = { Vector2d::Zero().eval(), Vector2d::Zero().eval() }; // Used for APIC
 	};

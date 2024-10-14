@@ -165,7 +165,7 @@ namespace Pivot {
 
 			if (id0 >= 0 && id1 >= 0) {
 				velocity[axis][face] -= (m_RdP[id1] - m_RdP[id0]) * weight;
-				m_GradPressure[axis][face] = (m_RdP[id1] - m_RdP[id0]);// * weight;
+				m_GradPressure[axis][face] = (m_RdP[id1] - m_RdP[id0]) * weight;
 			} else {
 				double const phi0 = levelSet[cell0];
 				double const phi1 = levelSet[cell1];

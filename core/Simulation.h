@@ -58,6 +58,7 @@ namespace Pivot {
 		Collider              m_Collider;
 		Pressure              m_Pressure;
 		SGridData<double>     m_Velocity;
+		SGridData<double> 	  m_ConvectVelocity;
 		GridData<double>      m_LevelSet;
 		Contour               m_Contour;
 		SGridData<double>     m_VelDiff; // Used for FLIP
@@ -66,8 +67,10 @@ namespace Pivot {
 		std::vector<Particle> m_Particles;
 		// Parameters for the scheme
 		Scheme m_Scheme            		= Scheme::PIC;
-		Algorithm m_CouplingAlgorithm   = Algorithm::alg0;
+		Algorithm m_CouplingAlgorithm   = Algorithm::alg1;
 		double m_BlendingFactor    		= 0.95; // Used for FLIP
+		double m_LastDeltaTime          = 1000000; //very large
+		double m_ViscosityCoeff         = 0.0001;
 		// Parameters for particles
 		int    m_SeedingSubFactor  		= 3;
 		double m_ParticleRadFactor 		= 1.01 * std::numbers::sqrt2 / 2;
@@ -89,7 +92,7 @@ namespace Pivot {
 
 		std::vector<Particle> m_DEMParticles;
 
-		double m_DEMDensity = 2;
+		double m_DEMDensity = 1;
 
 		// coupling structure
 		SGridData<double>     m_CouplingForce;
