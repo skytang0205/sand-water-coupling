@@ -8,16 +8,17 @@ namespace Pivot {
 		explicit Pressure(StaggeredGrid const &sgrid);
 
 	public:
-		void Project(SGridData<double> &velocity, GridData<double> const &levelSet, Collider const &collider);
-		void Correct(std::vector<Particle> &particles, GridData<double> const &levelSet, Collider const &collider);
+		void Project(std::vector<Particle> const &particles, SGridData<double> &velocity, GridData<double> const &levelSet, Collider const &collider);
+		void Correct(std::vector<Particle> &particles, GridData<double> const &levelSet, Collider const &collider, GridData<double> const &fraction);
 
 		void InitRestDensity(int numPartPerCell, std::vector<Particle> const &particles);
 
 		GridData<double>  const &GetPressure() const { return m_Pressure; }
-		SGridData<double>  const &GetGradPressure() const { return m_GradPressure; }
+		SGridData<double>  const &GetGradPressure1() const { return m_GradPressure1; }
+		SGridData<double>  const &GetGradPressure2() const { return m_GradPressure2; }
 	private:
-		void BuildProjectionMatrix(SGridData<double> const &velocity, GridData<double> const &levelSet, Collider const &collider);
-		void BuildCorrectionMatrix(std::vector<Particle> const &particles, Collider const &collider);
+		void BuildProjectionMatrix(std::vector<Particle> const &particles, SGridData<double> const &velocity, GridData<double> const &levelSet, Collider const &collider);
+		void BuildCorrectionMatrix(std::vector<Particle> const &particles, Collider const &collider, GridData<double> const &fraction);
 
 		void SetUnKnowns(GridData<double> const &levelSet);
 
@@ -38,7 +39,8 @@ namespace Pivot {
 		int               m_NumPartPerCell;
 		GridData<double>  m_RestDensity;
 		GridData<double>  m_Pressure;
-		SGridData<double> m_GradPressure;
+		SGridData<double> m_GradPressure1;
+		SGridData<double> m_GradPressure2;
 		SGridData<double> m_DeltaPos;
 	};
 }

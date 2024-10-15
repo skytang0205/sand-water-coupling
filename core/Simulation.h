@@ -42,6 +42,7 @@ namespace Pivot {
 		double GetCourantTimeStep() const;
 
 		void CacheNeighborHoods();
+		void CalFraction();
 
 		void MoveDEMParticles(double dt);
 		void MoveDEMParticlesSplit(double ddt, double dt);
@@ -66,8 +67,8 @@ namespace Pivot {
 		std::vector<Particle> m_ColliderParticles;
 		std::vector<Particle> m_Particles;
 		// Parameters for the scheme
-		Scheme m_Scheme            		= Scheme::PIC;
-		Algorithm m_CouplingAlgorithm   = Algorithm::alg1;
+		Scheme m_Scheme            		= Scheme::APIC;
+		Algorithm m_CouplingAlgorithm   = Algorithm::alg2;
 		double m_BlendingFactor    		= 0.95; // Used for FLIP
 		double m_LastDeltaTime          = 1000000; //very large
 		double m_ViscosityCoeff         = 0.0001;
@@ -96,6 +97,7 @@ namespace Pivot {
 
 		// coupling structure
 		SGridData<double>     m_CouplingForce;
+		GridData<double>      m_TargetFraction;
 
 	};
 }
