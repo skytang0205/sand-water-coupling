@@ -555,11 +555,18 @@ namespace Pivot {
 
 	void Simulation::CalFraction() {
 		if(m_CouplingAlgorithm == Algorithm::alg2){
+			m_TargetFraction.SetConstant(1.);
 			CacheNeighborHoods();
 			double frac = m_ParticleVolume / m_SGrid.GetSpacing() / m_SGrid.GetSpacing();
-			ParallelForEach(m_TargetFraction.GetGrid(), [&](Vector2i const &cell){
-				m_TargetFraction[cell] = std::clamp(1 - m_DEMGrid[cell].size() * frac, 1. - 0.907, 1.);
-			});
+			// ParallelForEach(m_TargetFraction.GetGrid(), [&](Vector2i const &cell){
+			// 	m_TargetFraction[cell] = std::clamp(1 - m_DEMGrid[cell].size() * frac, 1. - 0.907, 1.);
+			// });
+			for(Particle particle : m_DEMParticles){
+				for (auto [face, weight] : BiLerp::GetWtPoints(m_TargetFraction.GetGrid(), particle.Position)) {
+					face = m_TargetFraction.GetGrid().Clamp(face);
+					m_TargetFraction[face] -= weight * frac;
+				}
+			}
 		}
 		return;
 	}

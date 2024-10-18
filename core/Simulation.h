@@ -71,13 +71,13 @@ namespace Pivot {
 		std::vector<Particle> m_ColliderParticles;
 		std::vector<Particle> m_Particles;
 		// Parameters for the scheme
-		Scheme m_Scheme            		= Scheme::PIC;
+		Scheme m_Scheme            		= Scheme::FLIP;
 		Algorithm m_CouplingAlgorithm   = Algorithm::alg2;
 		double m_BlendingFactor    		= 0.95; // Used for FLIP
 		double m_LastDeltaTime          = 1000000; //very large
 		double m_ViscosityCoeff         = 0.0001;
 		// Parameters for particles
-		int    m_SeedingSubFactor  		= 7;
+		int    m_SeedingSubFactor  		= 15;
 		int    m_NumPartPerCell;
 		double m_ParticleRadFactor 		= 1.01 * std::numbers::sqrt2 / 2;
 		// Boolean configurations
@@ -98,8 +98,8 @@ namespace Pivot {
 
 		std::vector<Particle> m_DEMParticles;
 
-		double m_DEMDensity             = 1.1;
-		double m_Young                  = 1e5;
+		double m_DEMDensity             = 2;
+		double m_Young                  = 1e6;
 		double m_Poisson                = 0.3;
 		double m_Fricangle              = 0.5;
 
