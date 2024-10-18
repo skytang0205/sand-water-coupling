@@ -20,6 +20,8 @@ namespace Pivot {
 		m_LevelSet(m_SGrid.GetCellGrid(), std::numeric_limits<double>::infinity()),
 		m_Contour(m_SGrid.GetCellGrid()),
 		m_VelDiff(m_SGrid.GetFaceGrids()),
+		m_Density(m_SGrid.GetCellGrid()),
+		m_RestDensity(m_SGrid.GetCellGrid()),
 		m_DEMGrid(m_SGrid.GetCellGrid()),
 		m_CouplingForce(m_SGrid.GetFaceGrids()),
 		m_TargetFraction(m_SGrid.GetCellGrid()),
@@ -204,27 +206,37 @@ namespace Pivot {
 		ReconstructLevelSet();
 		GenerateContour();
 
+		m_NumPartPerCell = m_SeedingSubFactor * m_SeedingSubFactor;
 		if (m_DensityCorrectionEnabled)
-			m_Pressure.InitRestDensity(m_SeedingSubFactor * m_SeedingSubFactor, m_ColliderParticles);
+			m_Pressure.InitRestDensity(m_NumPartPerCell, m_ColliderParticles, m_RestDensity);
 
 		m_ParticleMass = m_DEMDensity * m_ParticleRadius * m_ParticleRadius * std::numbers::pi;
 		m_CouplingForce.SetZero();
 		m_TargetFraction.SetConstant(1.);
+		m_DEMForce = DEMForce(m_ParticleRadius, m_Young, m_Poisson, m_Fricangle);
 		CalFraction();
 	}
 
 	void Simulation::Advance(double deltaTime) {
-		MoveDEMParticles(deltaTime);
 
+		MoveDEMParticles(deltaTime);
+		
 		AdvectFields(deltaTime);
+
+		CalDensity();
+
+		CalFraction();
+
+		ProjectDensity();
 
 		TransferFromParticlesToGrid();
 
 		ApplyBodyForces(deltaTime);
 
-		ProjectVelocity(deltaTime);
+		ProjectVelocity();
 		
 		TransferFromGridToParticles();
+		
 		m_LastDeltaTime = deltaTime;
 	}
 
@@ -303,11 +315,6 @@ namespace Pivot {
 		tbb::parallel_for_each(m_Particles.begin(), m_Particles.end(), [&](Particle &particle) {
 			particle.Position = AdvectionSL::Trace<2>(particle.Position, m_Velocity, dt);
 		});
-		
-		if (m_DensityCorrectionEnabled) {
-			ReconstructLevelSet();
-			m_Pressure.Correct(m_Particles, m_LevelSet, m_Collider, m_TargetFraction);
-		}
 
 		m_Collider.Enforce(m_Particles);
 		ReconstructLevelSet();
@@ -327,8 +334,8 @@ namespace Pivot {
 		m_CouplingForce.SetZero();
 	}
 
-	void Simulation::ProjectVelocity(double dt) {
-		m_Pressure.Project(m_Particles, m_Velocity, m_LevelSet, m_Collider);
+	void Simulation::ProjectVelocity() {
+		m_Pressure.Project(m_Velocity, m_LevelSet, m_Collider, m_TargetFraction);
 		Extrapolation::Solve(m_Velocity, 0., 6, [&](int axis, Vector2i const &face) {
 			Vector2i const cell0 = StaggeredGrid::AdjCellOfFace(axis, face, 0);
 			Vector2i const cell1 = StaggeredGrid::AdjCellOfFace(axis, face, 1);
@@ -349,6 +356,17 @@ namespace Pivot {
 			}
 		});
 	}
+
+	void Simulation::ProjectDensity() {
+		if (m_DensityCorrectionEnabled) {
+			ReconstructLevelSet();
+			m_Pressure.Correct(m_Particles, m_LevelSet, m_Collider, m_TargetFraction, m_Density);
+			m_Collider.Enforce(m_Particles);
+			ReconstructLevelSet();
+			GenerateContour();
+		}
+	}
+
 
 	void Simulation::SeedParticles() {
 		Extrapolation::Solve(m_LevelSet, 1.5 * m_SGrid.GetSpacing(), 1, [&](Vector2i const &cell) {
@@ -417,7 +435,7 @@ namespace Pivot {
 		//printf("breakpoint 1\n");
 		for(Particle p : m_DEMParticles){
 			//printf("breakpoint 3\n");
-			Vector2i lower = m_DEMGrid.GetGrid().Clamp(m_DEMGrid.GetGrid().CalcLower<1>(p.Position));
+			Vector2i lower = m_DEMGrid.GetGrid().Clamp(m_DEMGrid.GetGrid().CalcLower<1>(p.Position + Vector2d::Ones() * m_SGrid.GetSpacing() * 0.5));
 			//printf("breakpoint 4\n");
 			//std::lock_guard<std::mutex> lock(m_mutex);
 			m_DEMGrid[lower].push_back(p);
@@ -436,7 +454,7 @@ namespace Pivot {
 			}
 			//printf("%lf\n",maxVel);
 			maxVel += std::sqrt(9.8 * m_ParticleRadius * 2);
-			double ddt = m_ParticleRadius * 2. / maxVel;
+			double ddt = std::min(m_ParticleRadius * 2. / maxVel,  m_ParticleRadius * std::numbers::pi * std::sqrt(m_DEMDensity / m_Young));
 
 			if(dt < ddt)
 				break;
@@ -446,7 +464,6 @@ namespace Pivot {
 			MoveDEMParticlesSplit(ddt, deltaTime);
 		}
 		MoveDEMParticlesSplit(dt, deltaTime);
-		CalFraction();
 	}
 
 	void Simulation::MoveDEMParticlesSplit(double ddt, double dt) {
@@ -546,4 +563,15 @@ namespace Pivot {
 		}
 		return;
 	}
+
+	void Simulation::CalDensity() {
+		m_Density = m_RestDensity;
+		for (auto const &particle : m_Particles) {
+			for (auto const [cell, weight] : BiLerp::GetWtPoints(m_Density.GetGrid(), particle.Position)) {
+				m_Density[m_Density.GetGrid().Clamp(cell)] += weight / m_NumPartPerCell;
+			}
+		}
+	}
+
+
 }

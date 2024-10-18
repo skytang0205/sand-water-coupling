@@ -12,47 +12,40 @@
 namespace Pivot {
 	Pressure::Pressure(StaggeredGrid const &sgrid) :
 		m_Grid2Mat(sgrid.GetCellGrid()),
-		m_RestDensity(sgrid.GetCellGrid()),
 		m_Pressure(sgrid.GetCellGrid()),
 		m_GradPressure1(sgrid.GetFaceGrids()),
 		m_GradPressure2(sgrid.GetFaceGrids()),
 		m_DeltaPos(sgrid.GetFaceGrids()) {
 	}
 
-	void Pressure::Project(std::vector<Particle> const &particles, SGridData<double> &velocity, GridData<double> const &levelSet, Collider const &collider) {
+	void Pressure::Project(SGridData<double> &velocity, GridData<double> const &levelSet, Collider const &collider, GridData<double> const &fraction) {
 		m_GradPressure1.SetZero();
 		SetUnKnowns(levelSet);
 		if (m_Mat2Grid.empty()) return;
-		BuildProjectionMatrix(particles, velocity, levelSet, collider);
+		BuildProjectionMatrix(velocity, levelSet, collider, fraction);
 		SolveLinearSystem();
 		ApplyProjection(velocity, levelSet, collider);
 	}
 
-	void Pressure::Correct(std::vector<Particle> &particles, GridData<double> const &levelSet, Collider const &collider, GridData<double> const &fraction) {
+	void Pressure::Correct(std::vector<Particle> &particles, GridData<double> const &levelSet, Collider const &collider, GridData<double> const &fraction, GridData<double> const &density) {
 		m_GradPressure2.SetZero();
 		SetUnKnowns(levelSet);
 		if (m_Mat2Grid.empty()) return;
-		BuildCorrectionMatrix(particles, collider, fraction);
+		BuildCorrectionMatrix(density, collider, fraction);
 		SolveLinearSystem();
 		ApplyCorrection(particles, collider);
 	}
 
-	void Pressure::InitRestDensity(int numPartPerCell, std::vector<Particle> const &particles) {
+	void Pressure::InitRestDensity(int numPartPerCell, std::vector<Particle> const &particles, GridData<double> &density) {
 		m_NumPartPerCell = numPartPerCell;
-		for (auto const &particle : particles) {
-			for (auto const [cell, weight] : BiLerp::GetWtPoints(m_RestDensity.GetGrid(), particle.Position)) {
-				m_RestDensity[m_RestDensity.GetGrid().Clamp(cell)] += weight / m_NumPartPerCell;
-			}
-		}
-	}
-
-	void Pressure::BuildProjectionMatrix(std::vector<Particle> const &particles, SGridData<double> const &velocity, GridData<double> const &levelSet, Collider const &collider) {
-		auto density = m_RestDensity;
 		for (auto const &particle : particles) {
 			for (auto const [cell, weight] : BiLerp::GetWtPoints(density.GetGrid(), particle.Position)) {
 				density[density.GetGrid().Clamp(cell)] += weight / m_NumPartPerCell;
 			}
 		}
+	}
+
+	void Pressure::BuildProjectionMatrix(SGridData<double> const &velocity, GridData<double> const &levelSet, Collider const &collider, GridData<double> const &fraction) {
 		std::vector<Triplet<double>> elements;
 
 		for (int r = 0; r < m_RdP.size(); r++) {
@@ -75,7 +68,7 @@ namespace Pivot {
 						double const intfCoef = 1. / std::max(theta, .001);
 						diagCoeff += weight * intfCoef;
 					}
-					div -= side * weight * velocity[axis][face];// * (1 + density[nbCell] / density[cell]) * 0.5;
+					div -= side * weight * velocity[axis][face] * (1 + fraction[nbCell] / fraction[cell]) * 0.5;
 				}
 				if (weight < 1) {
 					div -= side * (1 - weight) * collider.Velocity[axis][face];
@@ -88,17 +81,11 @@ namespace Pivot {
 		m_MatL.setFromTriplets(elements.begin(), elements.end());
 	}
 
-	void Pressure::BuildCorrectionMatrix(std::vector<Particle> const &particles, Collider const &collider, GridData<double> const &fraction) {
-		auto density = m_RestDensity;
-		for (auto const &particle : particles) {
-			for (auto const [cell, weight] : BiLerp::GetWtPoints(density.GetGrid(), particle.Position)) {
-				density[density.GetGrid().Clamp(cell)] += weight / m_NumPartPerCell;
-			}
-		}
+	void Pressure::BuildCorrectionMatrix(GridData<double> const &density, Collider const &collider, GridData<double> const &fraction) {
 		std::vector<Triplet<double>> elements;
 
 		for (int r = 0; r < m_RdP.size(); r++) {
-			Vector2i const cell = m_RestDensity.GetGrid().CoordOf(m_Mat2Grid[r]);
+			Vector2i const cell = density.GetGrid().CoordOf(m_Mat2Grid[r]);
 			double diagCoeff = 0;
 			bool isBoundary = false;
 			for (int i = 0; i < Grid::GetNumNeighbors(); i++) {
@@ -209,8 +196,8 @@ namespace Pivot {
 			double const p0 = id0 >= 0 ? m_RdP[id0] : 0;
 			double const p1 = id1 >= 0 ? m_RdP[id1] : 0;
 
-			m_DeltaPos[axis][face] = (p1 - p0) * weight * m_RestDensity.GetGrid().GetSpacing();
-			m_GradPressure2[axis][face] = (p1 - p0) * weight * m_RestDensity.GetGrid().GetSpacing();
+			m_DeltaPos[axis][face] = (p1 - p0) * weight * m_Pressure.GetGrid().GetSpacing();
+			m_GradPressure2[axis][face] = (p1 - p0) * weight * m_Pressure.GetGrid().GetSpacing();
 		});
 
 		tbb::parallel_for_each(particles.begin(), particles.end(), [&](Particle &particle) {

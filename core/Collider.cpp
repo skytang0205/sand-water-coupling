@@ -3,6 +3,7 @@
 #include "BiLerp.h"
 #include "FiniteDiff.h"
 #include "Redistancing.h"
+#include "Particle.h"
 
 namespace Pivot {
 	Collider::Collider(StaggeredGrid const &sgrid) :
@@ -79,12 +80,25 @@ namespace Pivot {
 	}
 
 	void Collider::Enforce(std::vector<Particle> &particles) const {
-		tbb::parallel_for_each(particles.begin(), particles.end(), [&](Particle &particle) {
-			double const phi = BiLerp::Interpolate(LevelSet, particle.Position);
-			if (phi < 0) {
-				Vector2d const n = BiLerp::Interpolate(m_Normal, particle.Position).normalized();
-				particle.Position -= n * phi;
-			}
-		});
+		if(particles[0].Type == ParticleType::PIC){
+			tbb::parallel_for_each(particles.begin(), particles.end(), [&](Particle &particle) {
+				double const phi = BiLerp::Interpolate(LevelSet, particle.Position);
+				if (phi < 0) {
+					Vector2d const n = BiLerp::Interpolate(m_Normal, particle.Position).normalized();
+					particle.Position -= n * phi;
+				}
+			});
+		}
+		else{
+			tbb::parallel_for_each(particles.begin(), particles.end(), [&](Particle &particle) {
+				double const phi = BiLerp::Interpolate(LevelSet, particle.Position);
+				if (phi < 0) {
+					Vector2d const n = BiLerp::Interpolate(m_Normal, particle.Position).normalized();
+					particle.Position -= n * phi;
+					particle.Velocity -= 2 * (particle.Velocity- BiLerp::Interpolate(Velocity, particle.Position)).dot(n) * n;// - BiLerp::Interpolate(Velocity, particle.Position)
+				}
+			});
+		}
+		
 	}
 }

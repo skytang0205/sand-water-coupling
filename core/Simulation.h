@@ -30,7 +30,8 @@ namespace Pivot {
 		void TransferFromParticlesToGrid();
 		void AdvectFields(double dt);
 		void ApplyBodyForces(double dt);
-		void ProjectVelocity(double dt);
+		void ProjectVelocity();
+		void ProjectDensity();
 
 		void SeedParticles();
 		void ReconstructLevelSet();
@@ -43,6 +44,7 @@ namespace Pivot {
 
 		void CacheNeighborHoods();
 		void CalFraction();
+		void CalDensity();
 
 		void MoveDEMParticles(double dt);
 		void MoveDEMParticlesSplit(double ddt, double dt);
@@ -63,17 +65,20 @@ namespace Pivot {
 		GridData<double>      m_LevelSet;
 		Contour               m_Contour;
 		SGridData<double>     m_VelDiff; // Used for FLIP
+		GridData<double>      m_RestDensity;
+		GridData<double>      m_Density;
 		// Particle-based data structures
 		std::vector<Particle> m_ColliderParticles;
 		std::vector<Particle> m_Particles;
 		// Parameters for the scheme
-		Scheme m_Scheme            		= Scheme::APIC;
+		Scheme m_Scheme            		= Scheme::PIC;
 		Algorithm m_CouplingAlgorithm   = Algorithm::alg2;
 		double m_BlendingFactor    		= 0.95; // Used for FLIP
 		double m_LastDeltaTime          = 1000000; //very large
 		double m_ViscosityCoeff         = 0.0001;
 		// Parameters for particles
-		int    m_SeedingSubFactor  		= 3;
+		int    m_SeedingSubFactor  		= 7;
+		int    m_NumPartPerCell;
 		double m_ParticleRadFactor 		= 1.01 * std::numbers::sqrt2 / 2;
 		// Boolean configurations
 		bool m_DensityCorrectionEnabled = true;
@@ -93,7 +98,10 @@ namespace Pivot {
 
 		std::vector<Particle> m_DEMParticles;
 
-		double m_DEMDensity = 1;
+		double m_DEMDensity             = 1.1;
+		double m_Young                  = 1e5;
+		double m_Poisson                = 0.3;
+		double m_Fricangle              = 0.5;
 
 		// coupling structure
 		SGridData<double>     m_CouplingForce;

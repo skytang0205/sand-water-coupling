@@ -6,22 +6,24 @@
 namespace Pivot {
     class DEMForce{
         public:
-        DEMForce(double radius){
+        DEMForce(double radius, double young = 1e5, double poisson = 0.3, double fricangle = 0.5){
             _radius = radius;
-            Young = 1e6;
-            Poisson = 0.1;
-            contact_angle = 30. / 180. * std::numbers::pi;
-            tan_fricangle = std::tan(0.5);
+            Young = young;
+            Poisson = poisson;
+            tan_fricangle = std::tan(fricangle);
+            // Poisson = 0.1;
             K_norm = Young * radius;
             K_tang = K_norm * Poisson;
-            volume_liquid_bridge = 4. / 3. * std::numbers::pi * std::pow(radius, 3.) * 0.01 * 0.01;
-            d_rupture = (1.f + 0.5f * contact_angle) * (std::pow(volume_liquid_bridge, 1. / 3.) + 0.1 * std::pow(volume_liquid_bridge, 2. / 3.));
-            c0 = 0.8;
-            cmc = 1.;
-            cmcp = 0.1;
-            csat = 0.1;
+            //contact_angle = 30. / 180. * std::numbers::pi;
+            
+            // volume_liquid_bridge = 4. / 3. * std::numbers::pi * std::pow(radius, 3.) * 0.01 * 0.01;
+            // d_rupture = (1.f + 0.5f * contact_angle) * (std::pow(volume_liquid_bridge, 1. / 3.) + 0.1 * std::pow(volume_liquid_bridge, 2. / 3.));
+            // c0 = 0.8;
+            // cmc = 1.;
+            // cmcp = 0.1;
+            // csat = 0.1;
             //G = QuadraticBezierCoeff(c0, cmc, cmcp, csat);
-            surface_tensor_cof = 1.0;
+            //surface_tensor_cof = 1.0;
             //printf("drupture: %lf\n", d_rupture/radius);
         }
 
@@ -141,8 +143,8 @@ namespace Pivot {
         private:
         double _radius;
         double Young, Poisson, K_norm, K_tang, tan_fricangle;
-        double contact_angle, volume_liquid_bridge, d_rupture;
-        double c0, cmc, cmcp, csat, sr, surface_tensor_cof;
+        // double contact_angle, volume_liquid_bridge, d_rupture;
+        // double c0, cmc, cmcp, csat, sr, surface_tensor_cof;
         //QuadraticBezierCoeff G;
     };
 }
